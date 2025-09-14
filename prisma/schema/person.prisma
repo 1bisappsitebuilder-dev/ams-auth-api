@@ -82,7 +82,7 @@ type Metadata {
   createdBy   String?   @db.ObjectId // Should reference a User id
   updatedBy   String?   @db.ObjectId // Should reference a User id
   lastLoginAt DateTime?
-  isDeleted   Boolean   @default(false) // Moved from root
+  deletedAt    DateTime?
 }
 
 model Person {

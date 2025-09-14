@@ -2,8 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient, Prisma } from "../../generated/prisma";
 import { getLogger } from "../../helper/logger";
 import { config } from "../../config/constant";
-import { handleQueryValidation, executeFormattedQuery } from "../../utils/queryUtils";
-import { buildAdvancedWhereClause, getSearchFields } from "../../utils/advancedFilterUtils";
 import {
 	sendSuccessResponse,
 	sendValidationError,
@@ -43,7 +41,7 @@ export const controller = (prisma: PrismaClient) => {
 					id,
 					metadata: {
 						is: {
-							isDeleted: false,
+							deletedAt: null,
 						},
 					},
 				},
@@ -57,7 +55,6 @@ export const controller = (prisma: PrismaClient) => {
 						if (parts.length > 1) {
 							const [parent, ...children] = parts;
 							acc[parent] = acc[parent] || { select: {} };
-
 							let current = acc[parent].select;
 							for (let i = 0; i < children.length - 1; i++) {
 								current[children[i]] = current[children[i]] || { select: {} };
@@ -88,7 +85,7 @@ export const controller = (prisma: PrismaClient) => {
 				);
 			}
 
-			// ✅ Log activity
+			// Log activity
 			logActivity(req, {
 				userId: (req as any).user?.id || "unknown",
 				action: "GET_PERSON",
@@ -116,87 +113,159 @@ export const controller = (prisma: PrismaClient) => {
 	};
 
 	const getAll = async (req: Request, res: Response, _next: NextFunction) => {
-		const parsedParams = handleQueryValidation(req, res, personLogger);
-		if (!parsedParams) return;
+		const { page = 1, limit = 10, sort, fields, query, order = "desc" } = req.query;
 
-		const {
-			page,
-			limit,
-			skip,
-			sort,
-			fields,
-			query,
-			filter,
-			order,
-			documents,
-			pagination,
-			count,
-		} = parsedParams;
+		// Validate page
+		if (isNaN(Number(page)) || Number(page) < 1) {
+			personLogger.error(`${config.ERROR.PERSON.INVALID_PAGE}: ${page}`);
+			res.status(400).json({ error: config.ERROR.PERSON.INVALID_PAGE });
+			return;
+		}
+
+		// Validate limit
+		if (isNaN(Number(limit)) || Number(limit) < 1) {
+			personLogger.error(`${config.ERROR.PERSON.INVALID_LIMIT}: ${limit}`);
+			res.status(400).json({ error: config.ERROR.PERSON.INVALID_LIMIT });
+			return;
+		}
+
+		// Validate order
+		if (order && !["asc", "desc"].includes(order as string)) {
+			personLogger.error(`${config.ERROR.PERSON.INVALID_ORDER}: ${order}`);
+			res.status(400).json({ error: config.ERROR.PERSON.ORDER_MUST_BE_ASC_OR_DESC });
+			return;
+		}
+
+		// Validate fields
+		if (fields && typeof fields !== "string") {
+			personLogger.error(`${config.ERROR.PERSON.INVALID_POPULATE}: ${fields}`);
+			res.status(400).json({ error: config.ERROR.PERSON.POPULATE_MUST_BE_STRING });
+			return;
+		}
+
+		// Validate sort
+		if (sort) {
+			if (typeof sort === "string" && sort.startsWith("{")) {
+				try {
+					JSON.parse(sort);
+				} catch (error) {
+					personLogger.error(`${config.ERROR.PERSON.INVALID_SORT}: ${sort}`);
+					res.status(400).json({
+						error: config.ERROR.PERSON.SORT_MUST_BE_STRING,
+					});
+					return;
+				}
+			}
+		}
+
+		const skip = (Number(page) - 1) * Number(limit);
 
 		personLogger.info(
-			`${config.SUCCESS.PERSON.GETTING_ALL_USERS}, page: ${page}, limit: ${limit}, query: ${query}, filter: ${JSON.stringify(filter)}, order: ${order}, format: ${documents ? "documents" : pagination ? "pagination" : count ? "count" : "no-data"}`,
+			`${config.SUCCESS.PERSON.GETTING_ALL_USERS}, page: ${page}, limit: ${limit}, query: ${query}, order: ${order}`,
 		);
 
 		try {
-			// Build base conditions
-			const baseConditions: Prisma.PersonWhereInput = {
+			const whereClause: Prisma.PersonWhereInput = {
 				metadata: {
 					is: {
-						isDeleted: false,
+						deletedAt: null,
 					},
 				},
+				...(query
+					? {
+							personalInfo: {
+								is: {
+									OR: [
+										{
+											firstName: {
+												contains: String(query),
+												mode: "insensitive",
+											},
+										},
+										{
+											lastName: {
+												contains: String(query),
+												mode: "insensitive",
+											},
+										},
+										{
+											middleName: {
+												contains: String(query),
+												mode: "insensitive",
+											},
+										},
+									],
+								},
+							},
+						}
+					: {}),
 			};
 
-			// Get search fields for person and its relations
-			const searchFields = getSearchFields("person", ["users"]);
-
-			// Build where clause using advanced filtering
-			const whereClause = buildAdvancedWhereClause(
-				baseConditions,
-				"person",
-				query,
-				searchFields,
-				filter,
-			);
-
-			// Define include options for person data
-			const includeOptions = {
-				users: true,
+			const findManyQuery: Prisma.PersonFindManyArgs = {
+				where: whereClause,
+				skip,
+				take: Number(limit),
+				orderBy: sort
+					? typeof sort === "string" && !sort.startsWith("{")
+						? { [sort as string]: order }
+						: JSON.parse(sort as string)
+					: { id: order as Prisma.SortOrder },
 			};
 
-			const response = await executeFormattedQuery(
-				prisma,
-				"person",
-				whereClause,
-				parsedParams,
-				"person",
-				"person",
-				includeOptions,
-			);
+			if (fields) {
+				const fieldSelections = fields.split(",").reduce(
+					(acc, field) => {
+						const parts = field.trim().split(".");
+						if (parts.length > 1) {
+							const [parent, ...children] = parts;
+							acc[parent] = acc[parent] || { select: {} };
+							let current = acc[parent].select;
+							for (let i = 0; i < children.length - 1; i++) {
+								current[children[i]] = current[children[i]] || { select: {} };
+								current = current[children[i]].select;
+							}
+							current[children[children.length - 1]] = true;
+						} else {
+							acc[parts[0]] = true;
+						}
+						return acc;
+					},
+					{ id: true } as Record<string, any>,
+				);
 
-			// ✅ Log activity
+				findManyQuery.select = fieldSelections;
+			}
+
+			const [person, total] = await Promise.all([
+				prisma.person.findMany(findManyQuery),
+				prisma.person.count({ where: whereClause }),
+			]);
+
+			// Log activity
 			logActivity(req, {
 				userId: (req as any).user?.id || "unknown",
 				action: "GET_ALL_PERSONS",
-				description: `Retrieved ${response.data?.length || response.length || 0} person records`,
+				description: `Retrieved ${person.length} person records`,
 				page: { url: req.originalUrl, title: "Get All Persons" },
 			});
 
-			personLogger.info(`Retrieved person records successfully`);
+			personLogger.info(`Retrieved ${person.length} person`);
 			res.status(200).json({
 				status: "success",
 				message: config.SUCCESS.PERSON.GETTING_ALL_USERS,
-				data: response.data || response,
+				data: {
+					person,
+					total,
+					page: Number(page),
+					totalPages: Math.ceil(total / Number(limit)),
+				},
 			});
 		} catch (error: any) {
-			if (error.name?.includes("Prisma") || error.code?.startsWith("P")) {
-				return sendPrismaErrorResponse(res, error, personLogger);
-			}
-
 			personLogger.error(`${config.ERROR.PERSON.ERROR_GETTING_USER}: ${error}`);
-			return sendValidationError(res, config.COMMON.INTERNAL_SERVER_ERROR, [
-				{ field: "Error", message: config.COMMON.INTERNAL_SERVER_ERROR },
-			]);
+			res.status(500).json({
+				status: "error",
+				error: config.ERROR.PERSON.INTERNAL_SERVER_ERROR,
+			});
 		}
 	};
 
@@ -222,7 +291,7 @@ export const controller = (prisma: PrismaClient) => {
 					},
 					metadata: {
 						is: {
-							isDeleted: false,
+							deletedAt: null, // Fixed: Changed isDeleted to deletedAt
 						},
 					},
 				},
@@ -235,7 +304,7 @@ export const controller = (prisma: PrismaClient) => {
 						street: incomingAddress.street || "",
 						address2: incomingAddress.address2 || "",
 						city: incomingAddress.city || "",
-						state: incomingAddress.province || incomingAddress.state || "",
+						state: incomingAddress.state || "", // Fixed: Removed province
 						country: incomingAddress.country || "",
 						postalCode: incomingAddress.postalCode || "",
 						zipCode: incomingAddress.zipCode?.toString() || "",
@@ -269,8 +338,8 @@ export const controller = (prisma: PrismaClient) => {
 					identification: {
 						set: {
 							...identification,
-							...(identification?.issueDate && {
-								issueDate: new Date(identification.issueDate),
+							...(identification?.issuingCountry && {
+								issuingCountry: identification.issuingCountry, // Fixed: Changed issueDate to issuingCountry
 							}),
 							...(identification?.expiryDate && {
 								expiryDate: new Date(identification.expiryDate),
@@ -290,7 +359,7 @@ export const controller = (prisma: PrismaClient) => {
 					data: dataForPerson,
 				});
 
-				// ✅ Log activity for update
+				// Log activity for update
 				logActivity(req, {
 					userId: (req as any).user?.id || "unknown",
 					action: "UPDATE_PERSON",
@@ -299,7 +368,7 @@ export const controller = (prisma: PrismaClient) => {
 					page: { url: req.originalUrl, title: "Person Update" },
 				});
 
-				// ✅ Log audit for update
+				// Log audit for update
 				logAudit(req, {
 					userId: (req as any).user?.id || "unknown",
 					action: "UPDATE",
@@ -332,8 +401,10 @@ export const controller = (prisma: PrismaClient) => {
 			const personDataToCreate: Prisma.PersonCreateInput = {
 				...dataForPerson,
 				metadata: {
-					isDeleted: false,
-					isActive: true,
+					set: {
+						isActive: true,
+						deletedAt: null, // Fixed: Changed isDeleted to deletedAt
+					},
 				},
 			};
 
@@ -341,7 +412,7 @@ export const controller = (prisma: PrismaClient) => {
 				data: personDataToCreate,
 			});
 
-			// ✅ Log activity for creation
+			// Log activity for creation
 			logActivity(req, {
 				userId: (req as any).user?.id || "unknown",
 				action: "CREATE_PERSON",
@@ -350,7 +421,7 @@ export const controller = (prisma: PrismaClient) => {
 				page: { url: req.originalUrl, title: "Person Creation" },
 			});
 
-			// ✅ Log audit for creation
+			// Log audit for creation
 			logAudit(req, {
 				userId: (req as any).user?.id || "unknown",
 				action: "CREATE",
@@ -445,8 +516,8 @@ export const controller = (prisma: PrismaClient) => {
 			if (identification) {
 				updateData.identification = {
 					...identification,
-					...(identification.issueDate && {
-						issueDate: new Date(identification.issueDate),
+					...(identification.issuingCountry && {
+						issuingCountry: identification.issuingCountry, // Fixed: Changed issueDate to issuingCountry
 					}),
 					...(identification.expiryDate && {
 						expiryDate: new Date(identification.expiryDate),
@@ -459,7 +530,7 @@ export const controller = (prisma: PrismaClient) => {
 				data: updateData,
 			});
 
-			// ✅ Log activity
+			// Log activity
 			logActivity(req, {
 				userId: (req as any).user?.id || "unknown",
 				action: "UPDATE_PERSON",
@@ -468,7 +539,7 @@ export const controller = (prisma: PrismaClient) => {
 				page: { url: req.originalUrl, title: "Person Update" },
 			});
 
-			// ✅ Log audit for update
+			// Log audit for update
 			logAudit(req, {
 				userId: (req as any).user?.id || "unknown",
 				action: "UPDATE",
@@ -540,12 +611,15 @@ export const controller = (prisma: PrismaClient) => {
 				where: { id },
 				data: {
 					metadata: {
-						isDeleted: true,
+						set: {
+							...existingUser.metadata,
+							deletedAt: new Date(),
+						},
 					},
 				},
 			});
 
-			// ✅ Log activity
+			// Log activity
 			logActivity(req, {
 				userId: (req as any).user?.id || "unknown",
 				action: "DELETE_PERSON",
@@ -554,7 +628,7 @@ export const controller = (prisma: PrismaClient) => {
 				page: { url: req.originalUrl, title: "Person Deletion" },
 			});
 
-			// ✅ Log audit for deletion
+			// Log audit for deletion
 			logAudit(req, {
 				userId: (req as any).user?.id || "unknown",
 				action: "DELETE",
@@ -571,7 +645,8 @@ export const controller = (prisma: PrismaClient) => {
 				},
 				changesAfter: {
 					metadata: {
-						isDeleted: true,
+						...existingUser.metadata,
+						deletedAt: new Date(),
 					},
 				},
 				description: `Soft deleted person with ID: ${id}`,
