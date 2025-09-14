@@ -1,4 +1,12 @@
 // securityScheme.prisma
+enum resource {
+  organization
+  user
+  role
+  app
+  module
+}
+
 enum Action {
   create
   read
@@ -7,20 +15,20 @@ enum Action {
 }
 
 type RolePermission {
-  resource String
+  resource resource
   actions  Action[]
 }
 
 type RoleDefinition {
   roleName    String
-  permissions RolePermission[] // embedded permissions
+  permissions RolePermission[] 
 }
 
 model SecurityScheme {
   id          String           @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
-  roles       RoleDefinition[] // embedded definitions
+  roles       RoleDefinition[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 

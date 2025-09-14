@@ -3,6 +3,7 @@
 	"version": "1.0.0",
 	"main": "index.js",
 	"scripts": {
+		"playground": "npx ts-node playground.ts",
 		"dev": "dotenv nodemon index.ts",
 		"start": "dotenv nodemon index.ts",
 		"lint": "eslint app/**/*.ts index.ts",

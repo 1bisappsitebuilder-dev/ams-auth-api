@@ -26,7 +26,7 @@ type PurchasedModule {
     isActive         Boolean   @default(true)
 }
 
-type PurchesedApp {
+type PurchasedApp {
     appId            String? // Reference to the original app if needed
     modules          PurchasedModule[]
     purchaseDate     DateTime          @default(now())
@@ -37,11 +37,11 @@ type PurchesedApp {
 
 model Organization {
     id               String         @id @default(auto()) @map("_id") @db.ObjectId
-    securitySchemeId String         @db.ObjectId
+    securitySchemeId String?         @db.ObjectId
     name             String
-    apps             PurchesedApp[]
-    description      String
     code             String
+    apps             PurchasedApp[]
+    description      String?
     branding         Branding?
     deleteAt         DateTime?
     createdAt        DateTime       @default(now())
@@ -49,5 +49,5 @@ model Organization {
 
     //relations
     users          User[]
-    securityScheme SecurityScheme @relation(fields: [securitySchemeId], references: [id])
+    securityScheme SecurityScheme? @relation(fields: [securitySchemeId], references: [id])
 }
