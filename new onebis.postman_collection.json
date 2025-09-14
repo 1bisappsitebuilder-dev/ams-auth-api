@@ -1,0 +1,5091 @@
+{
+	"info": {
+		"_postman_id": "8736764c-bb17-4656-b556-8b1e6dae27ff",
+		"name": "new onebis",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40327153",
+		"_collection_link": "https://bis-devs.postman.co/workspace/1bis-devs~de6c05ca-a0d4-4b5f-8b46-50f79f2dbf3b/collection/40327153-8736764c-bb17-4656-b556-8b1e6dae27ff?action=share&source=collection_link&creator=40327153"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Auth Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"userName\": \"onebis\",\r\n  \"subRole\": \"staff\",\r\n  \"email\":\"onebis-superadmin@domain.com\",\r\n  \"password\": \"Test123!\",\r\n  \"firstName\": \"onebis\",\r\n  \"lastName\": \"superadmin\",\r\n  \"role\":\"superadmin\",\r\n//   \"organizationId\": \"68412c97c0c093fb4f0b0a11\",\r\n  \"personalInfo\": {\r\n    \"dateOfBirth\": \"1990-01-01T00:00:00.000Z\",\r\n    \"placeOfBirth\": \"City, Country\",\r\n    \"age\": 34,\r\n    \"nationality\": \"Filipino\",\r\n    \"primaryLanguage\": \"Bisaya\",\r\n    \"gender\": \"male\"\r\n  },\r\n  \"contactInfo\": {\r\n    \"email\": \"Bryan@gmail.com\",\r\n    \"phones\": [\r\n      {\r\n        \"type\": \"mobile\",\r\n        \"countryCode\": \"+1\",\r\n        \"number\": \"5551234567\",\r\n        \"isPrimary\": true\r\n      },\r\n      {\r\n        \"type\": \"home\",\r\n        \"countryCode\": \"+1\",\r\n        \"number\": \"5557654321\",\r\n        \"isPrimary\": false\r\n      }\r\n    ],\r\n    \"address\": {\r\n      \"street\": \"123 Main St\",\r\n      \"city\": \"Anytown\",\r\n      \"state\": \"CA\",\r\n      \"country\": \"USA\",\r\n      \"postalCode\": \"90210\",\r\n      \"zipCode\": \"90210\",\r\n      \"houseNumber\": \"123\"\r\n    }\r\n  },\r\n  \"identification\": {\r\n    \"type\": \"drivers_license\",\r\n    \"number\": \"D1234567\",\r\n    \"issuingCountry\": \"USA\",\r\n    \"expiryDate\": \"2030-12-31T00:00:00.000Z\"\r\n  }\r\n}\r\n\r\n\r\n// {\r\n//     \"email\": \"onebis-superadmin@domain.com\",\r\n//     \"password\": \"Test123!\",\r\n//     \"userName\": \"dar\",\r\n//     \"role\": \"admin\",\r\n//     \"type\": \"vendor\",\r\n//     \"firstName\": \"John\",\r\n//     \"lastName\": \"Doe\",\r\n//     \"middleName\": \"Robert\",\r\n//     \"contactNumber\": \"+1234567890\",\r\n//     \"suffix\": \"Jr\",\r\n//     \"gender\": \"male\", \r\n//     \"birthDate\": \"1990-01-01T00:00:00.000Z\",\r\n//     \"birthPlace\": \"New York\",\r\n//     \"age\": 33,  \r\n//     \"religion\": \"Christian\",\r\n//     \"civilStatus\": \"single\",\r\n//     \"address\": {\r\n//         \"houseNo\": 123,\r\n//         \"street\": \"Main St\",\r\n//         \"province\": \"Sample Province\",\r\n//         \"city\": \"Sample City\",\r\n//         \"barangay\": \"Sample Barangay\",\r\n//         \"zipCode\": 12345,\r\n//         \"country\": \"USA\",\r\n//         \"type\": \"current\"\r\n//     }\r\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "register"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Auth Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"acl-admin@gmail.com\",\r\n    \"password\": \"Test123!\"\r\n}\r\n\r\n\r\n\r\n// {\r\n//     \"email\": \"onebis-superadmin@domain.com\",\r\n//     \"password\": \"Test123!\"\r\n// }\r\n\r\n// {\r\n//     \"email\": \"viewer@gmail.com\",\r\n//     \"password\": \"Test123!\"\r\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Encoder Test",
+			"item": [
+				{
+					"name": "Test Port",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n      \"port\": \"COM3\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/card-encoder/connect",
+							"host": ["{{base_url}}"],
+							"path": ["api", "card-encoder", "connect"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Test Bridge",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/card-encoder/status",
+							"host": ["{{base_url}}"],
+							"path": ["api", "card-encoder", "status"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Hotel info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://cnapi.ttlock.com/v3/hotel/getInfo?clientId=2a36101d46ec4a5c9971c9fc982bc07f&clientSecret=8d6aa828ea2e09f9b8fdf4bbe87d4861&date=1751963165000",
+							"protocol": "https",
+							"host": ["cnapi", "ttlock", "com"],
+							"path": ["v3", "hotel", "getInfo"],
+							"query": [
+								{
+									"key": "clientId",
+									"value": "2a36101d46ec4a5c9971c9fc982bc07f"
+								},
+								{
+									"key": "clientSecret",
+									"value": "8d6aa828ea2e09f9b8fdf4bbe87d4861"
+								},
+								{
+									"key": "date",
+									"value": "1751963165000"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Init Card",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"hotelInfo\": \"MzAsMzAsMjUsMjYsMjYsMywzMSwyNCw3NSw3NCwzMSwyNSwzMCw3Myw3NywyMiwyOSw3NCwzLDIzLDI2LDI2LDc0LDI0LDIyLDc3LDI5LDI1LDc1LDIzLDc4LDc4LDc1LDc2LDI5LDI4LDI3LDc0LDc3LDc1LDI4LDMxLDI0LDc2LDI0LDI0LDIyLDIzLDczLDc2LDI5LDMsMjksMjIsMzAsMjIsMjQsMjMsMjQsMjMsNTA=\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/card-encoder/init-card",
+							"host": ["{{base_url}}"],
+							"path": ["api", "card-encoder", "init-card"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get Current User",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/current",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "current"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Get By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/685dfd089f2627a2fcec0717",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "685dfd089f2627a2fcec0717"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Get All",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user?query=&filter=[{\"userName\":\"kkkkjjjjaaaa\"} ]",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "organization.branding.logo, person.personalInfo.firstName,  person.personalInfo.lastName, userName , email",
+									"disabled": true
+								},
+								{
+									"key": "query",
+									"value": ""
+								},
+								{
+									"key": "filter",
+									"value": "[{\"userName\":\"kkkkjjjjaaaa\"} ]"
+								},
+								{
+									"key": "filter",
+									"value": "[{\"role\": \"superadmin\"}]",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "5",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Update",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "mike@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "userName",
+									"value": "kkkkjjjjaaaa",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "subRole",
+									"value": "staff",
+									"type": "text"
+								},
+								{
+									"key": "organizationId",
+									"value": "68412c97c0c093fb4f0b0a11",
+									"type": "text"
+								},
+								{
+									"key": "path",
+									"value": "/rez",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "person",
+									"value": "{\n  \"personalInfo\": {\n    \"firstName\": \"dodz\",\n    \"lastName\": \"Daaaaoe\",\n    \"middleName\": \"Michael\",\n    \"dateOfBirth\": \"1990-01-15T00:00:00.000Z\",\n    \"placeOfBirth\": \"New York, USA\",\n    \"age\": 34,\n    \"nationality\": \"American\",\n    \"primaryLanguage\": \"English\",\n    \"gender\": \"male\"\n  },\n  \"contactInfo\": {\n    \"email\": \"john.doe.caaaontact@example.com\",\n    \"phones\": [\n      {\n        \"type\": \"mobile\",\n        \"countryCode\": \"+1\",\n        \"number\": \"5551234567\",\n        \"isPrimary\": true\n      }\n    ],\n    \"address\": {\n      \"street\": \"123 Main Street\",\n      \"city\": \"New York\",\n      \"state\": \"NY\",\n      \"country\": \"USA\",\n      \"postalCode\": \"10001\",\n      \"zipCode\": \"10001\",\n      \"houseNumber\": \"123\"\n    }\n  },\n  \"identification\": {\n    \"type\": \"drivers_license\",\n    \"number\": \"DL123456789\",\n    \"issuingCountry\": \"USA\",\n    \"expiryDate\": \"2030-12-31T00:00:00.000Z\"\n  },\n  \"metadata\": {\n    \"isActive\": true,\n    \"status\": null,\n    \"createdBy\": null,\n    \"updatedBy\": null,\n    \"lastLoginAt\": null,\n    \"isDeleted\": false\n  }\n}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/685e2a1837d0efe3a4a9bc30",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "685e2a1837d0efe3a4a9bc30"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Delete",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/682f0d4cf2e941e0a1b44c0f",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", "682f0d4cf2e941e0a1b44c0f"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "ac-hms-admin@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "userName",
+									"value": "ACL",
+									"type": "text"
+								},
+								{
+									"key": "role",
+									"value": "hms_admin",
+									"type": "text"
+								},
+								{
+									"key": "subRole",
+									"value": "staff",
+									"type": "text"
+								},
+								{
+									"key": "organizationId",
+									"value": "68412c97c0c093fb4f0b0a20",
+									"type": "text"
+								},
+								{
+									"key": "path",
+									"value": "/rez",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "/C:/Users/User/Downloads/487288153_9472573302837187_967906757489105272_n.jpg",
+									"disabled": true
+								},
+								{
+									"key": "person",
+									"value": "{\n  \"personalInfo\": {\n    \"firstName\": \"Joaahn\",\n    \"lastName\": \"Daaaaoe\",\n    \"middleName\": \"Michael\",\n    \"dateOfBirth\": \"1990-01-15T00:00:00.000Z\",\n    \"placeOfBirth\": \"New York, USA\",\n    \"age\": 34,\n    \"nationality\": \"American\",\n    \"primaryLanguage\": \"English\",\n    \"gender\": \"male\"\n  },\n  \"contactInfo\": {\n    \"email\": \"john.doe.caaaontact@example.com\",\n    \"phones\": [\n      {\n        \"type\": \"mobile\",\n        \"countryCode\": \"+1\",\n        \"number\": \"5551234567\",\n        \"isPrimary\": true\n      }\n    ],\n    \"address\": {\n      \"street\": \"123 Main Street\",\n      \"city\": \"New York\",\n      \"state\": \"NY\",\n      \"country\": \"USA\",\n      \"postalCode\": \"10001\",\n      \"zipCode\": \"10001\",\n      \"houseNumber\": \"123\"\n    }\n  },\n  \"identification\": {\n    \"type\": \"drivers_license\",\n    \"number\": \"DL123456789\",\n    \"issuingCountry\": \"USA\",\n    \"expiryDate\": \"2030-12-31T00:00:00.000Z\"\n  },\n  \"metadata\": {\n    \"isActive\": true,\n    \"status\": null,\n    \"createdBy\": null,\n    \"updatedBy\": null,\n    \"lastLoginAt\": null,\n    \"isDeleted\": false\n  }\n}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/user/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "user", ""]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Organization",
+			"item": [
+				{
+					"name": "Create Organization",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Unisan Hotel",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "A leading Hotel in Quezon Province",
+									"type": "text"
+								},
+								{
+									"key": "code",
+									"value": "UH2026",
+									"type": "text"
+								},
+								{
+									"key": "logo",
+									"type": "file",
+									"src": "/C:/Users/User/Downloads/ChatGPT Image Jun 13, 2025, 09_44_46 AM (1).png"
+								},
+								{
+									"key": "background",
+									"type": "file",
+									"src": "/C:/Users/User/Downloads/1645599766887.png"
+								},
+								{
+									"key": "path",
+									"value": "new-one-bis-kalilayan/1234",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organization",
+							"host": ["{{base_url}}"],
+							"path": ["api", "organization"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Organization By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/organization/68412c97c0c093fb4f0b0a20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "organization", "68412c97c0c093fb4f0b0a20"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "users",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"users.role\":\"hms_frontdesk_admin\"},{\"users.role\":\"admin\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Organization Get All",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organization?fields=name,code,description, integrations",
+							"host": ["{{base_url}}"],
+							"path": ["api", "organization"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name,code,description, integrations"
+								},
+								{
+									"key": "query",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"code\":\"ACHL\"},{\"description\":\"wewew\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add App to Organization",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"appId\": \"6847e35d6f7cf02ae4df955b\",\r\n  \"moduleIds\": [\r\n    \"6847e38b6f7cf02ae4df955c\"\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organization/68412c97c0c093fb4f0b0a11/app",
+							"host": ["{{base_url}}"],
+							"path": ["api", "organization", "68412c97c0c093fb4f0b0a11", "app"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "organization update",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "logo",
+									"type": "file",
+									"src": "/C:/Users/User/Pictures/Cute & Cozy 3d Avatars _ Unipaws (Community)/Girl 05.png",
+									"disabled": true
+								},
+								{
+									"key": "background",
+									"type": "file",
+									"src": "/C:/Users/User/Pictures/Screenshots/Screenshot (3).png",
+									"disabled": true
+								},
+								{
+									"key": "path",
+									"value": "test-update",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "branding",
+									"value": "{}",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organization/6841350dbec66d4297fecce9",
+							"host": ["{{base_url}}"],
+							"path": ["api", "organization", "6841350dbec66d4297fecce9"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Organization Dashboard",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"1bis-superadmin@domain.com\",\r\n    \"password\": \"Test123!\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organization/dashboard",
+							"host": ["{{base_url}}"],
+							"path": ["api", "organization", "dashboard"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Organization get app",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/organization/app",
+							"host": ["{{base_url}}"],
+							"path": ["api", "organization", "app"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "purchaseDate, name, code",
+									"disabled": true
+								},
+								{
+									"key": "query",
+									"value": "sample",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"name\":\"sample\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Organization get module",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/organization/app/6847e35d6f7cf02ae4df955b/module",
+							"host": ["{{base_url}}"],
+							"path": [
+								"api",
+								"organization",
+								"app",
+								"6847e35d6f7cf02ae4df955b",
+								"module"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name",
+									"disabled": true
+								},
+								{
+									"key": "query",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"icon\":\"IS\"}]",
+									"disabled": true
+								},
+								{
+									"key": "query",
+									"value": "AS",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All user in organization",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/organization/users",
+							"host": ["{{base_url}}"],
+							"path": ["api", "organization", "users"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "email,userName,status,person",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"role\":\"admin\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Organization",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/organization/6841350dbec66d4297fecce9",
+							"host": ["{{base_url}}"],
+							"path": ["api", "organization", "6841350dbec66d4297fecce9"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update organization App",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"licenseEndDate\": \"2025-12-31T23:59:59.000Z\",\r\n    \"isActive\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}} /api/organization/68412c97c0c093fb4f0b0a11/app/6847e35d6f7cf02ae4df955b",
+							"host": ["{{base_url}} "],
+							"path": [
+								"api",
+								"organization",
+								"68412c97c0c093fb4f0b0a11",
+								"app",
+								"6847e35d6f7cf02ae4df955b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update organization Integration",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"isActive\": true,\r\n    \"configuration\":{\r\n        \"apiKey\": \"sk_test_123456789\",\r\n        \"clientId\": \"clientId123\",\r\n        \"secretId\" :\"123456789\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}} /api/organization/68412c97c0c093fb4f0b0a11/integration/684b7aae3a99148f6a9e7c45",
+							"host": ["{{base_url}} "],
+							"path": [
+								"api",
+								"organization",
+								"68412c97c0c093fb4f0b0a11",
+								"integration",
+								"684b7aae3a99148f6a9e7c45"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update organization Module",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"licenseEndDate\": \"2025-06-30T23:59:59.000Z\",\r\n    \"isActive\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organization/68412c97c0c093fb4f0b0a11/app/6847e35d6f7cf02ae4df955b/module/6847e38b6f7cf02ae4df955c",
+							"host": ["{{base_url}}"],
+							"path": [
+								"api",
+								"organization",
+								"68412c97c0c093fb4f0b0a11",
+								"app",
+								"6847e35d6f7cf02ae4df955b",
+								"module",
+								"6847e38b6f7cf02ae4df955c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove organization App",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/organization/68412c97c0c093fb4f0b0a11/app/6847e35d6f7cf02ae4df955b",
+							"host": ["{{base_url}}"],
+							"path": [
+								"api",
+								"organization",
+								"68412c97c0c093fb4f0b0a11",
+								"app",
+								"6847e35d6f7cf02ae4df955b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove organization integration",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/organization/68412c97c0c093fb4f0b0a11/integration/684bb99d5d8e57435e831679",
+							"host": ["{{base_url}}"],
+							"path": [
+								"api",
+								"organization",
+								"68412c97c0c093fb4f0b0a11",
+								"integration",
+								"684bb99d5d8e57435e831679"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Organization module",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/organization/68412c97c0c093fb4f0b0a11/app/6847e35d6f7cf02ae4df955b/module/6847e38b6f7cf02ae4df955c",
+							"host": ["{{base_url}}"],
+							"path": [
+								"api",
+								"organization",
+								"68412c97c0c093fb4f0b0a11",
+								"app",
+								"6847e35d6f7cf02ae4df955b",
+								"module",
+								"6847e38b6f7cf02ae4df955c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Integration to Organization",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"integrationId\": \"684bb97db13a249c6c63048d\",\r\n  \"configuration\": {\r\n    \"apiKey\": \"sk_test_123456789\",\r\n    \"clientId\" : \"clientId123\"\r\n  },\r\n  \"isActive\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/organization/68412c97c0c093fb4f0b0a11/integration",
+							"host": ["{{base_url}}"],
+							"path": [
+								"api",
+								"organization",
+								"68412c97c0c093fb4f0b0a11",
+								"integration"
+							],
+							"query": [
+								{
+									"key": "fields",
+									"value": "apps.name, apps.modules.name, apps.modules.description",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "App",
+			"item": [
+				{
+					"name": "Create App",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"LMS\",\r\n    \"description\":\"LMS\",\r\n    \"code\":\"LMS\",\r\n    \"icon\":\"test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/app",
+							"host": ["{{base_url}}"],
+							"path": ["api", "app"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "App Get By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"sample\",\r\n    \"description\":\"Test\",\r\n    \"code\":\"sample\",\r\n    \"icon\":\"test\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/app/6847e35d6f7cf02ae4df955b",
+							"host": ["{{base_url}}"],
+							"path": ["api", "app", "6847e35d6f7cf02ae4df955b"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All App",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/app?filter=[{\"icon\":\"test\"}]",
+							"host": ["{{base_url}}"],
+							"path": ["api", "app"],
+							"query": [
+								{
+									"key": "filter",
+									"value": "[{\"icon\":\"test\"}]"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update App",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"sample\",\r\n    \"description\":\"Test\",\r\n    \"code\":\"sample\",\r\n    \"icon\":\"test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/app/68462f2829486ddcba524e7e",
+							"host": ["{{base_url}}"],
+							"path": ["api", "app", "68462f2829486ddcba524e7e"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove App",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Attendance system 2\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/app/6847e38b6f7cf02ae4df955c",
+							"host": ["{{base_url}}"],
+							"path": ["api", "app", "6847e38b6f7cf02ae4df955c"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transaction",
+			"item": [
+				{
+					"name": "Create transaction",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"LMS\",\r\n    \"description\":\"LMS\",\r\n    \"code\":\"LMS\",\r\n    \"icon\":\"test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/transaction",
+							"host": ["{{base_url}}"],
+							"path": ["api", "transaction"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Transaction Get By Id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"sample\",\r\n    \"description\":\"Test\",\r\n    \"code\":\"sample\",\r\n    \"icon\":\"test\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/app/transaction",
+							"host": ["{{base_url}}"],
+							"path": ["api", "app", "transaction"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All transaction",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/transaction",
+							"host": ["{{base_url}}"],
+							"path": ["api", "transaction"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update transaction",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"sample\",\r\n    \"description\":\"Test\",\r\n    \"code\":\"sample\",\r\n    \"icon\":\"test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/app/68462f2829486ddcba524e7e",
+							"host": ["{{base_url}}"],
+							"path": ["api", "app", "68462f2829486ddcba524e7e"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove transaction",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Attendance system 2\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/app/6847e38b6f7cf02ae4df955c",
+							"host": ["{{base_url}}"],
+							"path": ["api", "app", "6847e38b6f7cf02ae4df955c"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Module",
+			"item": [
+				{
+					"name": "Create module",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Inventory System\",\r\n  \"description\": \"IS\",\r\n  \"code\": \"IS\",\r\n  \"type\": \"IS\",\r\n  \"icon\": \"IS\",\r\n  \"appId\": \"6847e35d6f7cf02ae4df955b\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/module",
+							"host": ["{{base_url}}"],
+							"path": ["api", "module"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Module By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/module/684637147f09af59157c99ae",
+							"host": ["{{base_url}}"],
+							"path": ["api", "module", "684637147f09af59157c99ae"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Module Get All",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/module?fields=name, description, icon",
+							"host": ["{{base_url}}"],
+							"path": ["api", "module"],
+							"query": [
+								{
+									"key": "filter",
+									"value": "[{\"icon\":\"AS\"}]",
+									"disabled": true
+								},
+								{
+									"key": "fields",
+									"value": "name, description, icon"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Module",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Attendance system 2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/module/6847e38b6f7cf02ae4df955c",
+							"host": ["{{base_url}}"],
+							"path": ["api", "module", "6847e38b6f7cf02ae4df955c"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Module",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Attendance system 2\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/module/6847e38b6f7cf02ae4df955c",
+							"host": ["{{base_url}}"],
+							"path": ["api", "module", "6847e38b6f7cf02ae4df955c"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TTLOCK",
+			"item": [
+				{
+					"name": "User",
+					"item": [
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "// {\r\n//     \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n//     \"clientSecret\": \"688a259dd6ed3490405acafa9f927342\",\r\n//     \"username\": \"ebgja_TestName\",\r\n//     \"password\": \"5c3e5a40a72f0fd6d610b6dcf0f8e322\"\r\n// }\r\n\r\n  // \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n//access token d9cca9cad6aa2b49ab41cedde7d2d691\r\n//access token: cc2dd045936fadf231ac4b6ede131a57\r\n{\r\n    \"clientId\": \"4b8bc0348ff54d3186a1fd2128ed7274\",\r\n    \"clientSecret\": \"28f2d59934a748da1d518eb76833440d\",\r\n    \"username\": \"h_1751967914523\",\r\n    \"password\": \"c8355af3d1ae99d8c18348777a8e92d2\"\r\n}\r\n\r\n\r\n// {\r\n//     \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n//     \"clientSecret\": \"8d6aa828ea2e09f9b8fdf4bbe87d4861\",\r\n//     \"username\": \"renzrosada@gmail.com\",\r\n//     \"password\": \"52c4193ad179fdc3aacad099103970a4\"\r\n// }\r\n\r\n// {\r\n//     \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n//     \"clientSecret\": \"8d6aa828ea2e09f9b8fdf4bbe87d4861\",\r\n//     \"username\": \"renzrosada@gmail.com\",\r\n//     \"password\": \"52c4193ad179fdc3aacad099103970a4\"\r\n// }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/user/login",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "user", "login"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"clientSecret\": \"688a259dd6ed3490405acafa9f927342\",\r\n    \"username\": \"TestNamessq\",\r\n    \"password\": \"5c3e5a40a72f0fd6d610b6dcf0f8e322\",\r\n    \"date\": 1736411647000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/user",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "user"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "User Get All",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"clientSecret\": \"688a259dd6ed3490405acafa9f927342\",\r\n    \"pageNo\": 1,\r\n    \"pageSize\": 10\r\n    // \"startDate\": 1710745200000,\r\n    // \"endDate\": 1710831600000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/user/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "user", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"clientSecret\": \"688a259dd6ed3490405acafa9f927342\",\r\n    \"username\": \"ebgja_TestNamessq\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/user",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "user"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reset Password",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"clientSecret\": \"688a259dd6ed3490405acafa9f927342\",\r\n    \"username\": \"ebgja_TestNamessq\",\r\n\t\"password\": \"5c3e5a40a72f0fd6d610b6dcf0f8e322\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/user/reset-password",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "user", "reset-password"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Lock",
+					"item": [
+						{
+							"name": "Get Lock Details",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "// {\r\n//     \"lockId\": \"19951278\",\r\n//     \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n//     \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"action\": \"commonEkeys\"\r\n// }\r\n\r\n\r\n// note: action can be details or battery\r\n// details= this gives the lock details it does not need gateways\r\n// battery= this gets the lock current battery level this needs a gateway\r\n// passageMode= this data on the autoUnlock weekdays and passage mode dont need gateway\r\n//commonEkeys=  all the keys available on the lock",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock/information",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock", "information"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "\r\n  // \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n//access token d9cca9cad6aa2b49ab41cedde7d2d691\r\n\r\n{\r\n\t\"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n\t\"accessToken\": \"cc2dd045936fadf231ac4b6ede131a57\",\r\n\t\"pageNo\": 1,\r\n\t\"pageSize\": 10,\r\n\t\"action\": \"locklist\"\r\n}\r\n\r\n// \"lockId\": 19951278,\r\n\r\n// {\r\n// \t\"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n// \t\"accessToken\": \"d9cca9cad6aa2b49ab41cedde7d2d691\",\r\n//     \"lockId\": 19951278,\r\n// \t\"pageNo\": 1,\r\n// \t\"pageSize\": 10,\r\n// \t\"action\": \"listuser\"\r\n// }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Unlock or Lock",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n    \"accessToken\": \"cc2dd045936fadf231ac4b6ede131a57\",\r\n\t\"lockId\": 23939120,\r\n\t\"action\": \"unlock\"\r\n}\r\n// this needs gateway\r\n// action =  unlock or lock",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "//action for update is rename\r\n//this works without gateway\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n//     \"lockAlias\": \"Test Device\",\r\n// \t\"action\": \"rename\"\r\n// }\r\n\r\n\r\n//action for update is updateBattery\r\n//this works without gateway\r\n// {\r\n//     \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n//     \"electricQuantity\": 90,\r\n// \t\"action\": \"updateBattery\"\r\n// }\r\n\r\n//action for update is updateLockTime\r\n//this works without gateway\r\n// {\r\n//     \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n//     \"seconds\": 30,\r\n//     \"type\": 1,\r\n// \t\"action\": \"updateLockTime\"\r\n// }\r\n\r\n\r\n\r\n// action for changing super passcode\r\n//Super passcode, which only belongs to the administrator, can be entered on the keypad to unlock.\r\n//There is only one super passcode for a lock and it can't be deleted.\r\n// {\r\n//     \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n//     \"password\": 45675,\r\n//     \"type\": 2,//Method: 1-via phone bluetooth，must call APP SDK method first, 2-via gateway or WiFi lock, if it's a WiFi lock or it's connected to gateway, you can call this api directly, The default value is 1.\r\n// \t\"action\": \"superPasscode\"\r\n// }\r\n\r\n\r\n\r\n// this is for transfering locks to other user\r\n// The Selected Lock(s) will be Permanently Transferred to another account. \r\n// {\r\n//     \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"receiverUsername\": lock@google.com,\r\n//     \"lockIdList\": [1234,3332],\r\n// \t\"action\": \"transferLock\"\r\n// }\r\n\r\n\r\n\r\n// this action if for updating the auto lock duration of the lock\r\n// gateway is needed\r\n// {\r\n//     \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n//     \"seconds\": 10,\r\n// \t\"type\": 2, //method: 1-via phone bluetooth，must call Set auto lock time method of APP SDK before you request this API.  2-via gateway or WiFi lock, you can call this api directly if it's a WiFi lock or it's connected to gateway. The default value is 1.\r\n// \t\"action\": \"autoLock\"\r\n// }\r\n\r\n\r\n\r\n// this for updating lock data of the lock\r\n// {\r\n//     \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n// \t\"lockData\": [lockData]\r\n// \t\"action\": \"lockData\"\r\n// }\r\n\r\n\r\n// this for updating lock data of the lock\r\n// {\r\n//     \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n// \t\"sector\": 1,2,3,4,5,6,7,8,9,10\r\n// \t\"action\": \"hotelCardSector\"\r\n// }\r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "//action for deleting lock data not dont do or try this careless as per documentation  \" Alert：you must reset the lock via APP SDK before you request this API，otherwise you'll lose the lockData of the lock, and have to manually reset the lock\"\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n// \t\"action\": \"deleteLock\"\r\n// }\r\n\r\n// action for clearing the passcode of the door lock\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n// \t\"password\": 1234565,\r\n// \t\"action\": \"deleteLock\"\r\n// }\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete All",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "//action for deleting lock data not dont do or try this careless as per documentation  \" Alert：you must reset the lock via APP SDK before you request this API，otherwise you'll lose the lockData of the lock, and have to manually reset the lock\"\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n// \t\"action\": \"deleteLock\"\r\n// }\r\n\r\n// action for clearing the passcode of the door lock\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n// \t\"password\": 1234565,\r\n// \t\"action\": \"deleteLock\"\r\n// }\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Configure Passage Mode",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"915f44979682786f715b22f1c7615bf2\",\r\n    \"lockId\": 123456,\r\n    \"passageMode\": 1,\r\n    \"startDate\": 1234567890000,\r\n    \"endDate\": 1234567890000,\r\n    \"isAllDay\": true,\r\n    \"weekDays\": [1,2,3,4,5],\r\n    \"autoUnlock\": true,\r\n    \"type\": 1\r\n    // \"date\": 1234567890000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock/passage-mode",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock", "passage-mode"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "E-Key",
+					"item": [
+						{
+							"name": "Create",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"lockId\": 19951278,\r\n    \"receiverUsername\": \"ebgja_TestName2\",\r\n\t\"keyName\": \"Test\",\r\n    \"startDate\": 1736479162000,\r\n    \"endDate\": 1736564010000,\r\n\t\"createUser\": 0,\r\n\t\"remarks\": \"Test\",\r\n\t\"keyRight\": 1,\r\n\t\"remoteEnable\": 1\r\n\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/ekey",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "ekey"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"lockId\": \"19951278\",\r\n\t\"pageNo\": 1,\r\n\t\"pageSize\": 20\r\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/ekey/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "ekey", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By Id",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"lockId\": \"19951278\"\r\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/ekey/information",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "ekey", "information"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Ekey",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"keyId\": 199080454\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/ekey",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "ekey"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "//action = freeze or unfreeze\r\n{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"keyId\": \"199074898\",\r\n\t\"action\": \"unfreeze\"\r\n}\r\n\r\n\r\n//action = changePeriod\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"keyId\": \"199074898\",\r\n// \t\"startDate\": \"1736494559000\",\r\n// \t\"endDate\": \"1736952214000\"\r\n//  \"action\": \"changePeriod\"\r\n// }\r\n// action = authorize or unauthorize\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": \"19951278\",\r\n// \t\"keyId\": \"198828392\",\r\n// \t\"date\": \"1736495904000\"\r\n//  \"action\": \"authorize\"\r\n// }\r\n\r\n// action = modify\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": \"19951278\",\r\n// \t\"keyId\": \"199074898\",\r\n// \t\"keyName\": \"Meow2\",\r\n// \t\"remoteEnable\": \"1\",\r\n// \t\"date\": \"1736486707000\"\r\n// \t\"action\" = \"modify\"\r\n// }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/ekey",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "ekey"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Lock Ekeys",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"lockId\": \"19951278\",\r\n\t\"pageNo\": 1,\r\n\t\"pageSize\": 20\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/ekey/lock/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "ekey", "lock", "all"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Unlock Records",
+					"item": [
+						{
+							"name": "Get Unlock Records",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\r\n\r\n  // \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n//access token d9cca9cad6aa2b49ab41cedde7d2d691\r\n\r\n{\r\n  \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n  \"accessToken\": \"d9cca9cad6aa2b49ab41cedde7d2d691\",\r\n  \"lockId\": \"19951278\",\r\n  \"pageNo\": \"1\",\r\n  \"pageSize\": \"20\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/unlock-record/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "unlock-record", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Records",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"915f44979682786f715b22f1c7615bf2\",\r\n\t\"lockId\": \"19951278\",\r\n\t\"records\": [\r\n\t\t{\r\n\t\t\t\"accessoryElectricQuantity\": 0,\r\n\t\t\t\"deleteDate\": 0,\r\n\t\t\t\"electricQuantity\": 60,\r\n\t\t\t\"keyId\": 0,\r\n\t\t\t\"operateDate\": 1628522539000,\r\n\t\t\t\"recordId\": 1628522538,\r\n\t\t\t\"recordType\": 1,\r\n\t\t\t\"uid\": 1684037\r\n\t\t}\r\n\t]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/unlock-record/upload",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "unlock-record", "upload"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Records",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Cookie",
+										"value": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODQxMmNjNjUzYzYxOThlYjQ0ZjZkNGMiLCJyb2xlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBcmNoaWUiLCJsYXN0TmFtZSI6IlJvbm8iLCJpYXQiOjE3NTAxMjU4MDYsImV4cCI6MTc1MDEyOTQwNn0.cS-Ljhoi0umRWDsBi7Nnw9_M4GPwl1m-EqKrJx6p5bo"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\n    \"accessToken\": \"d9cca9cad6aa2b49ab41cedde7d2d691\",\n    \"lockId\": \"19951278\",\n    \"recordIdList\": [16355568211, 16355397091],\n    \"date\": 1625025703000\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/unlock-record/delete",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "unlock-record", "delete"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clear Record",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Cookie",
+										"value": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODQxMmNjNjUzYzYxOThlYjQ0ZjZkNGMiLCJyb2xlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBcmNoaWUiLCJsYXN0TmFtZSI6IlJvbm8iLCJpYXQiOjE3NTAxMjU4MDYsImV4cCI6MTc1MDEyOTQwNn0.cS-Ljhoi0umRWDsBi7Nnw9_M4GPwl1m-EqKrJx6p5bo"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\n    \"accessToken\": \"d9cca9cad6aa2b49ab41cedde7d2d691\",\n    \"lockId\": \"19951278\",\n    \"date\": 1625025703000\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/unlock-record/clear",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "unlock-record", "clear"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Group",
+					"item": [
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"name\": \"Test Group\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/integrations/ttlock/group",
+									"host": ["{{base_url}}"],
+									"path": ["api", "integrations", "ttlock", "group"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Group List",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"orderBy\": 0 //Sort by: 0-by name, 1-reverse order by time, 2-reverse order by name\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/group/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "group", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Group",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"groupId\": 892444,\r\n    \"name\": \"Updated Group Name\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/group",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "group"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Group",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"groupId\": 892444\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/group",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "group"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Set Lock Group",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"your_client_id\",\r\n    \"accessToken\": \"your_access_token\",\r\n    \"lockId\": \"your_lock_id\",\r\n    \"groupId\": 1342\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/group/lock-set",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "group", "lock-set"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Gateway",
+					"item": [
+						{
+							"name": "Initialize Gateway",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"yourClientId\",\r\n\t\"accessToken\": \"yourAccessToken\",\r\n\t\"gatewayData\": \"yourGatewayData\",\r\n\t\"date\": \"2023-10-01T00:00:00Z\",\r\n\t\"action\": \"checkStatus\"\r\n}\r\n\r\n//   action can be initialize or checkStatus\r\n//   the check status is for checking the initizatize status of the gateway",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/gateway/initialize",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "gateway", "initialize"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "//this is for geting the uid of the user\r\n{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"action\": \"getUserId\"\r\n}\r\n\r\n\r\n//this is for geting the lock time of the lock device (this need lock to be connected on the gateway)\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n// \t\"action\": \"getLockTime\"\r\n// }\r\n\r\n\r\n// lockStatus\r\n//{\r\n// \t\"errcode\": -4043,\r\n// \t\"errmsg\": \"The function is not supported for this lock.\",\r\n// \t\"description\": \"此锁不支持该操作。\"\r\n// }\r\n// lols\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": 19951278,\r\n// \t\"action\": \"lockStatus\"\r\n// }\r\n\r\n// this action is not tested due to needed of the gateway id\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"gatewayId\": 19951278,\r\n// \t\"action\": \"lockList\"\r\n//}\r\n\r\n// this action is not tested due to needed of the gateway id\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"gatewayId\": 19951278,\r\n// \t\"action\": \"checkUpgrade\"\r\n// }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/gateway/information",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "gateway", "information"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"pageNo\": 1,\r\n\t\"pageSize\": 20,\r\n\t\"action\": \"gatewayList\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/gateway/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "gateway", "all"],
+									"query": [
+										{
+											"key": "clientId",
+											"value": "906179dee79b4bd28030a885802b44be",
+											"disabled": true
+										},
+										{
+											"key": "accessToken",
+											"value": "99e9234a237db2dba73ae4e13528f6ee",
+											"disabled": true
+										},
+										{
+											"key": "pageNo",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "pageSize",
+											"value": "10",
+											"disabled": true
+										},
+										{
+											"key": "date",
+											"value": "2023-10-01T00:00:00Z",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "// for adjusting the time of the lock\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": \"19951278\",\r\n// \t\"date\": \"1737017896000\",\r\n// \t\"action\": \"adjustTime\"\r\n// }\r\n\r\n// Freeze the lock via gateway. All unlocking method will not work after it is frozen.\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": \"19951278\",\r\n// \t\"date\": \"1737017896000\",\r\n// \t\"action\": \"freeze\"\r\n// }\r\n\r\n// Unfreeze a lock via gateway\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"lockId\": \"19951278\",\r\n// \t\"date\": \"1737017896000\",\r\n// \t\"action\": \"unfreeze\"\r\n// }\r\n\r\n// The Selected Gateway(s) will be Permanently Transferred.\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"receiverUsername\": \"19951278\",\r\n// \t\"gatewayIdList\": [78979,78980],\r\n// \t\"date\": \"1737017896000\",\r\n// \t\"action\": \"transferGateway\"\r\n// }\r\n\r\n// Set gateway into upgrade mode remotely, when a gateway is in upgrade mode, it can't accept commands.\r\n// {\r\n// \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n// \t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n// \t\"gatewayId\": \"19951278\",\r\n// \t\"date\": \"1737017896000\",\r\n// \t\"action\": \"upgradeMode\"\r\n// }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/gateway/update",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "gateway", "update"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"gatewayId\": \"yourGatewayId\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/deleteGateway",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "deleteGateway"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Upload Gateway Details",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\r\n    \"clientId\": \"yourClientId\",\r\n    \"accessToken\": \"yourAccessToken\",\r\n    \"gatewayId\": \"yourGatewayId\",\r\n    \"modelNum\": \"modelNum\",\r\n    \"hardwareRevision\": \"hardwareRevision\",\r\n    \"firmwareRevision\": \"firmwareRevision\",\r\n    \"networkName\": \"networkName\",\r\n    \"date\": \"2023-10-01T00:00:00Z\"\r\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/gateway/upload/details",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "gateway", "upload", "details"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Query State",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"clientId\": \"your_client_id\",\n    \"accessToken\": \"your_access_token\",\n    \"lockId\": 123456,\n    \"date\": 1234567890\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock/query-open-state",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock", "query-open-state"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List by Lock",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Cookie",
+										"value": "token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODQxMmNjNjUzYzYxOThlYjQ0ZjZkNGMiLCJyb2xlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBcmNoaWUiLCJsYXN0TmFtZSI6IlJvbm8iLCJpYXQiOjE3NTAxMjk3NTcsImV4cCI6MTc1MDEzMzM1N30.nui73k7qz4SJNC2S7s1UXgtThGdPNzV4Pt0jUco8XhA"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"clientId\": \"your_client_id\",\n    \"accessToken\": \"your_access_token\",\n    \"lockId\": 163377,\n    \"date\": 1626674054000\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/gateway/list-by-lock",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "gateway", "list-by-lock"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Passage Mode",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"clientId\": \"your_client_id\",\n    \"accessToken\": \"your_access_token\",\n    \"lockId\": 163377,\n    \"passageMode\": 1,\n    \"cyclicConfig\": [{\n        \"isAllDay\": 2,\n        \"startTime\": 480,\n        \"endTime\": 1080,\n        \"weekDays\": [1, 2]\n    }],\n    \"autoUnlock\": 1,\n    \"type\": 2,\n    \"date\": 1625025703000\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock/configure-passage-mode",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock", "configure-passage-mode"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Passage Config",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"clientId\": \"your_client_id\",\n    \"accessToken\": \"your_access_token\",\n    \"lockId\": 3827,\n    \"date\": 1626674054000\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock/get-passage-config",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock", "get-passage-config"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Modilfy lock Settings",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"clientId\": \"your_client_id\",\n    \"accessToken\": \"your_access_token\",\n    \"lockId\": 163377,\n    \"type\": 3,\n    \"value\": 2,\n    \"changeType\": 2,\n    \"date\": 1625025703000\n}\n//Modify lock settings, including: 2-Privacy lock、3-Temper alert、4-Reset button、6-Lock sound、7-Open direction、8-Sound volume、10-Wifi lock's power saving, etc.",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock/update-setting",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock", "update-setting"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update Settings Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"clientId\": \"your_client_id\",\n    \"accessToken\": \"your_access_token\",\n    \"lockId\": 163377,\n    \"type\": 3,\n    \"date\": 1625025703000\n}\n\n\n//Query lock settings via gateway, including：2-Privacy lock、3-Tamper alert、4-Reset button、7-Open direction, etc.",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/lock/query-setting",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "lock", "query-setting"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "IC Cards",
+					"item": [
+						{
+							"name": "Create",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "// {\r\n//     \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n//     \"accessToken\": \"d9cca9cad6aa2b49ab41cedde7d2d691\",\r\n//     \"lockId\": \"19951278\",\r\n//     \"cardNumber\": \"98812595\", // currently available is 1581903712 and 2395595616\r\n//     \"cardName\": \"Test Card with Schedule\",\r\n//     \"cardType\": 1,\r\n//     \"addType\": 2,\r\n//     \"startDate\": 0,\r\n//     \"endDate\": 0\r\n// }\r\n{\r\n    // \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n    // \"accessToken\": \"cc2dd045936fadf231ac4b6ede131a57\",\r\n    \"integrationId\": \"684bb97db13a249c6c63048d\",\r\n    \"lockId\": \"23939120\",\r\n    \"cardNumber\": \"1030301489\", // IC card id\r\n    \"cardName\": \"Permanent Card via API\",\r\n    \"cardType\": 1,\r\n    \"addType\": 2,\r\n    \"startDate\": 0,\r\n    \"endDate\": 0\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/ic-card",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "ic-card"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get All",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    //   \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n    //   \"accessToken\": \"cc2dd045936fadf231ac4b6ede131a57\",\r\n    \"integrationId\": \"684bb97db13a249c6c63048d\",\r\n    \"lockId\": \"23939120\",\r\n    //   \"searchStr\": \"Sample\",\r\n    \"pageNo\": 1,\r\n    \"pageSize\": 10,\r\n    \"orderBy\": 1 //Sort by: 0-by name, 1-reverse order by time, 2-reverse order by name\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/ic-card/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "ic-card", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "//action= changeCardValidityPeriod\r\n// {\r\n//   \"clientId\": \"mock123456789\",\r\n//   \"accessToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\",\r\n//   \"lockId\": 98765,\r\n//   \"cardId\": 54321,\r\n//   \"startDate\": 1709251200000,\r\n//   \"endDate\": 1714521600000,    \r\n//   \"cyclicConfig\": [\r\n//     {\r\n//       \"weekDay\": 1,\r\n//       \"startTime\": 480, \r\n//       \"endTime\": 1080    \r\n//     }\r\n//   ],\r\n//   \"changeType\": 2,\r\n//   \"date\": 1709251200000,\r\n//   \"action\": \"changeCardValidityPeriod\"\r\n// }\r\n\r\n// action=rename\r\n// {\r\n//   \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n//   \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n//   \"lockId\": \"19951278\",\r\n//   \"cardId\": 84422234,\r\n//   \"cardName\": \"New Card Name\",\r\n//   \"date\": 1736679123000\r\n//   \"action\": \"rename\"\r\n// }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/ic-card",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "ic-card"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    // \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n    // \"accessToken\": \"cc2dd045936fadf231ac4b6ede131a57\",\r\n    \"integrationId\": \"684bb97db13a249c6c63048d\",\r\n    \"lockId\": \"23939120\",\r\n    \"cardId\": 104899264,\r\n    \"deleteType\": 2 //Delete type:1-delete with App via Bluetooth;2-delete via WiFi gateway, 3-via NB-IoT. The default value is 1. If it is 1, you should delete via bluetooth first. If it is 2, you can call this api to delete it directly.\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/ic-card",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "ic-card"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete All",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [""],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    //   \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    //   \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"integrationId\": \"684bb97db13a249c6c63048d\",\r\n    \"lockId\": \"19951278\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/ic-card/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "ic-card", "all"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Passcode",
+					"item": [
+						{
+							"name": "Get All",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "  // \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n//access token d9cca9cad6aa2b49ab41cedde7d2d691\r\n\r\n{\r\n  \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n  \"accessToken\": \"d9cca9cad6aa2b49ab41cedde7d2d691\",\r\n  \"lockId\": \"19951278\",\r\n  \"pageNo\": \"1\",\r\n  \"pageSize\": \"20\"\r\n}\t",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/passcode/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "passcode", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "\r\n// \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n// \"accessToken\": \"d9cca9cad6aa2b49ab41cedde7d2d691\"\r\n{\r\n\t\"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n\t\"accessToken\": \"d9cca9cad6aa2b49ab41cedde7d2d691\",\r\n\t\"lockId\": \"19951278\",\r\n\t\"keyboardPwd\": \"80915089\",\r\n\t\"keyboardPwdName\": \"New Test Passcode\",\r\n\t\"addType\": 1,\r\n    \"startDate\": 1736739418000,\r\n\t\"endDate\": 1736912218000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/passcode",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "passcode"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"lockId\": \"19951278\",\r\n\t\"keyboardPwdId\": 683687156,\r\n\t\"keyboardPwdName\": \"Updated Passcode\",\r\n\t\"newKeyboardPwd\": \"654321\",\r\n\t\"startDate\": 1736739418000,\r\n\t\"endDate\": 1736912218000,\r\n\t\"changeType\": 2\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/passcode",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "passcode"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"lockId\": \"19951278\",\r\n\t\"keyboardPwdId\": 683687156,\r\n\t\"deleteType\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/integration/ttlock/passcode",
+									"host": ["{{base_url}}"],
+									"path": ["api", "integration", "ttlock", "passcode"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Fingerprint",
+					"item": [
+						{
+							"name": "Get All",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "//   \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n//   \"accessToken\": \"d9cca9cad6aa2b49ab41cedde7d2d691\",\r\n\r\n{\r\n    \"clientId\": \"2a36101d46ec4a5c9971c9fc982bc07f\",\r\n    \"accessToken\": \"d9cca9cad6aa2b49ab41cedde7d2d691\",\r\n\t\"lockId\": \"19951278\",\r\n    \"pageNo\": 1,\r\n    \"pageSize\": 10\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/fingerprint/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "fingerprint", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"lockId\": 19951278,\r\n    \"fingerprintNumber\": \"FP001\",\r\n    \"fingerprintType\": 1,\r\n    \"fingerprintName\": \"John's Fingerprint\",\r\n    \"startDate\": 1699000000000,\r\n    \"endDate\": 1699086400000,\r\n    \"cyclicConfig\": [\r\n        {\r\n            \"startTime\": 480,\r\n            \"endTime\": 1080,\r\n            \"weekDay\": 1\r\n        }\r\n    ]//Recurring time period, the valid time period of each week day must be the same, for example:[{\"weekDay\":1, \"startTime\":480,\"endTime\":1080},{\"weekDay\":2, \"startTime\":480,\"endTime\":1080}] for valid from 8:00 to 18:00 in Monday and Tuesday.\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/fingerprint",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "fingerprint"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"lockId\": 19951278,\r\n    \"fingerprintId\": 39330570,\r\n    \"deleteType\":1  //\tMethod: 1-delete with App via Bluetooth, you should delete via bluetooth first 2-delete via gateway or WiFi lock, you can call this api directly if it's a WiFi lock or it's connected to gateway. The default value is 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/fingerprint",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "fingerprint"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete All",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n    \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n    \"lockId\": 19951278\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/fingerprint/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "fingerprint", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "//action = rename\r\n// {\r\n//     \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n//     \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n//     \"lockId\": 19951278,\r\n// \t\"fingerprintId\": 39617794,\r\n// \t\"fingerprintName\": \"test\",\r\n// \t\"action\": \"rename\"\r\n// }\r\n\r\n// action =changePeriod\r\n// {\r\n//     \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n//     \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n//     \"lockId\": 19951278,\r\n// \t\"fingerprintId\": 39330570,\r\n//     \"startDate\": 1699000000000,\r\n//     \"endDate\": 1699086400000,\r\n//     \"cyclicConfig\": [\r\n//         {\r\n//             \"startTime\": 480,\r\n//             \"endTime\": 1080,\r\n//             \"weekDay\": 1\r\n//         }\r\n//     ],\r\n//     \"changeType\": 2\r\n// }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/fingerprint",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "fingerprint"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Door Sensor",
+					"item": [
+						{
+							"name": "Get all",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n  \"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n  \"lockId\": \"19951278\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/door-sensor/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "door-sensor", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"lockId\": \"19951278\",\r\n\t\"name\": \"Door sensor for front door\",\r\n\t\"firmwareInfo\": {\r\n\t\t\"modelNum\": \"SN405_LR\",\r\n\t\t\"hardwareRevision\": \"1.3\",\r\n\t\t\"firmwareRevision\": \"1.0.0.210903\"\r\n\t},\r\n\t\"number\": \"SN9325-SN139-T2-T16-INT_PV53\",\r\n\t\"electricQuantity\": 90,\r\n\t\"mac\": \"4B:C1:BD:4C:0C:45\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/door-sensor",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "door-sensor"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"doorSensorId\": \"19951278\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/door-sensor",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "door-sensor"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"doorSensorId\": \"19951278\",\r\n\t\"name\": \"Test\"\r\n}\r\n\r\n//technically this just update the name of the door sensor Id",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/door-sensor",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "door-sensor"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Callback",
+					"item": [
+						{
+							"name": "Get",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/callback",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "callback"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "QR code",
+					"item": [
+						{
+							"name": "Get All",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n\t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"lockId\": \"19951278\",\r\n\t\"pageNo\": 1,\r\n\t\"pageSize\": 20,\r\n\t\"date\": 1736755254000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/qrcode/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "qrcode", "all"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \t\"clientId\": \"906179dee79b4bd28030a885802b44be\",\r\n\t\"accessToken\": \"99e9234a237db2dba73ae4e13528f6ee\",\r\n\t\"lockId\": \"19951278\",\r\n    \"name\": \"Main Entrance QR\",\r\n    \"type\": 2,\r\n    \"startDate\": 1625025600000,\r\n    \"endDate\": 1627617600000,\r\n\t\"refreshTime\": 100,\r\n    \"cyclicConfig\": [\r\n        {\r\n            \"startTime\": 480,\r\n            \"endTime\": 1080,\r\n            \"weekDay\": 1\r\n        },\r\n        {\r\n            \"startTime\": 480,\r\n            \"endTime\": 1080,\r\n            \"weekDay\": 2\r\n        }\r\n    ]\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/qrcode",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "qrcode"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get By Info",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"your_client_id\",\r\n    \"clientSecret\": \"your_client_secret\",\r\n    \"qrCodeId\": \"test@example.com\",\r\n    \"date\": 1710831600000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/qrcode/information",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "qrcode", "information"],
+									"query": [
+										{
+											"key": "qrCodeId",
+											"value": "123456",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"your_client_id\",\r\n    \"accessToken\": \"your_access_token\",\r\n    \"qrCodeId\": 123456,\r\n    \"name\": \"Updated QR Name\",\r\n    \"startDate\": 1625025600000,\r\n    \"endDate\": 1627617600000,\r\n    \"cyclicConfig\": [\r\n        {\r\n            \"startTime\": 480,\r\n            \"endTime\": 1080,\r\n            \"weekDay\": 1\r\n        }\r\n    ],\r\n    \"date\": 1625025600000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/qrcode",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "qrcode"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"your_client_id\",\r\n    \"accessToken\": \"your_access_token\",\r\n    \"lockId\": 123456,\r\n    \"qrCodeId\": 123456,\r\n    \"date\": 1625025600000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/qrcode",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "qrcode"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete All",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"clientId\": \"your_client_id\",\r\n    \"accessToken\": \"your_access_token\",\r\n    \"lockId\": 123456,\r\n    \"date\": 1625025600000\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/qrcode/all",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "qrcode", "all"]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Card Encoder",
+					"item": [
+						{
+							"name": "Initialize",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"clientId\": \"your_client_id\",\n  \"clientSecret\": \"your_client_secret\",\n  \"serialPort\": \"COM1\",\n  \"sectors\": \"0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/initialize",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "initialize"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Write Card",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"building\": 1,\n  \"floor\": 1,\n  \"deviceMAC\": \"AA:BB:CC:DD:EE:FF\",\n  \"expiration\": 1640995200000,\n  \"allowReverseLock\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/write-card",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "write-card"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Read Card",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"hotelInfo\": \"\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/read-card",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "read-card"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Connect",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"serialPort\": \"COM1\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/connect",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "connect"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Disconnect",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/disconnect",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "disconnect"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Status",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/status",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "status"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Card Number",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/card-number",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "card-number"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Clear Card",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"hotelInfo\": \"\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/clear-card",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "clear-card"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Beep",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"voiceLen\": 1000,\n  \"interval\": 500,\n  \"voiceCount\": 1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/beep",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "beep"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Version",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/version",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "version"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Set Sectors",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"sectors\": \"0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/set-sectors",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "set-sectors"]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get Sectors",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{token}}"
+									}
+								],
+								"url": {
+									"raw": "{{base_url}}/api/ttlock/card-encoder/get-sectors",
+									"host": ["{{base_url}}"],
+									"path": ["api", "ttlock", "card-encoder", "get-sectors"]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Intergation",
+			"item": [
+				{
+					"name": "Get All Integration",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/integration",
+							"host": ["{{base_url}}"],
+							"path": ["api", "integration"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Intergation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"TTlock\",\r\n    \"description\": \"Smart Lock and Door integration\",\r\n    \"provider\": \"TTLOCK\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/integration",
+							"host": ["{{base_url}}"],
+							"path": ["api", "integration"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Integration By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/integration/684b7aae3a99148f6a9e7c45",
+							"host": ["{{base_url}}"],
+							"path": ["api", "integration", "684b7aae3a99148f6a9e7c45"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Integration",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"TTlock\",\r\n    \"description\":\"TTlock door\",\r\n    \"provider\":\"TTlock ock\"\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/integration/684a42c88ada5b27c0632e8a",
+							"host": ["{{base_url}}"],
+							"path": ["api", "integration", "684a42c88ada5b27c0632e8a"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Integration",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"TTlock\",\r\n    \"description\":\"TTlock door\",\r\n    \"provider\":\"TTlock lock\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/integration/684b7aae3a99148f6a9e7c45",
+							"host": ["{{base_url}}"],
+							"path": ["api", "integration", "684b7aae3a99148f6a9e7c45"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Facility",
+			"item": [
+				{
+					"name": "Create Facility",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Ernest Restaurant\",\r\n  \"description\": \"Fine dining restaurant\",\r\n  \"organizationId\": \"68412c97c0c093fb4f0b0a11\",\r\n  \"locationId\": \"507f1f77bcf86cd799439011\",\r\n  \"facilityTypeId\": \"6863305926af2027a666cc55\",\r\n  \"isTimeBased\": true,\r\n  \"operatingHours\": {\r\n    \"monday\":    { \"openTime\": \"08:00\", \"closeTime\": \"22:00\" },\r\n    \"tuesday\":   { \"openTime\": \"08:00\", \"closeTime\": \"22:00\" },\r\n    \"wednesday\": { \"openTime\": \"08:00\", \"closeTime\": \"22:00\" },\r\n    \"thursday\":  { \"openTime\": \"08:00\", \"closeTime\": \"22:00\" },\r\n    \"friday\":    { \"openTime\": \"08:00\", \"closeTime\": \"23:00\" },\r\n    \"saturday\":  { \"openTime\": \"09:00\", \"closeTime\": \"23:00\" },\r\n    \"sunday\":    { \"openTime\": \"09:00\", \"closeTime\": \"21:00\" }\r\n  }\r\n}\r\n\r\n\r\n// {\r\n//   \"name\": \"Ernest Basketball Court\",\r\n//   \"description\": \"Ernest Basketball Court \",\r\n//   \"organizationId\": \"68412c97c0c093fb4f0b0a11\",\r\n//   \"locationId\": \"507f1f77bcf86cd799439012\",\r\n//   \"facilityTypeId\": \"6863305926af2027a666cc55\"\r\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/facility",
+							"host": ["{{base_url}}"],
+							"path": ["api", "facility"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "users",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"users.role\":\"hms_frontdesk_admin\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Facility",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/facility",
+							"host": ["{{base_url}}"],
+							"path": ["api", "facility"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "location, name, description, organization.apps.modules.purchaseDate",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"name\":\"DELUXE SUITE\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Facility",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "images",
+									"type": "file",
+									"src": [
+										"/C:/Users/User/Downloads/Image.png",
+										"/C:/Users/User/Downloads/4b10d753992203499eb54519e91c4806.jpg",
+										"/C:/Users/User/Downloads/istockphoto-1452529483-612x612.jpg"
+									]
+								},
+								{
+									"key": "path",
+									"value": "/test/test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/facility/684fb608d02ffc970c7d88ee",
+							"host": ["{{base_url}}"],
+							"path": ["api", "facility", "684fb608d02ffc970c7d88ee"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "users",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"users.role\":\"hms_frontdesk_admin\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Facility Get By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/facility/6863305926af2027a666cc55",
+							"host": ["{{base_url}}"],
+							"path": ["api", "facility", "6863305926af2027a666cc55"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "metadata.roomNumber",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"users.role\":\"hms_frontdesk_admin\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Facility Availability",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/facility/availability?startDate=2025-07-11T09:00:00Z&endDate=2025-07-12T11:00:00Z",
+							"host": ["{{base_url}}"],
+							"path": ["api", "facility", "availability"],
+							"query": [
+								{
+									"key": "facilityType",
+									"value": "INDOOR COURT",
+									"disabled": true
+								},
+								{
+									"key": "startDate",
+									"value": "2025-07-11T09:00:00Z"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-07-12T11:00:00Z"
+								},
+								{
+									"key": "filter",
+									"value": "[{\"amenities\":\"SWIMMING_POOL\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete  Facility",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/facility/686b2810894c33276dd01f06",
+							"host": ["{{base_url}}"],
+							"path": ["api", "facility", "686b2810894c33276dd01f06"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reservation",
+			"item": [
+				{
+					"name": "Create Reservation",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"facilityId\":\"685ca2e36b95e20131cae078\",\r\n//   \"facilityType\": \"INDOOR COURT\",\r\n  \"userId\": \"6848e3820d47ae357fdef748\",\r\n  \"rateTypeId\": \"6861f592cd6beb6cf26b0fad\",\r\n  \"reservationDate\": \"2025-07-11T14:00:00Z\",\r\n  \"reservationEndDate\": \"2025-07-12T11:00:00Z\",\r\n  \"guests\": 2,\r\n  \"additionalGuests\": [\r\n    {\r\n      \"firstName\": \"Jane\",\r\n      \"lastName\": \"Smith\",\r\n      \"phone\": \"+1234567890\"\r\n    },\r\n      {\r\n      \"firstName\": \"james\",\r\n      \"lastName\": \"Smith\",\r\n      \"phone\": \"+1234567890\"\r\n    }\r\n  ],\r\n  \"specialRequests\": \"Ocean view preferred, late check-out if possible\"\r\n\r\n}\r\n\r\n\r\n// {\r\n//   \"facilityType\": \"DELUXE SUITE\",\r\n//   \"rateTypeId\":\"685a17576ec24b52a9adb1ce\",\r\n//   \"reservationDate\": \"2025-09-24T15:00:00Z\",\r\n//   \"reservationEndDate\": \"2025-09-25T15:00:00Z\",\r\n//   \"currency\":\"PH\",\r\n// //   \"SourceCode\":\"\",\r\n// //   \"VipStatus\":\"\",\r\n//   \"guests\": 1,\r\n//   \"firstName\": \"drei\",\r\n//   \"lastName\": \"pantoja\",\r\n//   \"email\": \"drie@example.com\",\r\n//   \"contactInfo\": {\r\n//     \"phone\": \"555-0103\"\r\n//   },\r\n//     \"additionalGuests\": [\r\n//     {\r\n//       \"firstName\": \"John\",\r\n//       \"lastName\": \"Smith\",\r\n//       \"phone\": \"555-0104\"\r\n//     },\r\n//     {\r\n//       \"firstName\": \"Jane\",\r\n//       \"lastName\": \"Doe\"\r\n//     }\r\n//   ],\r\n//   \"specialRequests\":\"With  Ref\"\r\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reservation",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reservation"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CheckIn",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "// {\r\n//     \"checkInDate\": \"2025-11-01T14:00:00.000Z\",\r\n//      \"paymentProvider\": \"CREDIT_CARD\"\r\n//     // \"facilityId\":\"685ca0416b95e20131cae076\"\r\n//     // \"autoAssign\":true\r\n// }\r\n\r\n{\r\n  \"checkInDate\": \"2025-07-11T14:00:00.000Z\",\r\n  \"checkOutDate\": \"2025-07-12T18:00:00.000Z\",\r\n  \"facilityId\": \"685ca2e36b95e20131cae078\",\r\n  \"autoAssign\": true,\r\n  \"paymentProvider\": \"CREDIT_CARD\",\r\n  \r\n  \"transaction\": {\r\n    \"type\": \"PAYMENT\",\r\n    // \"amount\": 791.9736,\r\n    \"currency\": \"PHP\",\r\n    \"status\": \"COMPLETED\",\r\n    \"provider\": \"STRIPE\",\r\n    \"providerRef\": \"CUSTOM-REF-12345\",\r\n    \"metadata\": {\r\n      \"cardLast4\": \"1234\",\r\n      \"authCode\": \"ABC123\",\r\n      \"merchantId\": \"STRIPE_001\",\r\n      \"paymentMethod\": \"CREDIT_CARD\",\r\n      \"description\": \"Payment for deluxe room\",\r\n      \"notes\": \"Paid via mobile app\",\r\n      \"customerEmail\": \"guest@example.com\",\r\n      \"discount\": \"Early bird discount applied\",\r\n      \"receiptNumber\": \"RCP-789012\"\r\n    }\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reservation/687075e410fdb1c1fe7aa417/room",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reservation", "687075e410fdb1c1fe7aa417", "room"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update status",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\":\"CHECKED_OUT\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/reservation/687075e410fdb1c1fe7aa417",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reservation", "687075e410fdb1c1fe7aa417"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all reservation",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reservation",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reservation"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reservation Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/reservation/dashboard?startDate=2025-07-11T14:00:00Z&type=arrival",
+							"host": ["{{base_url}}"],
+							"path": ["api", "reservation", "dashboard"],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-07-11T14:00:00Z"
+								},
+								{
+									"key": "type",
+									"value": "arrival"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "facilityType",
+			"item": [
+				{
+					"name": "Create facilityType",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "INDOOR COURT",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Fine dining restaurant with panoramic ocean views and Mediterranean cuisine",
+									"type": "text"
+								},
+								{
+									"key": "amenities",
+									"value": "[\n    \"ROOM_SERVICE\",\n    \"CONCIERGE_SERVICE\",\n    \"SWIMMING_POOL\"\n  ]",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "roomFeatures",
+									"value": " [\n    \"AIR_CONDITIONING\",\n    \"WIFI\",\n    \"TELEVISION\",\n    \"MINIBAR\"\n  ]",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "bedType",
+									"value": "KING_BED",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "bedCount",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "maxOccupancy",
+									"value": "3",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "organizationId",
+									"value": "68412c97c0c093fb4f0b0a11",
+									"type": "text"
+								},
+								{
+									"key": "price",
+									"value": "299.99",
+									"type": "text"
+								},
+								{
+									"key": "images",
+									"type": "file",
+									"src": [
+										"/C:/Users/User/Downloads/360_F_444947921_xhrE42lESW5y8zGJmuulfO6C4YxqfihJ.jpg",
+										"/C:/Users/User/Downloads/1600w-hssDJm35N2k.webp"
+									]
+								},
+								{
+									"key": "path",
+									"value": "roomType/5",
+									"type": "text"
+								},
+								{
+									"key": "code",
+									"value": "ST1",
+									"type": "text"
+								},
+								{
+									"key": "category",
+									"value": "HOTEL",
+									"type": "text"
+								},
+								{
+									"key": "details",
+									"value": "{\n        \"bedType\": \"QUEEN_BED\",\n        \"bedCount\": 1,\n        \"maxOccupancy\": 2,\n        \"amenities\": [\"ROOM_SERVICE\", \"CONCIERGE_SERVICE\", \"LAUNDRY_SERVICE\"],\n        \"roomFeatures\": [\"WIFI\", \"TELEVISION\", \"MINIBAR\", \"SAFE\", \"AIR_CONDITIONING\", \"PRIVATE_BATHROOM\", \"WORK_DESK\", \"CITY_VIEW\"]\n    }",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/facilityType",
+							"host": ["{{base_url}}"],
+							"path": ["api", "facilityType"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get FacilityType",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/facilityType",
+							"host": ["{{base_url}}"],
+							"path": ["api", "facilityType"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"name\":\"DELUXE\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get facilityType By ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/facilityType/685b8a136914dc73ee4c9452",
+							"host": ["{{base_url}}"],
+							"path": ["api", "facilityType", "685b8a136914dc73ee4c9452"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "New Folder",
+			"item": [
+				{
+					"name": "Test Scanner",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"port\": \"COM1\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/card-encoder/connect",
+							"host": ["{{base_url}}"],
+							"path": ["api", "card-encoder", "connect"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Rate Type",
+			"item": [
+				{
+					"name": "Create Rate Type",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"name\": \"Promotional Rate\",\r\n\t\"code\": \"PROMO\",\r\n\t\"description\": \"Special promotional pricing for marketing campaigns\",\r\n\t\"organizationId\": \"68412c97c0c093fb4f0b0a11\",\r\n\t\"defaultTax\": 10.0,\r\n\t\"defaultDiscount\": 20.0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/rateType",
+							"host": ["{{base_url}}"],
+							"path": ["api", "rateType"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All  rateType",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Standard Rate\",\r\n  \"code\": \"STD\",\r\n  \"organizationId\": \"6848e3820d47ae357fdef748\",\r\n  \"defaultTax\": 12.5,\r\n  \"defaultDiscount\": 5.0\r\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/rateType/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "rateType", ""],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"code\":\"R1\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/rateType/6861f592cd6beb6cf26b0fad",
+							"host": ["{{base_url}}"],
+							"path": ["api", "rateType", "6861f592cd6beb6cf26b0fad"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Rate Type",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"defaultDiscount\": 26\r\n  \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/rateType/685a17576ec24b52a9adb1ce",
+							"host": ["{{base_url}}"],
+							"path": ["api", "rateType", "685a17576ec24b52a9adb1ce"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete RateType",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/rateType/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "rateType", ""],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"code\":\"R1\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Person",
+			"item": [
+				{
+					"name": "create person",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \r\n  \"organizationId\": \"68412c97c0c093fb4f0b0a11\",\r\n  \"personalInfo\": {\r\n    \"firstName\": \"Alexander\",\r\n  \"lastName\": \"Thompson\",\r\n    \"prefix\": \"Dr.\",\r\n    \"middleName\": \"James\",\r\n    \"dateOfBirth\": \"1985-03-22T00:00:00.000Z\",\r\n    \"placeOfBirth\": \"London, United Kingdom\",\r\n    \"age\": 38,\r\n    \"nationality\": \"British\",\r\n    \"primaryLanguage\": \"English\",\r\n    \"gender\": \"male\",\r\n    \"currency\": \"GBP\",\r\n    \"vipCode\": \"DIAMOND_VIP_2024_001\"\r\n  },\r\n  \"contactInfo\": {\r\n    \"email\": \"alexander.thompson@email.com\",\r\n    \"phones\": [\r\n      {\r\n        \"type\": \"mobile\",\r\n        \"countryCode\": \"+44\",\r\n        \"number\": \"7700-900123\",\r\n        \"isPrimary\": true\r\n      },\r\n      {\r\n        \"type\": \"work\",\r\n        \"countryCode\": \"+44\",\r\n        \"number\": \"20-7123-4567\",\r\n        \"isPrimary\": false\r\n      }\r\n    ],\r\n    \"fax\": \"+44-20-7946-0959\",\r\n    \"address\": {\r\n      \"street\": \"221B Baker Street\",\r\n      \"address2\": \"Floor 2, Suite 10\",\r\n      \"city\": \"London\",\r\n      \"state\": \"England\",\r\n      \"country\": \"United Kingdom\",\r\n      \"postalCode\": \"NW1 6XE\",\r\n      \"zipCode\": \"NW1 6XE\",\r\n      \"houseNumber\": \"221B\"\r\n    }\r\n  },\r\n  \"identification\": {\r\n    \"type\": \"passport\",\r\n    \"number\": \"GB123456789\",\r\n    \"issuingCountry\": \"United Kingdom\",\r\n    \"expiryDate\": \"2029-03-22T00:00:00.000Z\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/person",
+							"host": ["{{base_url}}"],
+							"path": ["api", "person"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "name",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[{\"name\":\"DELUXE\"}]",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Person",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/person?query=dodz",
+							"host": ["{{base_url}}"],
+							"path": ["api", "person"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "personalInfo.prefix",
+									"disabled": true
+								},
+								{
+									"key": "query",
+									"value": "dodz"
+								},
+								{
+									"key": "filter",
+									"value": "[{\"userName\":\"user1\"} ]",
+									"disabled": true
+								},
+								{
+									"key": "filter",
+									"value": "[ { \"personalInfo.lastName\": \"Daaaaoe\" } ]",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "page",
+									"value": "5",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/person/685e2a1837d0efe3a4a9bc2f?fields=personalInfo.firstName",
+							"host": ["{{base_url}}"],
+							"path": ["api", "person", "685e2a1837d0efe3a4a9bc2f"],
+							"query": [
+								{
+									"key": "fields",
+									"value": "personalInfo.firstName"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "test",
+			"item": [
+				{
+					"name": "test post",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Harry potter\",\r\n  \"author\": \"Bryan\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:5297/books",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5297",
+							"path": ["books"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Your Book Title\",\r\n  \"author\": \"Author Name\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:5297/books",
+							"protocol": "http",
+							"host": ["localhost"],
+							"port": "5297",
+							"path": ["books"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Maintenance",
+			"item": [
+				{
+					"name": "Create Maintenence",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"date\": \"2025-07-08T10:00:00Z\",\r\n  \"description\": \"Regular HVAC system maintenance and filter replacement\",\r\n  \"cost\": 150.00,\r\n  \"facilityId\": \"685bb10d100a8c0c0154c8b4\",\r\n  \"maintainedById\": \"68412cc653c6198eb44f6d4c\",\r\n  \"startDate\": \"2025-07-08T09:00:00Z\",\r\n  \"endDate\": \"2025-07-08T11:00:00Z\",\r\n  \"status\": \"PENDING\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/maintenance",
+							"host": ["{{base_url}}"],
+							"path": ["api", "maintenance"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/maintenance",
+							"host": ["{{base_url}}"],
+							"path": ["api", "maintenance"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Maintenance",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"686c7f9a365441452433a6cb\",\r\n  \"status\": \"COMPLETED\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/maintenance/686c7f9a365441452433a6cb",
+							"host": ["{{base_url}}"],
+							"path": ["api", "maintenance", "686c7f9a365441452433a6cb"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/maintenance/686c81d9f58cb4c5e4e67acc",
+							"host": ["{{base_url}}"],
+							"path": ["api", "maintenance", "686c81d9f58cb4c5e4e67acc"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Role",
+			"item": [
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"admin\",\r\n  \"description\": \"Manages hotel operations and staff\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/role",
+							"host": ["{{base_url}}"],
+							"path": ["api", "role"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all Role",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/role",
+							"host": ["{{base_url}}"],
+							"path": ["api", "role"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role By ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{base_url}}/api/role/686cb9e1b10bc444b0c4d4b8",
+							"host": ["{{base_url}}"],
+							"path": ["api", "role", "686cb9e1b10bc444b0c4d4b8"]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"hms-admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/role/686cb9e1b10bc444b0c4d4b8",
+							"host": ["{{base_url}}"],
+							"path": ["api", "role", "686cb9e1b10bc444b0c4d4b8"]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [""]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [""]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "localhost:3000",
+			"type": "string"
+		}
+	]
+}

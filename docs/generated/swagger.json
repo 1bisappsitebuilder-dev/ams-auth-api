@@ -1,0 +1,620 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "1BIS Backend API",
+		"version": "1.0.0",
+		"description": "Welcome to the 1BIS API documentation. This is a RESTful API that allows you to interact with the 1BIS backend services."
+	},
+	"tags": [
+		{
+			"name": "Template",
+			"description": "Template routes"
+		}
+	],
+	"paths": {
+		"security": {
+			"0": {
+				"bearerAuth": []
+			}
+		},
+		"/api/auth/register": {
+			"post": {
+				"summary": "Register",
+				"description": "Register a new user",
+				"tags": ["Auth"],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/User"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Returns the registered user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/auth/login": {
+			"post": {
+				"summary": "Login",
+				"description": "Login a user",
+				"tags": ["Auth"],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/User"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Returns the logged in user.",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/person/{id}": {
+			"get": {
+				"summary": "Get person by id",
+				"description": "Get person by id with optional fields to include",
+				"tags": ["Person"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "fields",
+						"schema": {
+							"type": "string"
+						},
+						"description": "Comma-separated list of fields to include"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Returns person data"
+					},
+					"404": {
+						"description": "Person not found"
+					}
+				}
+			},
+			"patch": {
+				"summary": "Update person",
+				"description": "Update person data by id",
+				"tags": ["Person"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"firstName": {
+										"type": "string"
+									},
+									"lastName": {
+										"type": "string"
+									},
+									"middleName": {
+										"type": "string"
+									},
+									"contactNumber": {
+										"type": "string"
+									},
+									"suffix": {
+										"type": "string"
+									},
+									"gender": {
+										"type": "string",
+										"enum": ["male", "female", "others"]
+									},
+									"birthDate": {
+										"type": "string",
+										"format": "date-time"
+									},
+									"birthPlace": {
+										"type": "string"
+									},
+									"age": {
+										"type": "integer"
+									},
+									"religion": {
+										"type": "string"
+									},
+									"civilStatus": {
+										"type": "string",
+										"enum": [
+											"single",
+											"married",
+											"separated",
+											"widow",
+											"cohabiting"
+										]
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Returns updated person"
+					},
+					"404": {
+						"description": "Person not found"
+					}
+				}
+			},
+			"put": {
+				"summary": "Soft delete person",
+				"description": "Mark person as deleted without permanently removing the data",
+				"tags": ["Person"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Person marked as deleted successfully"
+					},
+					"404": {
+						"description": "Person not found"
+					}
+				}
+			}
+		},
+		"/api/person": {
+			"get": {
+				"summary": "Get all persons",
+				"description": "Get all persons with pagination, sorting, and field selection",
+				"tags": ["Person"],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"schema": {
+							"type": "integer"
+						},
+						"description": "Page number (default 1)"
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"schema": {
+							"type": "integer"
+						},
+						"description": "Records per page (default 10)"
+					},
+					{
+						"in": "query",
+						"name": "sort",
+						"schema": {
+							"type": "string"
+						},
+						"description": "Field to sort by"
+					},
+					{
+						"in": "query",
+						"name": "order",
+						"schema": {
+							"type": "string",
+							"enum": ["asc", "desc"]
+						},
+						"description": "Sort order (default desc)"
+					},
+					{
+						"in": "query",
+						"name": "fields",
+						"schema": {
+							"type": "string"
+						},
+						"description": "Comma-separated list of fields to include"
+					},
+					{
+						"in": "query",
+						"name": "query",
+						"schema": {
+							"type": "string"
+						},
+						"description": "Search query to filter results"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Returns paginated persons list"
+					}
+				}
+			},
+			"post": {
+				"summary": "Create or find person",
+				"description": "Creates a new person or returns existing one if found with same first and last name",
+				"tags": ["Person"],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"required": ["firstName", "lastName"],
+								"properties": {
+									"firstName": {
+										"type": "string"
+									},
+									"lastName": {
+										"type": "string"
+									},
+									"middleName": {
+										"type": "string"
+									},
+									"contactNumber": {
+										"type": "string"
+									},
+									"suffix": {
+										"type": "string"
+									},
+									"gender": {
+										"type": "string",
+										"enum": ["male", "female", "others"]
+									},
+									"birthDate": {
+										"type": "string",
+										"format": "date-time"
+									},
+									"birthPlace": {
+										"type": "string"
+									},
+									"age": {
+										"type": "integer"
+									},
+									"religion": {
+										"type": "string"
+									},
+									"civilStatus": {
+										"type": "string",
+										"enum": [
+											"single",
+											"married",
+											"separated",
+											"widow",
+											"cohabiting"
+										]
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Returns existing person"
+					},
+					"201": {
+						"description": "Returns newly created person"
+					},
+					"400": {
+						"description": "Missing required fields"
+					}
+				}
+			}
+		},
+		"/api/user/current": {
+			"get": {
+				"summary": "Get current user",
+				"description": "Get the current authenticated user's information",
+				"tags": ["User"],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Returns current user data",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string"
+										},
+										"email": {
+											"type": "string"
+										},
+										"userName": {
+											"type": "string"
+										},
+										"role": {
+											"type": "string"
+										},
+										"subRole": {
+											"type": "string"
+										},
+										"status": {
+											"type": "string"
+										},
+										"person": {
+											"type": "object"
+										},
+										"organization": {
+											"type": "object"
+										}
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"404": {
+						"description": "User not found"
+					}
+				}
+			}
+		},
+		"/api/user/{id}": {
+			"get": {
+				"summary": "Get user by id",
+				"description": "Get user by id with optional select, sort, limit, and populate parameters",
+				"tags": ["User"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "select",
+						"schema": {
+							"type": "string"
+						},
+						"description": "JSON string of fields to select"
+					},
+					{
+						"in": "query",
+						"name": "sort",
+						"schema": {
+							"type": "string"
+						},
+						"description": "JSON string of sort criteria"
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"schema": {
+							"type": "integer"
+						},
+						"description": "Number of records to return (default 10)"
+					},
+					{
+						"in": "query",
+						"name": "populate",
+						"schema": {
+							"type": "string"
+						},
+						"description": "JSON string of relations to populate"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Returns user data"
+					},
+					"404": {
+						"description": "User not found"
+					}
+				}
+			},
+			"patch": {
+				"summary": "Update user",
+				"description": "Update user data by id",
+				"tags": ["User"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"firstName": {
+										"type": "string"
+									},
+									"lastName": {
+										"type": "string"
+									},
+									"email": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Returns updated user"
+					},
+					"404": {
+						"description": "User not found"
+					}
+				}
+			},
+			"put": {
+				"summary": "Soft delete user",
+				"description": "Mark user as deleted without permanently removing the data",
+				"tags": ["User"],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "User marked as deleted successfully"
+					},
+					"404": {
+						"description": "User not found"
+					}
+				}
+			}
+		},
+		"/api/user": {
+			"get": {
+				"summary": "Get all users",
+				"description": "Get all users with pagination, select, sort, limit, and populate options",
+				"tags": ["User"],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "page",
+						"schema": {
+							"type": "integer"
+						},
+						"description": "Page number (default 1)"
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"schema": {
+							"type": "integer"
+						},
+						"description": "Records per page (default 10)"
+					},
+					{
+						"in": "query",
+						"name": "select",
+						"schema": {
+							"type": "string"
+						},
+						"description": "JSON string of fields to select"
+					},
+					{
+						"in": "query",
+						"name": "sort",
+						"schema": {
+							"type": "string"
+						},
+						"description": "JSON string of sort criteria"
+					},
+					{
+						"in": "query",
+						"name": "populate",
+						"schema": {
+							"type": "string"
+						},
+						"description": "JSON string of relations to populate"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Returns paginated users list"
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"securitySchemes": {
+			"bearerAuth": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			}
+		},
+		"schemas": {
+			"User": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "The unique identifier of the user"
+					},
+					"email": {
+						"type": "string",
+						"description": "The email address of the user"
+					},
+					"password": {
+						"type": "string",
+						"description": "The hashed password of the user"
+					},
+					"firstName": {
+						"type": "string",
+						"description": "The first name of the user"
+					},
+					"lastName": {
+						"type": "string",
+						"description": "The last name of the user"
+					},
+					"role": {
+						"type": "string",
+						"enum": ["ADMIN", "USER"],
+						"description": "The role of the user"
+					}
+				},
+				"required": ["email", "password", "firstName", "lastName", "role"]
+			}
+		}
+	}
+}

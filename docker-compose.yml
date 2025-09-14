@@ -1,0 +1,140 @@
+services:
+    # Production service
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: runner
+        container_name: lms-api-app
+        ports:
+            - "3000:3000"
+        environment:
+            - NODE_ENV=production
+            - PORT=3000
+            - DATABASE_URL=${DATABASE_URL}
+            - JWT_SECRET=${JWT_SECRET}
+            - CORS_ORIGINS=${CORS_ORIGINS}
+        restart: unless-stopped
+        healthcheck:
+            test:
+                [
+                    "CMD",
+                    "node",
+                    "-e",
+                    "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })",
+                ]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 40s
+        networks:
+            - lms-network
+        volumes:
+            - ./logs:/app/logs
+            - ./assets:/app/assets
+        deploy:
+            resources:
+                limits:
+                    memory: 1G
+                    cpus: "0.5"
+                reservations:
+                    memory: 512M
+                    cpus: "0.25"
+
+    # Development service with hot reload
+    app-dev:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: builder
+        container_name: lms-api-app-dev
+        ports:
+            - "3001:3000"
+        environment:
+            - NODE_ENV=development
+            - PORT=3000
+            - DATABASE_URL=${DATABASE_URL}
+            - JWT_SECRET=${JWT_SECRET}
+            - CORS_ORIGINS=${CORS_ORIGINS}
+        restart: unless-stopped
+        volumes:
+            - ./app:/app/app
+            - ./config:/app/config
+            - ./helper:/app/helper
+            - ./middleware:/app/middleware
+            - ./utils:/app/utils
+            - ./zod:/app/zod
+            - ./prisma:/app/prisma
+            - ./docs:/app/docs
+            - ./assets:/app/assets
+            - ./index.ts:/app/index.ts
+            - ./logs:/app/logs
+            - /app/node_modules
+        command: ["npm", "run", "dev"]
+        networks:
+            - lms-network
+        profiles:
+            - dev
+
+    # Database service (if using local database)
+    database:
+        image: postgres:15-alpine
+        container_name: lms-database
+        environment:
+            - POSTGRES_DB=${POSTGRES_DB:-lms_db}
+            - POSTGRES_USER=${POSTGRES_USER:-lms_user}
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-lms_password}
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        networks:
+            - lms-network
+        profiles:
+            - dev
+            - local-db
+
+    # Prisma Studio service for database management
+    prisma-studio:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: builder
+        container_name: lms-prisma-studio
+        ports:
+            - "5555:5555"
+        environment:
+            - DATABASE_URL=${DATABASE_URL}
+        command: ["npx", "prisma", "studio", "--hostname", "0.0.0.0"]
+        networks:
+            - lms-network
+        profiles:
+            - dev
+            - prisma
+
+    # Nginx reverse proxy for production
+    nginx:
+        image: nginx:alpine
+        container_name: lms-nginx
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./nginx.conf:/etc/nginx/nginx.conf:ro
+            - ./ssl:/etc/nginx/ssl:ro
+        depends_on:
+            - app
+        networks:
+            - lms-network
+        profiles:
+            - production
+
+networks:
+    lms-network:
+        driver: bridge
+
+volumes:
+    postgres_data:
+        driver: local
+    logs:
+        driver: local

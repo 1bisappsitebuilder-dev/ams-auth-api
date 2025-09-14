@@ -1,0 +1,12 @@
+model Role {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  userIds     String[]  @db.ObjectId
+  name        String    @unique
+  description String?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  //relations
+  users       User[]    @relation(fields: [userIds], references: [id])
+}
