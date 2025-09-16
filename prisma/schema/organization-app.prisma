@@ -1,14 +1,14 @@
 model OrganizationApp {
-    id             String       @id @default(auto()) @map("_id") @db.ObjectId
-    organizationId String       @db.ObjectId
-    appId          String       @db.ObjectId
-    organization   Organization @relation(fields: [organizationId], references: [id])
-    app            App          @relation(fields: [appId], references: [id])
-    purchasedAt    DateTime     @default(now()) 
+    id             String    @id @default(auto()) @map("_id") @db.ObjectId
+    organizationId String    @db.ObjectId
+    appId          String    @db.ObjectId
+    purchasedAt    DateTime  @default(now())
     licenseStart   DateTime?
     licenseEnd     DateTime?
-    isActive       Boolean      @default(true)
-    // Optional: Add other fields like purchase details, license info, etc.
+    isActive       Boolean   @default(true)
+
+    organization Organization @relation(fields: [organizationId], references: [id])
+    app          App          @relation(fields: [appId], references: [id])
 
     @@unique([organizationId, appId]) // Prevent duplicate links
     @@index([organizationId])

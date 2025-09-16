@@ -24,9 +24,10 @@ model Organization {
   code             String
   description      String?
   branding         Branding?
-  deletedAt        DateTime?       // Corrected typo from 'deleteAt' to 'deletedAt'
+  deletedAt        DateTime?       
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
+
   // Relations
   users            User[]
   apps         OrganizationApp[] 

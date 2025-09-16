@@ -2,10 +2,11 @@ model UserRole {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
   roleId    String   @db.ObjectId
-  user      User     @relation(fields: [userId], references: [id])
-  role      Role     @relation(fields: [roleId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  //relations
+  user      User     @relation(fields: [userId], references: [id])
+  role      Role     @relation(fields: [roleId], references: [id])
   @@unique([userId, roleId]) // Ensure unique user-role combinations
 }

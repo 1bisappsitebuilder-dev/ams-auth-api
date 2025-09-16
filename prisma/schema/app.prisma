@@ -8,6 +8,8 @@ model App {
   isDeleted   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  //relations
   modules     Module[]
   organizations OrganizationApp[]
 }

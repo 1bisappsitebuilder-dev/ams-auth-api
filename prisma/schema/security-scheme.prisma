@@ -31,6 +31,7 @@ model SecurityScheme {
   roles                       RoleDefinition[]
   createdAt                   DateTime                     @default(now())
   updatedAt                   DateTime                     @updatedAt
+  
   // Relations
   organizationSecuritySchemes OrganizationSecurityScheme[] // Relation to the link table
 }
