@@ -6,6 +6,7 @@ model Role {
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
-  //relations
+  // Relations
   users       UserRole[]
+  securitySchemes SecuritySchemeRole[] // Link to Security Schemes through join table
 }

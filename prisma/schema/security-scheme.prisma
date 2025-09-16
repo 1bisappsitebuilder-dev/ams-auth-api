@@ -1,37 +1,11 @@
-// securityScheme.prisma
-enum resource {
-  organization
-  user
-  role
-  app
-  module
-}
-
-enum Action {
-  create
-  read
-  update
-  delete
-}
-
-type RolePermission {
-  resource resource
-  actions  Action[]
-}
-
-type RoleDefinition {
-  roleName    String
-  permissions RolePermission[]
-}
-
 model SecurityScheme {
-  id                          String                       @id @default(auto()) @map("_id") @db.ObjectId
-  name                        String
-  description                 String?
-  roles                       RoleDefinition[]
-  createdAt                   DateTime                     @default(now())
-  updatedAt                   DateTime                     @updatedAt
-  
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
   // Relations
-  organizationSecuritySchemes OrganizationSecurityScheme[] // Relation to the link table
+  roles       SecuritySchemeRole[] // Link to Roles through join table
+  organizations OrganizationSecurityScheme[] // Link to Organizations
 }

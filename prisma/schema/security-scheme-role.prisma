@@ -1,0 +1,36 @@
+enum Resource {
+    organization
+    user
+    role
+    app
+    module
+}
+
+enum Action {
+    create
+    read
+    update
+    delete
+}
+
+type RolePermission {
+    resource Resource
+    actions  Action[]
+}
+
+model SecuritySchemeRole {
+    id               String           @id @default(auto()) @map("_id") @db.ObjectId
+    securitySchemeId String           @db.ObjectId
+    roleId           String           @db.ObjectId
+    createdAt        DateTime         @default(now())
+    updatedAt        DateTime         @updatedAt
+    permissions      RolePermission[] // Permissions assigned to THIS role in THIS scheme
+
+    //relations
+    role             Role             @relation(fields: [roleId], references: [id])
+    securityScheme   SecurityScheme   @relation(fields: [securitySchemeId], references: [id])
+
+    @@unique([securitySchemeId, roleId])
+    @@index([securitySchemeId])
+    @@index([roleId])
+}
