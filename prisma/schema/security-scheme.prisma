@@ -21,17 +21,16 @@ type RolePermission {
 
 type RoleDefinition {
   roleName    String
-  permissions RolePermission[] 
+  permissions RolePermission[]
 }
 
 model SecurityScheme {
-  id          String           @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  description String?
-  roles       RoleDefinition[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  //relations
-  organizations Organization[]
+  id                          String                       @id @default(auto()) @map("_id") @db.ObjectId
+  name                        String
+  description                 String?
+  roles                       RoleDefinition[]
+  createdAt                   DateTime                     @default(now())
+  updatedAt                   DateTime                     @updatedAt
+  // Relations
+  organizationSecuritySchemes OrganizationSecurityScheme[] // Relation to the link table
 }

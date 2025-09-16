@@ -1,0 +1,11 @@
+model OrganizationSecurityScheme {
+    id               String         @id @default(auto()) @map("_id") @db.ObjectId
+    organizationId   String         @db.ObjectId
+    securitySchemeId String         @db.ObjectId
+    organization     Organization   @relation(fields: [organizationId], references: [id])
+    securityScheme   SecurityScheme @relation(fields: [securitySchemeId], references: [id])
+    createdAt        DateTime       @default(now())
+    updatedAt        DateTime       @updatedAt
+
+    @@unique([organizationId, securitySchemeId]) // Prevent duplicate entries
+}

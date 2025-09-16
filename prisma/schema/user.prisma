@@ -1,4 +1,3 @@
-
 enum Status {
   active
   inactive
@@ -8,7 +7,6 @@ enum Status {
 
 model User {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
-  roleIds        String[]      @db.ObjectId
   personId       String        @db.ObjectId
   organizationId String?       @db.ObjectId
   userName       String        @unique
@@ -17,15 +15,11 @@ model User {
   avatar         String?
   status         Status        @default(active)
   loginMethod    String
-
-  //metadata
-  lastLoginAt      DateTime?
-  deletedAt      DateTime?       
+  lastLoginAt    DateTime?
+  deletedAt      DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-
-  //relations
-  Role           Role[]        @relation(fields: [roleIds], references: [id])
   person         Person        @relation(fields: [personId], references: [id])
   organization   Organization? @relation(fields: [organizationId], references: [id])
+  roles          UserRole[] // Relation to the link table
 }

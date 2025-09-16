@@ -18,36 +18,17 @@ type Branding {
     colors     Colors?
 }
 
-type PurchasedModule {
-    moduleId         String? // Reference to the original module if needed
-    purchaseDate     DateTime  @default(now())
-    licenseStartDate DateTime  @default(now())
-    licenseEndDate   DateTime?
-    isActive         Boolean   @default(true)
-}
-
-type PurchasedApp {
-    appId            String? // Reference to the original app if needed
-    modules          PurchasedModule[]
-    purchaseDate     DateTime          @default(now())
-    licenseStartDate DateTime          @default(now())
-    licenseEndDate   DateTime?
-    isActive         Boolean           @default(true)
-}
-
 model Organization {
-    id               String         @id @default(auto()) @map("_id") @db.ObjectId
-    securitySchemeId String?         @db.ObjectId
-    name             String
-    code             String
-    apps             PurchasedApp[]
-    description      String?
-    branding         Branding?
-    deleteAt         DateTime?
-    createdAt        DateTime       @default(now())
-    updatedAt        DateTime       @updatedAt
-
-    //relations
-    users          User[]
-    securityScheme SecurityScheme? @relation(fields: [securitySchemeId], references: [id])
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  name             String
+  code             String
+  description      String?
+  branding         Branding?
+  deletedAt        DateTime?       // Corrected typo from 'deleteAt' to 'deletedAt'
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  // Relations
+  users            User[]
+  apps         OrganizationApp[] 
+  organizationSecuritySchemes OrganizationSecurityScheme[]  // Relation to the link table
 }
