@@ -1,3 +1,4 @@
+//many to many relation between app and organization
 model OrganizationApp {
     id             String    @id @default(auto()) @map("_id") @db.ObjectId
     organizationId String    @db.ObjectId

@@ -1,3 +1,5 @@
+//many to many relation between organization and security scheme
+
 model OrganizationSecurityScheme {
     id               String   @id @default(auto()) @map("_id") @db.ObjectId
     organizationId   String   @db.ObjectId

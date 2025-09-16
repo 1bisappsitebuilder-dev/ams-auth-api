@@ -18,6 +18,8 @@ type RolePermission {
     actions  Action[]
 }
 
+//many to many relation between security scheme and role
+
 model SecuritySchemeRole {
     id               String           @id @default(auto()) @map("_id") @db.ObjectId
     securitySchemeId String           @db.ObjectId

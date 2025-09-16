@@ -1,3 +1,5 @@
+//many to many relation between user and role
+
 model UserRole {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   userId    String   @db.ObjectId
