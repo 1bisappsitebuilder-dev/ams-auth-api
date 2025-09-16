@@ -5,7 +5,7 @@ const isProd = process.env.NODE_ENV === "production";
 module.exports = {
 	entry: "./index.ts",
 	target: "node",
-	  mode: isProd ? "production" : "development", // ✅ fix the warning
+	mode: isProd ? "production" : "development",
 
 	externals: [
 		/^[a-z\-0-9]+$/, // Ignore node_modules folder
