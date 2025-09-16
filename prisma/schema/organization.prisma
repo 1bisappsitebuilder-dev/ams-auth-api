@@ -1,35 +1,34 @@
 type Colors {
-    primary   String?
-    secondary String?
-    accent    String?
-    success   String?
-    warning   String?
-    danger    String?
-    info      String?
-    light     String?
-    dark      String?
-    neutral   String?
+  primary   String?
+  secondary String?
+  accent    String?
+  success   String?
+  warning   String?
+  danger    String?
+  info      String?
+  light     String?
+  dark      String?
+  neutral   String?
 }
 
 type Branding {
-    logo       String?
-    background String?
-    font       String?
-    colors     Colors?
+  logo       String?
+  background String?
+  font       String?
+  colors     Colors?
 }
 
 model Organization {
-  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
   name             String
   code             String
   description      String?
   branding         Branding?
-  deletedAt        DateTime?       
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  deletedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   // Relations
-  users            User[]
-  apps         OrganizationApp[] 
-  organizationSecuritySchemes OrganizationSecurityScheme[]  // Relation to the link table
+  users          User[]
+  apps           OrganizationApp[]
 }

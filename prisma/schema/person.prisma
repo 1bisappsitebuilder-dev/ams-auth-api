@@ -29,21 +29,6 @@ enum IdentificationType {
   school_id
 }
 
-type PersonalInfo {
-  prefix          String? // Added: Mr., Ms., Dr., etc.
-  firstName       String
-  middleName      String? // Added: Middle name
-  lastName        String
-  dateOfBirth     DateTime?
-  placeOfBirth    String?
-  age             Int?
-  nationality     String?
-  primaryLanguage String?
-  gender          GenderType?
-  currency        String? // Added: Preferred currency (USD, EUR, etc.)
-  vipCode         String? // Added: VIP status code
-}
-
 type Phone {
   type        PhoneType?
   countryCode String?
@@ -52,8 +37,8 @@ type Phone {
 }
 
 type ContactAddress {
-  street      String? // address1
-  address2    String? // Added: Second address line
+  street      String?
+  address2    String?
   city        String?
   state       String?
   country     String?
@@ -65,7 +50,7 @@ type ContactAddress {
 type ContactInfo {
   email   String?
   phones  Phone[]
-  fax     String? // Added: Separate fax field
+  fax     String?
   address ContactAddress?
 }
 
@@ -78,19 +63,36 @@ type Identification {
 
 type Metadata {
   isActive    Boolean   @default(true)
-  status      String? // TODO: Define enum based on config.ENUMS.PERSON.PERSON_STATUS
-  createdBy   String?   @db.ObjectId // Should reference a User id
-  updatedBy   String?   @db.ObjectId // Should reference a User id
+  status      String?
+  createdBy   String?   @db.ObjectId
+  updatedBy   String?   @db.ObjectId
   lastLoginAt DateTime?
-  deletedAt    DateTime?
+  deletedAt   DateTime?
 }
 
 model Person {
-  id             String          @id @default(auto()) @map("_id") @db.ObjectId
-  organizationId String?         @db.ObjectId
-  personalInfo   PersonalInfo?
+  id             String  @id @default(auto()) @map("_id") @db.ObjectId
+  organizationId String? @db.ObjectId
+
+  // Flattened searchable fields
+  prefix          String?
+  firstName       String
+  middleName      String?
+  lastName        String
+  dateOfBirth     DateTime?
+  placeOfBirth    String?
+  age             Int?
+  nationality     String?
+  primaryLanguage String?
+  gender          GenderType?
+  currency        String?
+  vipCode         String?
+
+  //  Keep structured as composites (not searched often)
   contactInfo    ContactInfo?
   identification Identification?
   metadata       Metadata?
-  users          User[]
+
+  //  Relations
+  users User[]
 }

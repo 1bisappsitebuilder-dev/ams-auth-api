@@ -1,11 +1,10 @@
 model SecurityScheme {
-  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  roles       SecuritySchemeRole[] // Link to Roles through join table
-  organizations OrganizationSecurityScheme[] // Link to Organizations
+  roles         SecuritySchemeRole[]
 }

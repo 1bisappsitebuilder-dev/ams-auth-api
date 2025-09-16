@@ -1,352 +1,163 @@
 import { Request, Response, NextFunction } from "express";
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient, Prisma } from "../../generated/prisma";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { getLogger } from "../../helper/logger";
 import { controller as personController } from "../person/person.controller";
-import {
-	RegisterSchema,
-	LoginSchema,
-	UpdatePasswordSchema,
-	type RegisterInput,
-	type LoginInput,
-	type UpdatePasswordInput,
-} from "../../zod/auth.zod";
-import {
-	validateWithZod,
-	sendValidationError,
-	sendSuccessResponse,
-	sendErrorResponse,
-	sendConflictResponse,
-	sendNotFoundResponse,
-	sendPrismaErrorResponse,
-} from "../../utils/validationHelper";
 import { config } from "../../config/constant";
-import { logActivity } from "../../utils/activityLogger";
-import { logAudit } from "../../utils/auditLogger";
 
 const logger = getLogger();
-const authLogger = logger.child({ module: "auth" });
+const authLogger = logger.child({
+	module: "auth",
+});
 
 export const controller = (prisma: PrismaClient) => {
-	const personCtrl = personController(prisma);
-
-	// Utility function to safely extract non-object fields
-	const extractScalarFields = (obj: Record<string, any> = {}) => {
-		return Object.fromEntries(
-			Object.entries(obj).filter(
-				([key, value]) =>
-					value !== undefined && value !== null && typeof value !== "object",
-			),
-		);
-	};
+	// const personCtrl = personController(prisma);
 
 	const register = async (req: Request, res: Response, next: NextFunction) => {
-		const validation = validateWithZod(RegisterSchema, req.body);
-		if (!validation.success) {
-			return sendValidationError(res, config.ERROR.AUTH.REGISTRATION_VALIDATION_FAILED, [
-				{ field: "Error", message: config.ERROR.AUTH.REGISTRATION_VALIDATION_FAILED },
-			]);
+		const { email, password, userName, ...personData } = req.body;
+		const { firstName, lastName } = personData;
+
+		// Validate required fields
+		if (!firstName || !lastName) {
+			authLogger.error("First name and last name are required");
+			res.status(400).json({ message: "First name and last name are required" });
 		}
 
-		const {
-			email,
-			password,
-			userName,
-			role,
-			subRole,
-			firstName,
-			lastName,
-			organizationId,
-			phoneNumber,
-			...personData
-		} = validation.data as RegisterInput;
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(email)) {
+			authLogger.error(`Invalid email address: ${email}`);
+			res.status(400).json({ message: "Invalid email address" });
+		}
 
-		authLogger.info(`${config.INFO.USER.REGISTERING_USER}: ${email}`);
+		if (!password || password.length < 6) {
+			authLogger.error("Password must be at least 6 characters long");
+			res.status(400).json({ message: "Password must be at least 6 characters long" });
+		}
 
 		try {
+			// Check if user already exists
 			const existingUser = await prisma.user.findUnique({ where: { email } });
 			if (existingUser) {
-				authLogger.error(`${config.ERROR.AUTH.USER_ALREADY_EXISTS}: ${email}`);
-				return sendConflictResponse(
-					res,
-					config.COMMON.EMAIL,
-					config.ERROR.AUTH.USER_ALREADY_EXISTS,
-				);
+				authLogger.error(`User already exists: ${email}`);
+				res.status(400).json({ message: "User already exists" });
 			}
 
 			const hashedPassword = await argon2.hash(password);
 
 			const result = await prisma.$transaction(async (tx) => {
-				// Structure contact info with phone number if provided
-				const contactInfo = {
-					...(req.body.contactInfo || {}),
-					...(phoneNumber && {
-						phones: [
-							{
-								type: "mobile",
-								number: phoneNumber,
-								isPrimary: true,
-							},
-						],
-					}),
-				};
+				// Create Person record
+				const person = await tx.person.create({
+					data: { firstName, lastName, ...personData },
+				});
 
-				// Build personalInfo from the original request, ensuring no nested duplication
-				const originalPersonalInfo = req.body.personalInfo || {};
-				const personalInfo = {
-					firstName,
-					lastName,
-					...extractScalarFields(originalPersonalInfo),
-				};
-
-				const mockReq = {
-					body: {
-						personalInfo,
-						...(organizationId && { organizationId }),
-						...(req.body.address && { address: req.body.address }),
-						...(Object.keys(contactInfo).length > 0 && { contactInfo }),
-						...(req.body.identification && { identification: req.body.identification }),
-					},
-				} as Request;
-
-				const mockRes = {
-					statusCode: 0,
-					data: null,
-					status: function (code: number) {
-						this.statusCode = code;
-						return this;
-					},
-					json: function (data: any) {
-						this.data = data;
-						return this;
-					},
-				} as any;
-
-				await personCtrl.create(mockReq, mockRes, next);
-
-				if (mockRes.statusCode !== 201 && mockRes.statusCode !== 200) {
-					throw new Error(config.ERROR.AUTH.FAILED_TO_CREATE_OR_FIND_PERSON);
-				}
-
-				const person = mockRes.data;
-
+				// Create User linked to Person
 				const user = await tx.user.create({
 					data: {
 						email,
-						userName,
+						userName: userName || "",
 						password: hashedPassword,
-						role,
-						subRole,
-						loginMethod: config.COMMON.EMAIL_METHOD,
+						loginMethod: "email",
 						personId: person.id,
 					},
-					include: { person: true },
+					include: {
+						person: true,
+						roles: true, // include roles if you need them
+					},
 				});
 
-				return { user, isExistingPerson: mockRes.statusCode === 200 };
+				return { user };
 			});
 
-			const userResponse = {
-				id: result.user.id,
-				email: result.user.email,
-				userName: result.user.userName,
-				role: result.user.role,
-				subRole: result.user.subRole,
-				avatar: result.user.avatar,
-			};
-
-			// ✅ Log activity
-			logActivity(req, {
-				userId: result.user.id,
-				action: "REGISTER",
-				description: `User ${email} registered successfully`,
-				organizationId,
-				page: { url: req.originalUrl, title: "Registration Page" },
+			authLogger.info(`User created: ${result.user.id}`);
+			res.status(201).json({
+				message: "Registration successful",
+				user: result.user,
 			});
-			logAudit(req, {
-				userId: result.user.id,
-				action: "CREATE",
-				resource: "users",
-				severity: "LOW",
-				entityType: "user",
-				entityId: result.user.id,
-				changesBefore: null,
-				changesAfter: {
-					email: result.user.email,
-					userName: result.user.userName,
-					role: result.user.role,
-					subRole: result.user.subRole,
-				},
-				description: `New user account created: ${email}`,
-				organizationId,
-			});
-
-			authLogger.info(`${config.SUCCESS.AUTH.USER_CREATED}: ${result.user.id}`);
-			return sendSuccessResponse(
-				res,
-				config.SUCCESS.AUTH.REGISTRATION_SUCCESSFUL,
-				userResponse,
-				201,
-			);
-		} catch (error: any) {
-			if (error.name?.includes("Prisma") || error.code?.startsWith("P")) {
-				return sendPrismaErrorResponse(res, error, authLogger);
-			}
-			authLogger.error(`${config.ERROR.AUTH.ERROR_DURING_REGISTRATION}: ${error}`);
-			return sendErrorResponse(res, config.ERROR.AUTH.ERROR_DURING_REGISTRATION);
+		} catch (error) {
+			authLogger.error(`Error during registration: ${error}`);
+			res.status(500).json({ message: "Error during registration" });
+			next(error);
 		}
 	};
 
 	const login = async (req: Request, res: Response, _next: NextFunction) => {
-		const validation = validateWithZod(LoginSchema, req.body);
-		if (!validation.success) {
-			return sendValidationError(res, config.ERROR.AUTH.LOGIN_VALIDATION_FAILED, [
-				{ field: "Error", message: config.ERROR.AUTH.LOGIN_VALIDATION_FAILED },
-			]);
+		const { identifier, password } = req.body;
+		// `identifier` can be either username or email
+
+		if (!identifier || !password) {
+			authLogger.error("Username/email and password are required");
+			res.status(400).json({ message: "Username/email and password are required" });
 		}
 
-		const { email, password } = validation.data as LoginInput;
-
-		authLogger.info(`${config.INFO.USER.LOGGING_IN_USER}: ${email}`);
+		authLogger.info(`Logging in user with identifier: ${identifier}`);
 
 		try {
-			const user = await prisma.user.findUnique({
-				where: { email },
-				include: { person: true },
+			const user = await prisma.user.findFirst({
+				where: {
+					OR: [{ email: identifier }, { userName: identifier }],
+				},
+				include: {
+					person: true,
+					roles: {
+						include: {
+							role: true,
+						},
+					},
+				},
 			});
 
 			if (!user || !user.password) {
-				authLogger.error(`${config.ERROR.AUTH.INVALID_CREDENTIALS}: ${email}`);
-				return sendValidationError(res, config.ERROR.AUTH.INVALID_CREDENTIALS, [
-					{ field: "Error", message: config.ERROR.AUTH.INVALID_CREDENTIALS },
-				]);
+				authLogger.error(`Invalid credentials for identifier: ${identifier}`);
+				res.status(401).json({ message: "Invalid credentials" });
+				return
 			}
 
 			const isPasswordValid = await argon2.verify(user.password, password);
 			if (!isPasswordValid) {
-				authLogger.error(`${config.ERROR.AUTH.INVALID_CREDENTIALS}: ${email}`);
-				return sendValidationError(res, config.ERROR.AUTH.INVALID_CREDENTIALS, [
-					{ field: "Error", message: config.ERROR.AUTH.INVALID_CREDENTIALS },
-				]);
+				authLogger.error(`Invalid password for identifier: ${identifier}`);
+				res.status(401).json({ message: "Invalid credentials" });
 			}
 
+			// Update last login timestamp
 			await prisma.user.update({
 				where: { id: user.id },
-				data: { lastLogin: new Date() },
+				data: { lastLoginAt: new Date() },
 			});
 
+			// Generate JWT
 			const token = jwt.sign(
 				{
 					userId: user.id,
-					role: user.role,
-					firstName: user.person?.personalInfo?.firstName,
-					lastName: user.person?.personalInfo?.lastName,
+					roles: user.roles.map((r) => r.role.name), // assuming UserRole has "name"
+					firstName: user.person?.firstName,
+					lastName: user.person?.lastName,
 				},
 				process.env.JWT_SECRET || "",
-				{ expiresIn: "1d" },
+				{ expiresIn: "1h" },
 			);
 
-			const isProduction = process.env.NODE_ENV === config.COMMON.PRODUCTION;
-			res.cookie(config.COMMON.TOKEN, token, {
+			// Set cookie
+			res.cookie("token", token, {
 				httpOnly: true,
-				secure: isProduction,
-				sameSite: isProduction ? "none" : "lax",
-				maxAge: 1 * 24 * 60 * 60 * 1000,
-				path: "/",
+				secure: process.env.NODE_ENV === "production",
+				maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day
 			});
 
-			const userResponse = {
-				id: user.id,
-				email: user.email,
-				role: user.role,
-				subRole: user.subRole,
-				avatar: user.avatar,
-				person: user.person,
-				token,
-			};
-
-			// ✅ Log activity
-			logActivity(req, {
-				userId: user.id,
-				action: "LOGIN",
-				description: `User ${email} logged in`,
-				organizationId: user.person?.organizationId ?? undefined,
-				page: { url: req.originalUrl, title: "Login Page" },
+			authLogger.info(`User logged in: ${user.id}`);
+			res.status(200).json({
+				message: "Logged in successfully",
+				user: {
+					id: user.id,
+					email: user.email,
+					userName: user.userName,
+					roles: user.roles,
+					person: user.person,
+				},
 			});
-
-			authLogger.info(`${config.SUCCESS.AUTH.USER_LOGGED_IN}: ${user.id}`);
-			return sendSuccessResponse(
-				res,
-				config.SUCCESS.AUTH.LOGGED_IN_SUCCESSFULLY,
-				userResponse,
-			);
-		} catch (error: any) {
-			if (error.name?.includes("Prisma") || error.code?.startsWith("P")) {
-				return sendPrismaErrorResponse(res, error, authLogger);
-			}
-			authLogger.error(`${config.ERROR.AUTH.ERROR_DURING_LOGIN}: ${error}`);
-			return sendErrorResponse(res, config.ERROR.AUTH.ERROR_DURING_LOGIN, "LOGIN_ERROR");
-		}
-	};
-
-	const updatePassword = async (req: Request, res: Response, _next: NextFunction) => {
-		const validation = validateWithZod(UpdatePasswordSchema, req.body);
-		if (!validation.success) {
-			return sendValidationError(res, config.ERROR.AUTH.PASSWORD_UPDATE_VALIDATION_FAILED, [
-				{ field: "Error", message: config.ERROR.AUTH.PASSWORD_UPDATE_VALIDATION_FAILED },
-			]);
-		}
-
-		const { userId, password } = validation.data as UpdatePasswordInput;
-
-		try {
-			const existingUser = await prisma.user.findUnique({ where: { id: userId } });
-			const previousPassword = existingUser?.password;
-			if (!existingUser) {
-				authLogger.error(`${config.ERROR.AUTH.USER_NOT_FOUND}: ${userId}`);
-				return sendNotFoundResponse(res, config.COMMON.USER, config.COMMON.USER_ID);
-			}
-
-			const hashedPassword = await argon2.hash(password);
-			await prisma.user.update({
-				where: { id: userId },
-				data: { password: hashedPassword },
-			});
-
-			// ✅ Log activity
-			logActivity(req, {
-				userId,
-				action: "UPDATE_PASSWORD",
-				description: "User updated their password",
-				organizationId: existingUser.organizationId ?? undefined,
-				page: { url: req.originalUrl, title: "Password Update Page" },
-			});
-			logAudit(req, {
-				userId,
-				action: "UPDATE",
-				resource: "users",
-				severity: "HIGH",
-				entityType: "user",
-				entityId: userId,
-				changesBefore: { password: previousPassword },
-				changesAfter: { password: hashedPassword },
-				description: "User password updated",
-				organizationId: existingUser.organizationId ?? undefined,
-			});
-
-			authLogger.info(`${config.SUCCESS.AUTH.PASSWORD_UPDATED_SUCCESSFULLY}: ${userId}`);
-			return sendSuccessResponse(res, config.SUCCESS.AUTH.PASSWORD_UPDATED_SUCCESSFULLY);
-		} catch (error: any) {
-			if (error.name?.includes("Prisma") || error.code?.startsWith("P")) {
-				return sendPrismaErrorResponse(res, error, authLogger);
-			}
-			authLogger.error(`${config.ERROR.AUTH.ERROR_UPDATING_PASSWORD}: ${error}`);
-			return sendErrorResponse(
-				res,
-				config.ERROR.AUTH.ERROR_UPDATING_PASSWORD,
-				"PASSWORD_UPDATE_ERROR",
-			);
+		} catch (error) {
+			authLogger.error(`Error during login: ${error}`);
+			res.status(500).json({ message: "Error during login" });
 		}
 	};
 
@@ -354,32 +165,93 @@ export const controller = (prisma: PrismaClient) => {
 		try {
 			const isProduction = process.env.NODE_ENV === config.COMMON.PRODUCTION;
 
+			// Retrieve token from cookie (if exists)
+			const token = req.cookies[config.COMMON.TOKEN];
+
+			// Clear the JWT cookie
 			res.cookie(config.COMMON.TOKEN, "", {
 				httpOnly: true,
 				secure: isProduction,
 				sameSite: isProduction ? "none" : "lax",
-				maxAge: 0,
+				maxAge: 0, // Expire immediately
 				path: "/",
 			});
 
-			// ✅ Log activity
-			logActivity(req, {
-				userId: (req as any).user?.id || "unknown",
-				action: "LOGOUT",
-				description: "User logged out",
-				page: { url: req.originalUrl, title: "Logout Endpoint" },
-			});
+			// Get user info from request (set by auth middleware)
+			const userId = (req as any).user?.id || "system";
+			const organizationId = (req as any).user?.organizationId;
 
-			authLogger.info("User logged out successfully");
-			return sendSuccessResponse(res, "Logged out successfully");
+			authLogger.info(`${config.SUCCESS.AUTH.LOGGED_OUT_SUCCESSFULLY}: ${userId}`);
+			res.status(200).json({
+				message: config.SUCCESS.AUTH.LOGGED_OUT_SUCCESSFULLY,
+				success: true,
+			});
 		} catch (error: any) {
 			if (error.name?.includes("Prisma") || error.code?.startsWith("P")) {
-				return sendPrismaErrorResponse(res, error, authLogger);
+				authLogger.error(`Prisma error during logout: ${error}`);
+				res.status(500).json({
+					message: config.ERROR.AUTH.ERROR_DURING_LOGOUT,
+					error: error.message,
+					success: false,
+				});
 			}
-			authLogger.error(`Error during logout: ${error}`);
-			return sendErrorResponse(res, "Error during logout", "LOGOUT_ERROR");
+
+			authLogger.error(`${config.ERROR.AUTH.ERROR_DURING_LOGOUT}: ${error}`);
+			res.status(500).json({
+				message: config.ERROR.AUTH.ERROR_DURING_LOGOUT,
+				error: error.message,
+				success: false,
+			});
 		}
 	};
 
-	return { register, login, updatePassword, logout };
+	const updatePassword = async (req: Request, res: Response, _next: NextFunction) => {
+		const { userId, password } = req.body;
+
+		if (!userId || !password) {
+			authLogger.error("User ID and new password are required");
+			res.status(400).json({
+				message: "User ID and new password are required",
+			});
+			return;
+		}
+
+		if (password.length < 6) {
+			authLogger.error("Password must be at least 6 characters long");
+			res.status(400).json({
+				message: "Password must be at least 6 characters long",
+			});
+			return;
+		}
+
+		try {
+			const hashedPassword = await argon2.hash(password);
+
+			await prisma.user.update({
+				where: {
+					id: userId,
+				},
+				data: {
+					password: hashedPassword,
+				},
+			});
+
+			authLogger.info(`Password updated for user: ${userId}`);
+			res.status(200).json({
+				message: "Password updated successfully",
+			});
+		} catch (error) {
+			authLogger.error(`Error updating password: ${error}`);
+			res.status(500).json({
+				message: "Error updating password",
+			});
+		}
+	};
+
+	return {
+		register,
+		login,
+		updatePassword,
+		logout,
+	};
 };

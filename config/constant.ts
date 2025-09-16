@@ -101,7 +101,8 @@ export const config = {
 			ORGANIZATION_VERIFIED: "Organization verified",
 			TOKEN_GENERATED: "Token generated successfully",
 			USER_LOGGED_IN: "User logged in successfully",
-		}
+			ERROR_DURING_LOGOUT: "Error logging out",
+		},
 	},
 
 	SUCCESS: {
@@ -130,6 +131,7 @@ export const config = {
 			TOKEN_GENERATED: "Token generated successfully",
 			ORGANIZATION_VERIFIED: "Organization verified successfully",
 			USER_LOGGED_IN: "User logged in successfully",
+			LOGGED_OUT_SUCCESSFULLY: "User logged out successfully",
 		},
 		PERSON: {
 			RETRIEVED: "Person retrieved",
@@ -147,17 +149,16 @@ export const config = {
 			DELETED: "Image deleted successfully",
 			DELETION_COMPLETED: "Deletion completed",
 			TRANSFORMED: "Image transformed successfully",
-		}
+		},
 	},
 	INFO: {
 		USER: {
 			REGISTERING_USER: "Registering user with email:",
 			CREATING_USER_WITH_PERSON_ID: "Creating user with personId:",
 			LOGGING_IN_USER: "Logging in user with email:",
-		}
+		},
 	},
 	COMMON: {
-
 		// Common field names
 		ID: "id",
 		EMAIL: "email",
