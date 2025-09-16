@@ -190,7 +190,7 @@ export const controller = (prisma: PrismaClient) => {
 
 		try {
 			const existingOrg = await prisma.organization.findFirst({
-				where: { name, deletedAt: null },
+				where: { code, deletedAt: null },
 			});
 
 			if (existingOrg) {
