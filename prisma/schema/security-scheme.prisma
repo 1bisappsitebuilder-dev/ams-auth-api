@@ -7,4 +7,5 @@ model SecurityScheme {
 
   // Relations
   roles         SecuritySchemeRole[]
+  
 }

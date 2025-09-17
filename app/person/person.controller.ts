@@ -29,7 +29,7 @@ export const controller = (prisma: PrismaClient) => {
 			const query: Prisma.PersonFindFirstArgs = {
 				where: {
 					id,
-					deletedAt: null,
+					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				},
 			};
 
@@ -113,10 +113,7 @@ export const controller = (prisma: PrismaClient) => {
 
 		try {
 			const whereClause: Prisma.PersonWhereInput = {
-				OR: [
-					{ deletedAt: null },
-					{ deletedAt: { isSet: false } }, // For fields that don't exist
-				],
+				OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				...(query
 					? {
 							OR: [
@@ -196,7 +193,7 @@ export const controller = (prisma: PrismaClient) => {
 				where: {
 					firstName,
 					lastName,
-					deletedAt: null, 
+					deletedAt: null,
 				},
 			});
 

@@ -31,7 +31,7 @@ const auth = require("./app/auth")(prisma);
 const user = require("./app/user")(prisma);
 const person = require("./app/person")(prisma);
 const images = require("./app/images")(prisma);
-// const roleRouter = require("./app/role")(prisma);
+const role = require("./app/role")(prisma);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -69,7 +69,7 @@ app.use(config.baseApiPath, (req: Request, res: Response, next: NextFunction) =>
 app.use(config.baseApiPath, user);
 app.use(config.baseApiPath, person);
 app.use(`${config.baseApiPath}/images`, images);
-// app.use(config.baseApiPath, roleRouter);
+app.use(config.baseApiPath, role);
 
 server.listen(config.port, async () => {
 	await connectDb();
