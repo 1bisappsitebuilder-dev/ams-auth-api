@@ -1,4 +1,4 @@
-model SecurityScheme {
+model AccessPolicy {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String?
@@ -6,6 +6,6 @@ model SecurityScheme {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  roles         SecuritySchemeRole[]
+  roles         AccessPolicyRole[]
   
 }
