@@ -29,11 +29,7 @@ export const controller = (prisma: PrismaClient) => {
 			const query: Prisma.PersonFindFirstArgs = {
 				where: {
 					id,
-					metadata: {
-						is: {
-							deletedAt: null,
-						},
-					},
+					deletedAt: null,
 				},
 			};
 
@@ -117,11 +113,10 @@ export const controller = (prisma: PrismaClient) => {
 
 		try {
 			const whereClause: Prisma.PersonWhereInput = {
-				metadata: {
-					is: {
-						deletedAt: null,
-					},
-				},
+				OR: [
+					{ deletedAt: null },
+					{ deletedAt: { isSet: false } }, // For fields that don't exist
+				],
 				...(query
 					? {
 							OR: [
@@ -201,11 +196,7 @@ export const controller = (prisma: PrismaClient) => {
 				where: {
 					firstName,
 					lastName,
-					metadata: {
-						is: {
-							deletedAt: null,
-						},
-					},
+					deletedAt: null, 
 				},
 			});
 
@@ -307,9 +298,7 @@ export const controller = (prisma: PrismaClient) => {
 			await prisma.person.update({
 				where: { id },
 				data: {
-					metadata: {
-						deletedAt: new Date(),
-					},
+					deletedAt: new Date(),
 				},
 			});
 

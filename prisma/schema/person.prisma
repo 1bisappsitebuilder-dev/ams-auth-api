@@ -91,7 +91,14 @@ model Person {
   //  Keep structured as composites (not searched often)
   contactInfo    ContactInfo?
   identification Identification?
-  metadata       Metadata?
+
+  //metadata
+  isActive    Boolean   @default(true)
+  status      String?
+  createdBy   String?   @db.ObjectId
+  updatedBy   String?   @db.ObjectId
+  lastLoginAt DateTime?
+  deletedAt   DateTime?
 
   //  Relations
   users User[]

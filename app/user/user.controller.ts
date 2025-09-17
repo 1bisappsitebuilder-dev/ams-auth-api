@@ -310,9 +310,7 @@ export const controller = (prisma: PrismaClient) => {
 				prisma.person.update({
 					where: { id: existingUser.person.id },
 					data: {
-						metadata: {
-							deletedAt: new Date(),
-						},
+						deletedAt: new Date(),
 					},
 				}),
 			]);
@@ -366,8 +364,6 @@ export const controller = (prisma: PrismaClient) => {
 			]);
 		}
 	};
-
-	
 
 	return {
 		getById,

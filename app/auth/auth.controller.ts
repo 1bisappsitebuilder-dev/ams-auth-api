@@ -3,7 +3,6 @@ import { PrismaClient, Prisma } from "../../generated/prisma";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { getLogger } from "../../helper/logger";
-import { controller as personController } from "../person/person.controller";
 import { config } from "../../config/constant";
 
 const logger = getLogger();
