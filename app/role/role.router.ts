@@ -1,24 +1,25 @@
 import { Router, Request, Response, NextFunction } from "express";
 
-interface IController {
+interface IPermissionController {
 	getById(req: Request, res: Response, next: NextFunction): Promise<void>;
 	getAll(req: Request, res: Response, next: NextFunction): Promise<void>;
 	create(req: Request, res: Response, next: NextFunction): Promise<void>;
 	update(req: Request, res: Response, next: NextFunction): Promise<void>;
 	remove(req: Request, res: Response, next: NextFunction): Promise<void>;
+	// checkPermissions(req: Request, res: Response, next: NextFunction): Promise<void>;
 }
 
-export const router = (route: Router, controller: IController): Router => {
+export const router = (route: Router, controller: IPermissionController): Router => {
 	const routes = Router();
-	const path = "/role";
+	const path = "/permission";
 
 	/**
 	 * @openapi
-	 * /api/role/{id}:
+	 * /api/permission/{id}:
 	 *   get:
-	 *     summary: Get role by id
-	 *     description: Retrieve role information by id with optional fields
-	 *     tags: [Role]
+	 *     summary: Get permission by id
+	 *     description: Retrieve permission information by id with optional fields
+	 *     tags: [Permission]
 	 *     parameters:
 	 *       - in: path
 	 *         name: id
@@ -32,19 +33,19 @@ export const router = (route: Router, controller: IController): Router => {
 	 *         description: Comma-separated list of fields to include
 	 *     responses:
 	 *       200:
-	 *         description: Returns role data
+	 *         description: Returns permission data
 	 *       404:
-	 *         description: Role not found
+	 *         description: Permission not found
 	 */
 	routes.get("/:id", controller.getById);
 
 	/**
 	 * @openapi
-	 * /api/role:
+	 * /api/permission:
 	 *   get:
-	 *     summary: Get all roles
-	 *     description: Retrieve all roles with pagination, sorting, and optional field selection
-	 *     tags: [Role]
+	 *     summary: Get all permissions
+	 *     description: Retrieve all permissions with pagination, sorting, filtering and optional field selection
+	 *     tags: [Permission]
 	 *     parameters:
 	 *       - in: query
 	 *         name: page
@@ -73,23 +74,64 @@ export const router = (route: Router, controller: IController): Router => {
 	 *           type: string
 	 *         description: Comma-separated list of fields to include
 	 *       - in: query
-	 *         name: query
+	 *         name: accessPolicyId
 	 *         schema:
 	 *           type: string
-	 *         description: Search query to filter roles (by name or description)
+	 *         description: Filter by access policy ID
+	 *       - in: query
+	 *         name: roleId
+	 *         schema:
+	 *           type: string
+	 *         description: Filter by role ID
 	 *     responses:
 	 *       200:
-	 *         description: Returns paginated roles list
+	 *         description: Returns paginated permissions list
 	 */
 	routes.get("/", controller.getAll);
 
 	/**
 	 * @openapi
-	 * /api/role:
+	 * /api/permission/check:
+	 *   get:
+	 *     summary: Check role permissions
+	 *     description: Check if a role has specific permissions for a resource and action
+	 *     tags: [Permission]
+	 *     parameters:
+	 *       - in: query
+	 *         name: roleId
+	 *         required: true
+	 *         schema:
+	 *           type: string
+	 *         description: Role ID to check permissions for
+	 *       - in: query
+	 *         name: resource
+	 *         required: true
+	 *         schema:
+	 *           type: string
+	 *           enum: [organization, user, role, app, module]
+	 *         description: Resource to check access for
+	 *       - in: query
+	 *         name: action
+	 *         required: true
+	 *         schema:
+	 *           type: string
+	 *           enum: [create, read, update, delete]
+	 *         description: Action to check permission for
+	 *     responses:
+	 *       200:
+	 *         description: Returns permission check result
+	 *       400:
+	 *         description: Missing required parameters
+	 */
+	// routes.get("/check", controller.checkPermissions);
+
+	/**
+	 * @openapi
+	 * /api/permission:
 	 *   post:
-	 *     summary: Create a new role
-	 *     description: Creates a new role or returns existing one if same name exists
-	 *     tags: [Role]
+	 *     summary: Create a new permission
+	 *     description: Creates a new permission linking a role to an access policy with specific permissions
+	 *     tags: [Permission]
 	 *     requestBody:
 	 *       required: true
 	 *       content:
@@ -97,29 +139,48 @@ export const router = (route: Router, controller: IController): Router => {
 	 *           schema:
 	 *             type: object
 	 *             required:
-	 *               - name
+	 *               - accessPolicyId
+	 *               - roleId
 	 *             properties:
-	 *               name:
+	 *               accessPolicyId:
 	 *                 type: string
-	 *               description:
+	 *                 description: ID of the access policy
+	 *               roleId:
 	 *                 type: string
+	 *                 description: ID of the role
+	 *               rolePermissions:
+	 *                 type: array
+	 *                 items:
+	 *                   type: object
+	 *                   properties:
+	 *                     resource:
+	 *                       type: string
+	 *                       enum: [organization, user, role, app, module]
+	 *                     actions:
+	 *                       type: array
+	 *                       items:
+	 *                         type: string
+	 *                         enum: [create, read, update, delete]
+	 *                 description: Array of role permissions
 	 *     responses:
 	 *       201:
-	 *         description: Returns newly created role
+	 *         description: Returns newly created permission
 	 *       200:
-	 *         description: Returns existing role if found
+	 *         description: Returns existing permission if found
 	 *       400:
 	 *         description: Missing required fields
+	 *       404:
+	 *         description: Access policy or role not found
 	 */
 	routes.post("/", controller.create);
 
 	/**
 	 * @openapi
-	 * /api/role/{id}:
+	 * /api/permission/{id}:
 	 *   patch:
-	 *     summary: Update role
-	 *     description: Update role data by id
-	 *     tags: [Role]
+	 *     summary: Update permission
+	 *     description: Update permission data by id (mainly rolePermissions)
+	 *     tags: [Permission]
 	 *     parameters:
 	 *       - in: path
 	 *         name: id
@@ -132,23 +193,34 @@ export const router = (route: Router, controller: IController): Router => {
 	 *           schema:
 	 *             type: object
 	 *             properties:
-	 *               name: { type: string }
-	 *               description: { type: string }
+	 *               rolePermissions:
+	 *                 type: array
+	 *                 items:
+	 *                   type: object
+	 *                   properties:
+	 *                     resource:
+	 *                       type: string
+	 *                       enum: [organization, user, role, app, module]
+	 *                     actions:
+	 *                       type: array
+	 *                       items:
+	 *                         type: string
+	 *                         enum: [create, read, update, delete]
 	 *     responses:
 	 *       200:
-	 *         description: Returns updated role
+	 *         description: Returns updated permission
 	 *       404:
-	 *         description: Role not found
+	 *         description: Permission not found
 	 */
 	routes.patch("/:id", controller.update);
 
 	/**
 	 * @openapi
-	 * /api/role/{id}:
+	 * /api/permission/{id}:
 	 *   delete:
-	 *     summary: Soft delete role
-	 *     description: Mark role as deleted without permanently removing the data
-	 *     tags: [Role]
+	 *     summary: Delete permission
+	 *     description: Permanently delete a permission
+	 *     tags: [Permission]
 	 *     parameters:
 	 *       - in: path
 	 *         name: id
@@ -157,9 +229,9 @@ export const router = (route: Router, controller: IController): Router => {
 	 *           type: string
 	 *     responses:
 	 *       200:
-	 *         description: Role marked as deleted successfully
+	 *         description: Permission deleted successfully
 	 *       404:
-	 *         description: Role not found
+	 *         description: Permission not found
 	 */
 	routes.delete("/:id", controller.remove);
 

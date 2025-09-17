@@ -1,0 +1,1 @@
+export type TAction = "create" | "read" | "update" | "delete"

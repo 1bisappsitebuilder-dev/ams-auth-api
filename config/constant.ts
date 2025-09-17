@@ -142,6 +142,35 @@ export const config = {
 			INTERNAL_SERVER_ERROR: "Internal server error",
 			INVALID_INPUT: "Invalid input: role name is required",
 		},
+		PERMISSION: {
+			MISSING_ID: "Permission ID is required",
+			PERMISSION_ID_REQUIRED: "Permission ID is required",
+			NOT_FOUND: "Permission not found",
+			INVALID_INPUT: "Invalid input data",
+			INTERNAL_SERVER_ERROR: "Internal server error while processing permission",
+			ERROR_GETTING: "Error getting permission",
+			ERROR_CREATING: "Error creating permission",
+			ERROR_UPDATING: "Error updating permission",
+			ERROR_DELETING: "Error deleting permission",
+			ERROR_CHECKING: "Error checking permissions",
+			INVALID_PAGE: "Invalid page parameter",
+			INVALID_LIMIT: "Invalid limit parameter",
+			INVALID_ORDER: "Invalid order parameter",
+			ORDER_MUST_BE_ASC_OR_DESC: "Order must be 'asc' or 'desc'",
+			INVALID_POPULATE: "Invalid populate parameter",
+			POPULATE_MUST_BE_STRING: "Populate must be a string",
+			INVALID_SORT: "Invalid sort parameter",
+			SORT_MUST_BE_STRING: "Sort must be a string",
+			NO_UPDATE_FIELDS: "No fields to update",
+			AT_LEAST_ONE_FIELD_REQUIRED: "At least one field is required to update",
+			MISSING_PARAMS: "Missing required parameters",
+			ACCESS_POLICY_NOT_FOUND: "Access policy not found",
+			ROLE_NOT_FOUND: "Role not found",
+			DUPLICATE_PERMISSION: "Permission already exists for this access policy and role",
+		},
+		ACCESS_POLICY: {
+			NOT_FOUND: "Access Policy not found"
+		}
 	},
 
 	SUCCESS: {
@@ -206,6 +235,17 @@ export const config = {
 			UPDATE: "Role updated successfully",
 			SOFT_DELETING: "Soft deleting role",
 			DELETED: "Role deleted successfully",
+		},
+		PERMISSION: {
+			GETTING_BY_ID: "Getting permission by ID",
+			RETRIEVED: "Permission retrieved successfully",
+			GETTING_ALL: "Getting all permissions",
+			CREATED: "Permission created successfully",
+			UPDATED: "Permission updated successfully",
+			DELETED: "Permission deleted successfully",
+			DELETING: "Deleting permission",
+			CHECKED: "Permission check completed successfully",
+			UPDATE: "Permission updated successfully"
 		},
 	},
 	INFO: {
