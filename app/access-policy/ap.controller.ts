@@ -58,7 +58,7 @@ export const controller = (prisma: PrismaClient) => {
 			// Include roles if requested
 			if (includeRoles === "true") {
 				query.include = {
-					roles: {
+					permissions: {
 						include: {
 							role: true,
 						},
@@ -184,7 +184,7 @@ export const controller = (prisma: PrismaClient) => {
 			// Include roles if requested
 			if (includeRoles === "true") {
 				findManyQuery.include = {
-					roles: {
+					permissions: {
 						include: {
 							role: true,
 						},
@@ -324,7 +324,7 @@ export const controller = (prisma: PrismaClient) => {
 			const existingPolicy = await prisma.accessPolicy.findUnique({
 				where: { id },
 				include: {
-					roles: {
+					permissions: {
 						include: {
 							role: true,
 						},
@@ -339,11 +339,11 @@ export const controller = (prisma: PrismaClient) => {
 			}
 
 			// Check if policy has roles assigned
-			if (existingPolicy.roles.length > 0) {
+			if (existingPolicy.permissions.length > 0) {
 				accessPolicyLogger.error(`Cannot delete access policy with assigned roles: ${id}`);
 				res.status(409).json({
 					error: "Cannot delete access policy with assigned roles. Remove roles first.",
-					assignedRoles: existingPolicy.roles.map((role) => role.role),
+					assignedRoles: existingPolicy.permissions.map((role) => role.role),
 				});
 				return;
 			}
