@@ -11,7 +11,7 @@ interface IPermissionController {
 
 export const router = (route: Router, controller: IPermissionController): Router => {
 	const routes = Router();
-	const path = "/permission";
+	const path = "/role";
 
 	/**
 	 * @openapi

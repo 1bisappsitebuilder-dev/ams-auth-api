@@ -10,7 +10,7 @@ interface IController {
 
 export const router = (route: Router, controller: IController): Router => {
 	const routes = Router();
-	const path = "/role";
+	const path = "/permission";
 
 	/**
 	 * @openapi
