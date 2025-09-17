@@ -29,7 +29,7 @@ export const controller = (prisma: PrismaClient) => {
 			const query: Prisma.RoleFindFirstArgs = {
 				where: {
 					id,
-					deletedAt: null,
+					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				},
 			};
 
@@ -113,7 +113,7 @@ export const controller = (prisma: PrismaClient) => {
 
 		try {
 			const whereClause: Prisma.RoleWhereInput = {
-				deletedAt: null,
+				OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				...(query
 					? {
 							OR: [
