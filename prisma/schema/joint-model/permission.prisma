@@ -29,7 +29,7 @@ model Permission {
 
     //relations
     role           Role         @relation(fields: [roleId], references: [id])
-    securityScheme AccessPolicy @relation(fields: [accessPolicyId], references: [id])
+    accessPolicy AccessPolicy @relation(fields: [accessPolicyId], references: [id])
 
     @@unique([accessPolicyId, roleId])
     @@index([accessPolicyId])

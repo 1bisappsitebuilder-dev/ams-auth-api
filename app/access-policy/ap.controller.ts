@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient, Prisma } from "../../generated/prisma";
 import { getLogger } from "../../helper/logger";
-import { config } from "../../config/constant";
 
 const logger = getLogger();
 const accessPolicyLogger = logger.child({ module: "accessPolicy" });
@@ -431,7 +430,7 @@ export const controller = (prisma: PrismaClient) => {
 				},
 				include: {
 					role: true,
-					securityScheme: true,
+					accessPolicy: true,
 				},
 			});
 
@@ -549,7 +548,7 @@ export const controller = (prisma: PrismaClient) => {
 				},
 				include: {
 					role: true,
-					securityScheme: true,
+					accessPolicy: true,
 				},
 			});
 
