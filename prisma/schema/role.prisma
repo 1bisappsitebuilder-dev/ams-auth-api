@@ -8,7 +8,7 @@ model Role {
 
   // Relations
   users           UserRole[]
-  securitySchemes AccessPolicyRole[] // Link to Security Schemes through join table
+  permissions Permission[] // Link to Security Schemes through join table
 
   // Indexes
   @@index([deletedAt])

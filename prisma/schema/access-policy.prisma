@@ -6,6 +6,5 @@ model AccessPolicy {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  roles         AccessPolicyRole[]
-  
+  roles Permission[]
 }
