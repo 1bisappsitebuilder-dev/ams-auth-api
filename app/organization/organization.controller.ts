@@ -45,18 +45,7 @@ export const controller = (prisma: PrismaClient) => {
 				},
 			};
 
-			query.select = getNestedFields(fields) || {
-				id: true,
-				name: true,
-				code: true,
-				description: true,
-				branding: true,
-				createdAt: true,
-				updatedAt: true,
-				deletedAt: true,
-				users: true,
-				apps: true,
-			};
+			query.select = getNestedFields(fields);
 
 			const organization = await prisma.organization.findFirst(query);
 
@@ -77,7 +66,7 @@ export const controller = (prisma: PrismaClient) => {
 		} catch (error) {
 			organizationLogger.error(`${config.ERROR.ORGANIZATION.ERROR_GETTING}: ${error}`);
 			const errorResponse = buildErrorResponse(
-				config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR,
+				config.ERROR.COMMON.INTERNAL_SERVER_ERROR,
 				500,
 			);
 			res.status(500).json(errorResponse);
@@ -134,7 +123,7 @@ export const controller = (prisma: PrismaClient) => {
 		} catch (error) {
 			organizationLogger.error(`${config.ERROR.ORGANIZATION.ERROR_GETTING}: ${error}`);
 			res.status(500).json(
-				buildErrorResponse(config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR, 500),
+				buildErrorResponse(config.ERROR.COMMON.INTERNAL_SERVER_ERROR, 500),
 			);
 		}
 	};
@@ -191,11 +180,9 @@ export const controller = (prisma: PrismaClient) => {
 			);
 			res.status(201).json(successResponse);
 		} catch (error) {
-			organizationLogger.error(
-				`${config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR}: ${error}`,
-			);
+			organizationLogger.error(`${config.ERROR.COMMON.INTERNAL_SERVER_ERROR}: ${error}`);
 			const errorResponse = buildErrorResponse(
-				config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR,
+				config.ERROR.COMMON.INTERNAL_SERVER_ERROR,
 				500,
 			);
 			res.status(500).json(errorResponse);
@@ -271,7 +258,7 @@ export const controller = (prisma: PrismaClient) => {
 		} catch (error) {
 			organizationLogger.error(`${config.ERROR.ORGANIZATION.ERROR_UPDATING}: ${error}`);
 			const errorResponse = buildErrorResponse(
-				config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR,
+				config.ERROR.COMMON.INTERNAL_SERVER_ERROR,
 				500,
 			);
 			res.status(500).json(errorResponse);
@@ -322,7 +309,7 @@ export const controller = (prisma: PrismaClient) => {
 		} catch (error) {
 			organizationLogger.error(`${config.ERROR.ORGANIZATION.ERROR_DELETING}: ${error}`);
 			const errorResponse = buildErrorResponse(
-				config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR,
+				config.ERROR.COMMON.INTERNAL_SERVER_ERROR,
 				500,
 			);
 			res.status(500).json(errorResponse);

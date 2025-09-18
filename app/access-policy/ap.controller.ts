@@ -1,136 +1,99 @@
 import { Request, Response, NextFunction } from "express";
 import { PrismaClient, Prisma } from "../../generated/prisma";
 import { getLogger } from "../../helper/logger";
+import { config } from "../../config/constant";
+import { buildErrorResponse, formatZodErrors } from "../../helper/error-handler";
+import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
+import { validateQueryParams } from "../../helper/validation-helper";
+import { buildFindManyQuery, getNestedFields } from "../../helper/query-builder";
+import { AccessPolicySchema } from "../../zod/access-policy.zod";
 
 const logger = getLogger();
-const accessPolicyLogger = logger.child({ module: "accessPolicy" });
+const accessPolicyLogger = logger.child({ module: "person" });
 
 export const controller = (prisma: PrismaClient) => {
 	const getById = async (req: Request, res: Response, _next: NextFunction) => {
 		const { id } = req.params;
-		const { fields, includeRoles } = req.query;
-
-		if (!id) {
-			accessPolicyLogger.error("Access policy ID is required");
-			res.status(400).json({ error: "Access policy ID is required" });
-			return;
-		}
-
-		if (fields && typeof fields !== "string") {
-			accessPolicyLogger.error("Invalid fields parameter");
-			res.status(400).json({ error: "Fields must be a string" });
-			return;
-		}
-
-		accessPolicyLogger.info(`Getting access policy by ID: ${id}`);
+		const { fields } = req.query;
 
 		try {
+			if (!id) {
+				accessPolicyLogger.error(config.ERROR.QUERY_PARAMS.MISSING_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.MISSING_ID, 400);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			if (fields && typeof fields !== "string") {
+				accessPolicyLogger.error(
+					`${config.ERROR.QUERY_PARAMS.INVALID_POPULATE}: ${fields}`,
+				);
+				const errorResponse = buildErrorResponse(
+					config.ERROR.QUERY_PARAMS.POPULATE_MUST_BE_STRING,
+					400,
+				);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			accessPolicyLogger.info(`${config.SUCCESS.ACCESS_POLICY.GETTING_BY_ID}: ${id}`);
+
 			const query: Prisma.AccessPolicyFindFirstArgs = {
 				where: { id },
 			};
 
-			if (fields) {
-				const fieldSelections = fields.split(",").reduce(
-					(acc, field) => {
-						const parts = field.trim().split(".");
-						if (parts.length > 1) {
-							const [parent, ...children] = parts;
-							acc[parent] = acc[parent] || { select: {} };
-
-							let current = acc[parent].select;
-							for (let i = 0; i < children.length - 1; i++) {
-								current[children[i]] = current[children[i]] || { select: {} };
-								current = current[children[i]].select;
-							}
-							current[children[children.length - 1]] = true;
-						} else {
-							acc[parts[0]] = true;
-						}
-						return acc;
-					},
-					{ id: true } as Record<string, any>,
-				);
-
-				query.select = fieldSelections;
-			}
-
-			// Include roles if requested
-			if (includeRoles === "true") {
-				query.include = {
-					permissions: {
-						include: {
-							role: true,
-						},
-					},
-				};
-			}
+			query.select = getNestedFields(fields) || {
+				id: true,
+				name: true,
+				description: true,
+				createdAt: true,
+				updatedAt: true,
+				permissions: true,
+			};
 
 			const accessPolicy = await prisma.accessPolicy.findFirst(query);
 
 			if (!accessPolicy) {
-				accessPolicyLogger.error(`Access policy not found: ${id}`);
-				res.status(404).json({ error: "Access policy not found" });
+				accessPolicyLogger.error(`${config.ERROR.ACCESS_POLICY.NOT_FOUND}: ${id}`);
+				const errorResponse = buildErrorResponse(config.ERROR.ACCESS_POLICY.NOT_FOUND, 404);
+				res.status(404).json(errorResponse);
 				return;
 			}
 
-			accessPolicyLogger.info(`Retrieved access policy: ${accessPolicy.id}`);
-			res.status(200).json(accessPolicy);
+			accessPolicyLogger.info(
+				`${config.SUCCESS.ACCESS_POLICY.RETRIEVED}: ${accessPolicy.id}`,
+			);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.ACCESS_POLICY.RETRIEVED,
+				{ accessPolicy },
+				200,
+			);
+			res.status(200).json(successResponse);
 		} catch (error) {
-			accessPolicyLogger.error(`Error getting access policy: ${error}`);
-			res.status(500).json({ error: "Internal server error" });
+			accessPolicyLogger.error(`${config.ERROR.ACCESS_POLICY.ERROR_GETTING}: ${error}`);
+			const errorResponse = buildErrorResponse(
+				config.ERROR.COMMON.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
 	const getAll = async (req: Request, res: Response, _next: NextFunction) => {
-		const {
-			page = 1,
-			limit = 10,
-			sort,
-			fields,
-			query,
-			order = "desc",
-			includeRoles,
-		} = req.query;
+		// Validate query parameters
+		const validationResult = validateQueryParams(req, accessPolicyLogger);
 
-		if (isNaN(Number(page)) || Number(page) < 1) {
-			accessPolicyLogger.error(`Invalid page: ${page}`);
-			res.status(400).json({ error: "Invalid page number" });
+		if (!validationResult.isValid) {
+			res.status(400).json(validationResult.errorResponse);
 			return;
 		}
 
-		if (isNaN(Number(limit)) || Number(limit) < 1) {
-			accessPolicyLogger.error(`Invalid limit: ${limit}`);
-			res.status(400).json({ error: "Invalid limit" });
-			return;
-		}
+		const { page, limit, order, fields, sort, skip, query, document, pagination, count } =
+			validationResult.validatedParams!;
 
-		if (order && !["asc", "desc"].includes(order as string)) {
-			accessPolicyLogger.error(`Invalid order: ${order}`);
-			res.status(400).json({ error: "Order must be 'asc' or 'desc'" });
-			return;
-		}
-
-		if (fields && typeof fields !== "string") {
-			accessPolicyLogger.error(`Invalid fields parameter: ${fields}`);
-			res.status(400).json({ error: "Fields must be a string" });
-			return;
-		}
-
-		if (sort) {
-			if (typeof sort === "string" && sort.startsWith("{")) {
-				try {
-					JSON.parse(sort);
-				} catch (error) {
-					accessPolicyLogger.error(`Invalid sort: ${sort}`);
-					res.status(400).json({ error: "Invalid sort format" });
-					return;
-				}
-			}
-		}
-
-		const skip = (Number(page) - 1) * Number(limit);
-
-		accessPolicyLogger.info(`Getting all access policies, page: ${page}, limit: ${limit}`);
+		accessPolicyLogger.info(
+			`${config.SUCCESS.ACCESS_POLICY.GETTING_ALL}, page: ${page}, limit: ${limit}, query: ${query}, order: ${order}`,
+		);
 
 		try {
 			const whereClause: Prisma.AccessPolicyWhereInput = {
@@ -144,206 +107,180 @@ export const controller = (prisma: PrismaClient) => {
 					: {}),
 			};
 
-			const findManyQuery: Prisma.AccessPolicyFindManyArgs = {
-				where: whereClause,
-				skip,
-				take: Number(limit),
-				orderBy: sort
-					? typeof sort === "string" && !sort.startsWith("{")
-						? { [sort as string]: order }
-						: JSON.parse(sort as string)
-					: { createdAt: order as Prisma.SortOrder },
-			};
-
-			if (fields) {
-				const fieldSelections = fields.split(",").reduce(
-					(acc, field) => {
-						const parts = field.trim().split(".");
-						if (parts.length > 1) {
-							const [parent, ...children] = parts;
-							acc[parent] = acc[parent] || { select: {} };
-
-							let current = acc[parent].select;
-							for (let i = 0; i < children.length - 1; i++) {
-								current[children[i]] = current[children[i]] || { select: {} };
-								current = current[children[i]].select;
-							}
-							current[children[children.length - 1]] = true;
-						} else {
-							acc[parts[0]] = true;
-						}
-						return acc;
-					},
-					{ id: true } as Record<string, any>,
-				);
-
-				findManyQuery.select = fieldSelections;
-			}
-
-			// Include roles if requested
-			if (includeRoles === "true") {
-				findManyQuery.include = {
-					permissions: {
-						include: {
-							role: true,
-						},
-					},
-				};
-			}
+			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);
 
 			const [accessPolicies, total] = await Promise.all([
-				prisma.accessPolicy.findMany(findManyQuery),
-				prisma.accessPolicy.count({ where: whereClause }),
+				document ? prisma.accessPolicy.findMany(findManyQuery) : [],
+				count ? prisma.accessPolicy.count({ where: whereClause }) : 0,
 			]);
 
 			accessPolicyLogger.info(`Retrieved ${accessPolicies.length} access policies`);
-			res.status(200).json({
-				accessPolicies,
-				total,
-				page: Number(page),
-				totalPages: Math.ceil(total / Number(limit)),
-			});
+			const responseData = {
+				...(document && { accessPolicies }),
+				...(count && { count: total }),
+				...(pagination && { pagination: buildPagination(total, page, limit) }),
+			};
+
+			res.status(200).json(
+				buildSuccessResponse(config.SUCCESS.ACCESS_POLICY.RETRIEVED, responseData, 200),
+			);
 		} catch (error) {
-			accessPolicyLogger.error(`Error getting access policies: ${error}`);
-			res.status(500).json({ error: "Internal server error" });
+			accessPolicyLogger.error(`${config.ERROR.ACCESS_POLICY.ERROR_GETTING}: ${error}`);
+			res.status(500).json(
+				buildErrorResponse(config.ERROR.COMMON.INTERNAL_SERVER_ERROR, 500),
+			);
 		}
 	};
 
 	const create = async (req: Request, res: Response, _next: NextFunction) => {
-		const { name, description } = req.body;
-
-		if (!name) {
-			accessPolicyLogger.error("Access policy name is required");
-			res.status(400).json({ error: "Access policy name is required" });
-			return;
-		}
-
 		try {
-			// Check if access policy with same name already exists
+			// Validate the request body using Zod
+			const validationResult = AccessPolicySchema.safeParse(req.body);
+
+			if (!validationResult.success) {
+				const formattedErrors = formatZodErrors(validationResult.error.format());
+				accessPolicyLogger.error(`Validation failed: ${JSON.stringify(formattedErrors)}`);
+				const errorResponse = buildErrorResponse("Validation failed", 400, formattedErrors);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			const validatedData = validationResult.data;
+
+			// Check if access policy already exists
 			const existingPolicy = await prisma.accessPolicy.findFirst({
-				where: { name },
+				where: {
+					name: validatedData.name,
+				},
 			});
 
 			if (existingPolicy) {
-				accessPolicyLogger.info(`Access policy already exists: ${existingPolicy.id}`);
-				res.status(409).json({
-					error: "Access policy with this name already exists",
-					existingPolicy,
-				});
+				accessPolicyLogger.info(
+					`${config.SUCCESS.ACCESS_POLICY.RETRIEVED}: ${existingPolicy.id}`,
+				);
+				const successResponse = buildSuccessResponse(
+					"Existing access policy found",
+					{ accessPolicy: existingPolicy },
+					200,
+				);
+				res.status(200).json(successResponse);
 				return;
 			}
 
 			const newAccessPolicy = await prisma.accessPolicy.create({
 				data: {
-					name,
-					description,
+					...validatedData,
 				},
 			});
 
-			accessPolicyLogger.info(`Created access policy: ${newAccessPolicy.id}`);
-			res.status(201).json(newAccessPolicy);
+			accessPolicyLogger.info(
+				`${config.SUCCESS.ACCESS_POLICY.CREATED}: ${newAccessPolicy.id}`,
+			);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.ACCESS_POLICY.CREATED,
+				{ accessPolicy: newAccessPolicy },
+				201,
+			);
+			res.status(201).json(successResponse);
 		} catch (error) {
-			accessPolicyLogger.error(`Error creating access policy: ${error}`);
-			res.status(500).json({ error: "Internal server error" });
+			accessPolicyLogger.error(`${config.ERROR.COMMON.INTERNAL_SERVER_ERROR}: ${error}`);
+			const errorResponse = buildErrorResponse(
+				config.ERROR.COMMON.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
 	const update = async (req: Request, res: Response, _next: NextFunction) => {
 		const { id } = req.params;
-		const { name, description } = req.body;
-
-		if (!id) {
-			accessPolicyLogger.error("Access policy ID is required");
-			res.status(400).json({ error: "Access policy ID is required" });
-			return;
-		}
-
-		if (Object.keys(req.body).length === 0) {
-			accessPolicyLogger.error("No update fields provided");
-			res.status(400).json({
-				error: "At least one field is required for update",
-			});
-			return;
-		}
-
-		accessPolicyLogger.info(`Updating access policy: ${id}`);
 
 		try {
-			const existingPolicy = await prisma.accessPolicy.findUnique({
+			if (!id) {
+				accessPolicyLogger.error(config.ERROR.QUERY_PARAMS.MISSING_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.MISSING_ID, 400);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			// Validate the request body using Zod
+			const validationResult = AccessPolicySchema.partial().safeParse(req.body);
+
+			if (!validationResult.success) {
+				const formattedErrors = formatZodErrors(validationResult.error.format());
+				accessPolicyLogger.error(`Validation failed: ${JSON.stringify(formattedErrors)}`);
+				const errorResponse = buildErrorResponse("Validation failed", 400, formattedErrors);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			if (Object.keys(req.body).length === 0) {
+				accessPolicyLogger.error(config.ERROR.COMMON.NO_UPDATE_FIELDS);
+				const errorResponse = buildErrorResponse(config.ERROR.COMMON.NO_UPDATE_FIELDS, 400);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			const validatedData = validationResult.data;
+
+			accessPolicyLogger.info(`Updating access policy: ${id}`);
+
+			const existingPolicy = await prisma.accessPolicy.findFirst({
 				where: { id },
 			});
 
 			if (!existingPolicy) {
-				accessPolicyLogger.error(`Access policy not found: ${id}`);
-				res.status(404).json({ error: "Access policy not found" });
+				accessPolicyLogger.error(`${config.ERROR.ACCESS_POLICY.NOT_FOUND}: ${id}`);
+				const errorResponse = buildErrorResponse(config.ERROR.ACCESS_POLICY.NOT_FOUND, 404);
+				res.status(404).json(errorResponse);
 				return;
-			}
-
-			// Check if name is being changed and if it conflicts with another policy
-			if (name && name !== existingPolicy.name) {
-				const conflictingPolicy = await prisma.accessPolicy.findFirst({
-					where: { name, id: { not: id } },
-				});
-
-				if (conflictingPolicy) {
-					accessPolicyLogger.error(`Access policy name already exists: ${name}`);
-					res.status(409).json({ error: "Access policy with this name already exists" });
-					return;
-				}
 			}
 
 			const updatedPolicy = await prisma.accessPolicy.update({
 				where: { id },
 				data: {
-					...(name && { name }),
-					...(description !== undefined && { description }),
+					...validatedData,
 				},
 			});
 
-			accessPolicyLogger.info(`Updated access policy: ${updatedPolicy.id}`);
-			res.status(200).json(updatedPolicy);
+			accessPolicyLogger.info(`${config.SUCCESS.ACCESS_POLICY.UPDATED}: ${updatedPolicy.id}`);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.ACCESS_POLICY.UPDATED,
+				{ accessPolicy: updatedPolicy },
+				200,
+			);
+			res.status(200).json(successResponse);
 		} catch (error) {
-			accessPolicyLogger.error(`Error updating access policy: ${error}`);
-			res.status(500).json({ error: "Internal server error" });
+			accessPolicyLogger.error(`${config.ERROR.ACCESS_POLICY.ERROR_UPDATING}: ${error}`);
+			const errorResponse = buildErrorResponse(
+				config.ERROR.COMMON.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
 	const remove = async (req: Request, res: Response, _next: NextFunction) => {
 		const { id } = req.params;
 
-		if (!id) {
-			accessPolicyLogger.error("Access policy ID is required");
-			res.status(400).json({ error: "Access policy ID is required" });
-			return;
-		}
-
-		accessPolicyLogger.info(`Deleting access policy: ${id}`);
-
 		try {
-			const existingPolicy = await prisma.accessPolicy.findUnique({
-				where: { id },
-				include: {
-					permissions: {
-						include: {
-							role: true,
-						},
-					},
-				},
-			});
-
-			if (!existingPolicy) {
-				accessPolicyLogger.error(`Access policy not found: ${id}`);
-				res.status(404).json({ error: "Access policy not found" });
+			if (!id) {
+				accessPolicyLogger.error(config.ERROR.QUERY_PARAMS.MISSING_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.MISSING_ID, 400);
+				res.status(400).json(errorResponse);
 				return;
 			}
 
-			// Check if policy has roles assigned
-			if (existingPolicy.permissions.length > 0) {
-				accessPolicyLogger.error(`Cannot delete access policy with assigned roles: ${id}`);
-				res.status(409).json({
-					error: "Cannot delete access policy with assigned roles. Remove roles first.",
-					assignedRoles: existingPolicy.permissions.map((role) => role.role),
-				});
+			accessPolicyLogger.info(`${config.SUCCESS.ACCESS_POLICY.DELETED}: ${id}`);
+
+			const existingPolicy = await prisma.accessPolicy.findFirst({
+				where: { id },
+			});
+
+			if (!existingPolicy) {
+				accessPolicyLogger.error(`${config.ERROR.ACCESS_POLICY.NOT_FOUND}: ${id}`);
+				const errorResponse = buildErrorResponse(config.ERROR.ACCESS_POLICY.NOT_FOUND, 404);
+				res.status(404).json(errorResponse);
 				return;
 			}
 
@@ -351,214 +288,20 @@ export const controller = (prisma: PrismaClient) => {
 				where: { id },
 			});
 
-			accessPolicyLogger.info(`Deleted access policy: ${id}`);
-			res.status(200).json({ message: "Access policy deleted successfully" });
-		} catch (error) {
-			accessPolicyLogger.error(`Error deleting access policy: ${error}`);
-			res.status(500).json({ error: "Internal server error" });
-		}
-	};
-
-	const assignRole = async (req: Request, res: Response, _next: NextFunction) => {
-		const { id } = req.params;
-		const { roleId, permissions } = req.body;
-
-		if (!id) {
-			accessPolicyLogger.error("Access policy ID is required");
-			res.status(400).json({ error: "Access policy ID is required" });
-			return;
-		}
-
-		if (!roleId) {
-			accessPolicyLogger.error("Role ID is required");
-			res.status(400).json({ error: "Role ID is required" });
-			return;
-		}
-
-		if (!permissions || !Array.isArray(permissions)) {
-			accessPolicyLogger.error("Permissions array is required");
-			res.status(400).json({ error: "Permissions array is required" });
-			return;
-		}
-
-		accessPolicyLogger.info(`Assigning role ${roleId} to access policy ${id}`);
-
-		try {
-			// Check if access policy exists
-			const accessPolicy = await prisma.accessPolicy.findUnique({
-				where: { id },
-			});
-
-			if (!accessPolicy) {
-				accessPolicyLogger.error(`Access policy not found: ${id}`);
-				res.status(404).json({ error: "Access policy not found" });
-				return;
-			}
-
-			// Check if role exists
-			const role = await prisma.role.findUnique({
-				where: { id: roleId },
-			});
-
-			if (!role) {
-				accessPolicyLogger.error(`Role not found: ${roleId}`);
-				res.status(404).json({ error: "Role not found" });
-				return;
-			}
-
-			// Check if role is already assigned to this policy
-			const existingAssignment = await prisma.permission.findUnique({
-				where: {
-					accessPolicyId_roleId: {
-						accessPolicyId: id,
-						roleId: roleId,
-					},
-				},
-			});
-
-			if (existingAssignment) {
-				accessPolicyLogger.error(`Role already assigned to access policy: ${roleId}`);
-				res.status(409).json({ error: "Role already assigned to this access policy" });
-				return;
-			}
-
-			const assignment = await prisma.permission.create({
-				data: {
-					accessPolicyId: id,
-					roleId: roleId,
-					rolePermissions: permissions,
-				},
-				include: {
-					role: true,
-					accessPolicy: true,
-				},
-			});
-
-			accessPolicyLogger.info(`Assigned role to access policy: ${assignment.id}`);
-			res.status(201).json(assignment);
-		} catch (error) {
-			accessPolicyLogger.error(`Error assigning role to access policy: ${error}`);
-			res.status(500).json({ error: "Internal server error" });
-		}
-	};
-
-	const removeRole = async (req: Request, res: Response, _next: NextFunction) => {
-		const { id, roleId } = req.params;
-
-		if (!id) {
-			accessPolicyLogger.error("Access policy ID is required");
-			res.status(400).json({ error: "Access policy ID is required" });
-			return;
-		}
-
-		if (!roleId) {
-			accessPolicyLogger.error("Role ID is required");
-			res.status(400).json({ error: "Role ID is required" });
-			return;
-		}
-
-		accessPolicyLogger.info(`Removing role ${roleId} from access policy ${id}`);
-
-		try {
-			const assignment = await prisma.permission.findUnique({
-				where: {
-					accessPolicyId_roleId: {
-						accessPolicyId: id,
-						roleId: roleId,
-					},
-				},
-			});
-
-			if (!assignment) {
-				accessPolicyLogger.error(
-					`Role assignment not found for access policy: ${id}, role: ${roleId}`,
-				);
-				res.status(404).json({ error: "Role assignment not found" });
-				return;
-			}
-
-			await prisma.permission.delete({
-				where: {
-					accessPolicyId_roleId: {
-						accessPolicyId: id,
-						roleId: roleId,
-					},
-				},
-			});
-
-			accessPolicyLogger.info(`Removed role from access policy: ${assignment.id}`);
-			res.status(200).json({ message: "Role removed from access policy successfully" });
-		} catch (error) {
-			accessPolicyLogger.error(`Error removing role from access policy: ${error}`);
-			res.status(500).json({ error: "Internal server error" });
-		}
-	};
-
-	const updateRolePermissions = async (req: Request, res: Response, _next: NextFunction) => {
-		const { id, roleId } = req.params;
-		const { permissions } = req.body;
-
-		if (!id) {
-			accessPolicyLogger.error("Access policy ID is required");
-			res.status(400).json({ error: "Access policy ID is required" });
-			return;
-		}
-
-		if (!roleId) {
-			accessPolicyLogger.error("Role ID is required");
-			res.status(400).json({ error: "Role ID is required" });
-			return;
-		}
-
-		if (!permissions || !Array.isArray(permissions)) {
-			accessPolicyLogger.error("Permissions array is required");
-			res.status(400).json({ error: "Permissions array is required" });
-			return;
-		}
-
-		accessPolicyLogger.info(`Updating permissions for role ${roleId} in access policy ${id}`);
-
-		try {
-			const assignment = await prisma.permission.findUnique({
-				where: {
-					accessPolicyId_roleId: {
-						accessPolicyId: id,
-						roleId: roleId,
-					},
-				},
-			});
-
-			if (!assignment) {
-				accessPolicyLogger.error(
-					`Role assignment not found for access policy: ${id}, role: ${roleId}`,
-				);
-				res.status(404).json({ error: "Role assignment not found" });
-				return;
-			}
-
-			const updatedAssignment = await prisma.permission.update({
-				where: {
-					accessPolicyId_roleId: {
-						accessPolicyId: id,
-						roleId: roleId,
-					},
-				},
-				data: {
-					rolePermissions: permissions,
-				},
-				include: {
-					role: true,
-					accessPolicy: true,
-				},
-			});
-
-			accessPolicyLogger.info(
-				`Updated permissions for role in access policy: ${updatedAssignment.id}`,
+			accessPolicyLogger.info(`${config.SUCCESS.ACCESS_POLICY.DELETED}: ${id}`);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.ACCESS_POLICY.DELETED,
+				{},
+				200,
 			);
-			res.status(200).json(updatedAssignment);
+			res.status(200).json(successResponse);
 		} catch (error) {
-			accessPolicyLogger.error(`Error updating role permissions: ${error}`);
-			res.status(500).json({ error: "Internal server error" });
+			accessPolicyLogger.error(`${config.ERROR.ACCESS_POLICY.DELETED}: ${error}`);
+			const errorResponse = buildErrorResponse(
+				config.ERROR.COMMON.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
@@ -568,8 +311,5 @@ export const controller = (prisma: PrismaClient) => {
 		create,
 		update,
 		remove,
-		assignRole,
-		removeRole,
-		updateRolePermissions,
 	};
 };

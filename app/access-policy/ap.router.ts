@@ -6,9 +6,6 @@ interface IAccessPolicyController {
 	create(req: Request, res: Response, next: NextFunction): Promise<void>;
 	update(req: Request, res: Response, next: NextFunction): Promise<void>;
 	remove(req: Request, res: Response, next: NextFunction): Promise<void>;
-	assignRole(req: Request, res: Response, next: NextFunction): Promise<void>;
-	removeRole(req: Request, res: Response, next: NextFunction): Promise<void>;
-	updateRolePermissions(req: Request, res: Response, next: NextFunction): Promise<void>;
 }
 
 export const router = (route: Router, controller: IAccessPolicyController): Router => {
@@ -179,128 +176,6 @@ export const router = (route: Router, controller: IAccessPolicyController): Rout
 	 *         description: Cannot delete access policy with assigned roles
 	 */
 	routes.delete("/:id", controller.remove);
-
-	/**
-	 * @openapi
-	 * /api/access-policy/{id}/roles:
-	 *   post:
-	 *     summary: Assign role to access policy
-	 *     description: Assign a role to an access policy with specific permissions
-	 *     tags: [AccessPolicy]
-	 *     parameters:
-	 *       - in: path
-	 *         name: id
-	 *         required: true
-	 *         schema:
-	 *           type: string
-	 *     requestBody:
-	 *       required: true
-	 *       content:
-	 *         application/json:
-	 *           schema:
-	 *             type: object
-	 *             required:
-	 *               - roleId
-	 *               - permissions
-	 *             properties:
-	 *               roleId:
-	 *                 type: string
-	 *               permissions:
-	 *                 type: array
-	 *                 items:
-	 *                   type: object
-	 *                   properties:
-	 *                     resource:
-	 *                       type: string
-	 *                       enum: [organization, user, role, app, module]
-	 *                     actions:
-	 *                       type: array
-	 *                       items:
-	 *                         type: string
-	 *                         enum: [create, read, update, delete]
-	 *     responses:
-	 *       201:
-	 *         description: Role assigned to access policy successfully
-	 *       404:
-	 *         description: Access policy or role not found
-	 *       409:
-	 *         description: Role already assigned to this access policy
-	 */
-	routes.post("/:id/roles", controller.assignRole);
-
-	/**
-	 * @openapi
-	 * /api/access-policy/{id}/roles/{roleId}:
-	 *   delete:
-	 *     summary: Remove role from access policy
-	 *     description: Remove a role assignment from an access policy
-	 *     tags: [AccessPolicy]
-	 *     parameters:
-	 *       - in: path
-	 *         name: id
-	 *         required: true
-	 *         schema:
-	 *           type: string
-	 *       - in: path
-	 *         name: roleId
-	 *         required: true
-	 *         schema:
-	 *           type: string
-	 *     responses:
-	 *       200:
-	 *         description: Role removed from access policy successfully
-	 *       404:
-	 *         description: Role assignment not found
-	 */
-	routes.delete("/:id/roles/:roleId", controller.removeRole);
-
-	/**
-	 * @openapi
-	 * /api/access-policy/{id}/roles/{roleId}/permissions:
-	 *   patch:
-	 *     summary: Update role permissions in access policy
-	 *     description: Update permissions for a role within an access policy
-	 *     tags: [AccessPolicy]
-	 *     parameters:
-	 *       - in: path
-	 *         name: id
-	 *         required: true
-	 *         schema:
-	 *           type: string
-	 *       - in: path
-	 *         name: roleId
-	 *         required: true
-	 *         schema:
-	 *           type: string
-	 *     requestBody:
-	 *       required: true
-	 *       content:
-	 *         application/json:
-	 *           schema:
-	 *             type: object
-	 *             required:
-	 *               - permissions
-	 *             properties:
-	 *               permissions:
-	 *                 type: array
-	 *                 items:
-	 *                   type: object
-	 *                   properties:
-	 *                     resource:
-	 *                       type: string
-	 *                       enum: [organization, user, role, app, module]
-	 *                     actions:
-	 *                       type: array
-	 *                       items:
-	 *                         type: string
-	 *                         enum: [create, read, update, delete]
-	 *     responses:
-	 *       200:
-	 *         description: Role permissions updated successfully
-	 *       404:
-	 *         description: Role assignment not found
-	 */
-	routes.patch("/:id/roles/:roleId/permissions", controller.updateRolePermissions);
 
 	route.use(path, routes);
 	return route;

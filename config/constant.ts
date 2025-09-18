@@ -13,7 +13,7 @@ export const config = {
 			INVALID_POPULATE: "Invalid populate parameter",
 			INVALID_SORT: "Invalid sort parameter",
 			INVALID_QUERY: "Invalid Query",
-			MISSING_ID: "ID is required"
+			MISSING_ID: "ID is required",
 		},
 		USER: {
 			NOT_FOUND: "User not found",
@@ -129,7 +129,6 @@ export const config = {
 			ERROR_GETTING: "Error retrieving organization(s)",
 			ERROR_UPDATING: "Error updating organization",
 			ERROR_DELETING: "Error deleting organization",
-			INTERNAL_SERVER_ERROR: "Internal server error",
 			INVALID_INPUT: "Invalid input: name and code are required",
 		},
 		ROLE: {
@@ -179,6 +178,14 @@ export const config = {
 		},
 		ACCESS_POLICY: {
 			NOT_FOUND: "Access Policy not found",
+			ERROR_GETTING: "Error getting Access Policy",
+			NAME_EXISTS: "Access Policy name already exist",
+			ERROR_UPDATING: "Error updating Access Policy",
+			DELETED: "There has been an error deleting access policy",
+		},
+		COMMON: {
+			INTERNAL_SERVER_ERROR: "Internal server error",
+			NO_UPDATE_FIELDS: "Please include at least one field to update",
 		},
 	},
 
@@ -255,6 +262,14 @@ export const config = {
 			DELETING: "Deleting permission",
 			CHECKED: "Permission check completed successfully",
 			UPDATE: "Permission updated successfully",
+		},
+		ACCESS_POLICY: {
+			GETTING_BY_ID: "Success getting Access Policy by id",
+			RETRIEVED: "Access Policy retrieved successfully",
+			GETTING_ALL: "Success getting all Access Policy",
+			CREATED: "Created Access Policy successfully",
+			UPDATED: "Access Policy updated successfully",
+			DELETED: "Access Policy deleted successfully",
 		},
 	},
 	INFO: {
