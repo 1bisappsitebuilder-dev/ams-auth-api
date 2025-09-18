@@ -194,6 +194,75 @@ export const controller = (prisma: PrismaClient) => {
 		}
 	};
 
+	const create = async (req: Request, res: Response, _next: NextFunction) => {
+		const { personId, userName, email, loginMethod, ...others } = req.body;
+
+		// Validate required fields
+		if (!personId || !userName || !email || !loginMethod) {
+			userLogger.error(config.ERROR.USER.MISSING_REQUIRED_FIELDS);
+			res.status(400).json({
+				error: "personId, userName, email, and loginMethod are required",
+			});
+			return;
+		}
+
+		try {
+			// Check if person exists
+			const existingPerson = await prisma.person.findFirst({
+				where: {
+					id: personId,
+					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+				},
+			});
+
+			if (!existingPerson) {
+				userLogger.error(`${config.ERROR.USER.PERSON_NOT_FOUND}: ${personId}`);
+				res.status(404).json({ error: config.ERROR.USER.PERSON_NOT_FOUND });
+				return;
+			}
+
+			// Check for existing user with same username or email
+			const existingUser = await prisma.user.findFirst({
+				where: {
+					AND: [
+						{
+							OR: [{ userName }, { email }],
+						},
+						{
+							OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+						},
+					],
+				},
+			});
+
+			if (existingUser) {
+				userLogger.info(`${config.SUCCESS.USER.RETRIEVED}: ${existingUser.id}`);
+				res.status(200).json({
+					...existingUser,
+					message: "Existing user found with matching username or email",
+				});
+				return;
+			}
+
+			// Create new user
+			const newUser = await prisma.user.create({
+				data: {
+					personId,
+					userName,
+					email,
+					loginMethod,
+					...others,
+				},
+			});
+
+			userLogger.info(`${config.SUCCESS.USER.CREATED}: ${newUser.id}`);
+			res.status(201).json(newUser);
+		} catch (error) {
+			userLogger.error(`${config.ERROR.USER.INTERNAL_SERVER_ERROR}: ${error}`);
+			res.status(500).json({ error: config.ERROR.USER.INTERNAL_SERVER_ERROR });
+		}
+	};
+
 	const update = async (req: AuthRequest, res: Response, _next: NextFunction) => {
 		const { id } = req.params;
 		const { email, userName, password, type, status, ...personData } = req.body;
@@ -371,6 +440,6 @@ export const controller = (prisma: PrismaClient) => {
 		update,
 		remove,
 		getCurrentUser,
-		// create
+		create
 	};
 };

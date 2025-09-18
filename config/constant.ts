@@ -40,6 +40,8 @@ export const config = {
 			AVATAR_UPLOADED: "Avatar uploaded successfully",
 			ORGANIZATION_VERIFIED: "Organization verified",
 			USER_ALREADY_EXISTS: "User already exists",
+			MISSING_REQUIRED_FIELDS: "Missing Required Fields",
+			PERSON_NOT_FOUND: "Person not found",
 		},
 		PERSON: {
 			NOT_FOUND: "Person not found",
@@ -169,8 +171,8 @@ export const config = {
 			DUPLICATE_PERMISSION: "Permission already exists for this access policy and role",
 		},
 		ACCESS_POLICY: {
-			NOT_FOUND: "Access Policy not found"
-		}
+			NOT_FOUND: "Access Policy not found",
+		},
 	},
 
 	SUCCESS: {
@@ -245,7 +247,7 @@ export const config = {
 			DELETED: "Permission deleted successfully",
 			DELETING: "Deleting permission",
 			CHECKED: "Permission check completed successfully",
-			UPDATE: "Permission updated successfully"
+			UPDATE: "Permission updated successfully",
 		},
 	},
 	INFO: {

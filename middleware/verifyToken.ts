@@ -28,6 +28,7 @@ export default (req: AuthRequest, res: Response, next: NextFunction) => {
 
 	try {
 		const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload;
+		console.log("decoded", decoded);
 		req.role = decoded.role;
 		req.userId = decoded.userId;
 		req.firstName = decoded.firstName;

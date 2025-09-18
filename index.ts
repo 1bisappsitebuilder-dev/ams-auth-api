@@ -52,15 +52,19 @@ if (process.env.NODE_ENV !== "production") {
 	app.use(`${config.baseApiPath}/docs`, swaggerUi.serve, swaggerUi.setup(openApiSpecs()));
 }
 
-// Set up routes that don't need authentication
-app.use(config.baseApiPath, auth);
-
-
 // Apply middleware for protected routes, excluding /docs and /auth
+app.use(config.baseApiPath, auth);
+app.use(config.baseApiPath, user);
+app.use(config.baseApiPath, organization);
+app.use(config.baseApiPath, person);
+app.use(`${config.baseApiPath}/images`, images);
+app.use(config.baseApiPath, role);
+app.use(config.baseApiPath, accessPolicy);
+app.use(config.baseApiPath, permission);
+
+// Set up routes that don't need authentication
 app.use(config.baseApiPath, (req: Request, res: Response, next: NextFunction) => {
-	if (
-		req.path.startsWith("/docs")
-	) {
+	if (req.path.startsWith("/docs")) {
 		// Skip middleware for the docs, auth, and add IC card routes
 		return next();
 	}
@@ -69,13 +73,7 @@ app.use(config.baseApiPath, (req: Request, res: Response, next: NextFunction) =>
 	});
 });
 
-app.use(config.baseApiPath, user);
-app.use(config.baseApiPath, organization);
-app.use(config.baseApiPath, person);
-app.use(`${config.baseApiPath}/images`, images);
-app.use(config.baseApiPath, role);
-app.use(config.baseApiPath, accessPolicy);
-app.use(config.baseApiPath, permission);
+
 
 server.listen(config.port, async () => {
 	await connectDb();

@@ -4,6 +4,7 @@ interface IController {
 	register(req: Request, res: Response, next: NextFunction): Promise<void>;
 	login(req: Request, res: Response, next: NextFunction): Promise<void>;
 	logout(req: Request, res: Response, next: NextFunction): Promise<void>;
+	updatePassword(req: Request, res: Response, next: NextFunction): Promise<void>;
 }
 
 export const router = (route: Router, controller: IController): Router => {
@@ -77,6 +78,48 @@ export const router = (route: Router, controller: IController): Router => {
 	 *                   type: string
 	 */
 	routes.post("/logout", controller.logout);
+
+	/**
+	 * @openapi
+	 * /api/auth/update-password:
+	 *   post:
+	 *     summary: Update Password
+	 *     description: Update the password for an authenticated user
+	 *     tags: [Auth]
+	 *     security:
+	 *       - bearerAuth: []
+	 *     requestBody:
+	 *       required: true
+	 *       content:
+	 *         application/json:
+	 *           schema:
+	 *             type: object
+	 *             required:
+	 *               - currentPassword
+	 *               - newPassword
+	 *             properties:
+	 *               currentPassword:
+	 *                 type: string
+	 *                 description: The user's current password
+	 *               newPassword:
+	 *                 type: string
+	 *                 description: The new password to set
+	 *     responses:
+	 *       200:
+	 *         description: Password updated successfully
+	 *         content:
+	 *           application/json:
+	 *             schema:
+	 *               type: object
+	 *               properties:
+	 *                 success:
+	 *                   type: boolean
+	 *                 message:
+	 *                   type: string
+	 *       401:
+	 *         description: Unauthorized or invalid current password
+	 */
+	routes.post("/update-password", controller.updatePassword);
 
 	route.use(path, routes);
 

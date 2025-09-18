@@ -4,7 +4,7 @@ import { uploadUserFiles } from "../../middleware/upload";
 interface IController {
 	getById(req: Request, res: Response, next: NextFunction): Promise<void>;
 	getAll(req: Request, res: Response, next: NextFunction): Promise<void>;
-	// create(req: Request, res: Response, next: NextFunction): Promise<void>;
+	create(req: Request, res: Response, next: NextFunction): Promise<void>;
 	update(req: Request, res: Response, next: NextFunction): Promise<void>;
 	remove(req: Request, res: Response, next: NextFunction): Promise<void>;
 	getCurrentUser(req: Request, res: Response, next: NextFunction): Promise<void>;
@@ -184,7 +184,7 @@ export const router = (route: Router, controller: IController): Router => {
 	 *       500:
 	 *         description: Internal server error
 	 */
-	// routes.post("/", uploadUserFiles, controller.create);
+	routes.post("/", uploadUserFiles, controller.create);
 
 	/**
 	 * @openapi
