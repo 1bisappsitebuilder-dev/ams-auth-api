@@ -6,6 +6,7 @@ import { buildErrorResponse, formatZodErrors } from "../../helper/error-handler"
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { PersonSchema } from "../../zod/person.zod";
 import { validateQueryParams } from "../../helper/validation-helper";
+import { buildFindManyQuery, getNestedFields } from "../../helper/query-builder";
 
 const logger = getLogger();
 const personLogger = logger.child({ module: "person" });
@@ -42,20 +43,7 @@ export const controller = (prisma: PrismaClient) => {
 				},
 			};
 
-			if (fields) {
-				const includeFields = (fields as string).split(",").reduce(
-					(acc, field) => ({
-						...acc,
-						[field.trim()]: true,
-					}),
-					{},
-				);
-
-				query.select = {
-					...query.select,
-					...includeFields,
-				};
-			}
+			query.select = getNestedFields(fields);
 
 			const person = await prisma.person.findFirst(query);
 
@@ -91,12 +79,10 @@ export const controller = (prisma: PrismaClient) => {
 
 		if (!validationResult.isValid) {
 			res.status(400).json(validationResult.errorResponse);
-			return;
 		}
 
-		const { page, limit, order, fields, sort } = validationResult.validatedParams!;
-
-		const skip = (page - 1) * limit;
+		const { page, limit, order, fields, sort, skip, document, pagination, count } =
+			validationResult.validatedParams!;
 
 		personLogger.info(
 			`${config.SUCCESS.PERSON.GETTING_ALL_USERS}, page: ${page}, limit: ${limit}, query: ${query}, order: ${order}`,
@@ -116,64 +102,28 @@ export const controller = (prisma: PrismaClient) => {
 					: {}),
 			};
 
-			const findManyQuery: Prisma.PersonFindManyArgs = {
-				where: whereClause,
-				skip,
-				take: limit,
-				orderBy: sort
-					? typeof sort === "string" && !sort.startsWith("{")
-						? { [sort as string]: order }
-						: JSON.parse(sort as string)
-					: { id: order as Prisma.SortOrder },
-			};
-
-			if (fields) {
-				const fieldSelections = fields.split(",").reduce(
-					(acc, field) => {
-						const parts = field.trim().split(".");
-						if (parts.length > 1) {
-							const [parent, ...children] = parts;
-							acc[parent] = acc[parent] || { select: {} };
-
-							let current = acc[parent].select;
-							for (let i = 0; i < children.length - 1; i++) {
-								current[children[i]] = current[children[i]] || { select: {} };
-								current = current[children[i]].select;
-							}
-							current[children[children.length - 1]] = true;
-						} else {
-							acc[parts[0]] = true;
-						}
-						return acc;
-					},
-					{ id: true } as Record<string, any>,
-				);
-
-				findManyQuery.select = fieldSelections;
-			}
+			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);
 
 			const [person, total] = await Promise.all([
-				prisma.person.findMany(findManyQuery),
-				prisma.person.count({ where: whereClause }),
+				document ? prisma.person.findMany(findManyQuery) : [],
+				count ? prisma.person.count({ where: whereClause }) : 0,
 			]);
 
 			personLogger.info(`Retrieved ${person.length} person`);
-			const successResponse = buildSuccessResponse(
-				config.SUCCESS.PERSON.RETRIEVED,
-				{
-					person,
-					pagination: buildPagination(total, page, limit),
-				},
-				200,
+			const responseData = {
+				...(document && { person }),
+				...(count && { count: total }),
+				...(pagination && { pagination: buildPagination(total, page, limit) }),
+			};
+
+			res.status(200).json(
+				buildSuccessResponse(config.SUCCESS.PERSON.RETRIEVED, responseData, 200),
 			);
-			res.status(200).json(successResponse);
 		} catch (error) {
 			personLogger.error(`${config.ERROR.PERSON.ERROR_GETTING_USER}: ${error}`);
-			const errorResponse = buildErrorResponse(
-				config.ERROR.PERSON.INTERNAL_SERVER_ERROR,
-				500,
+			res.status(500).json(
+				buildErrorResponse(config.ERROR.PERSON.INTERNAL_SERVER_ERROR, 500),
 			);
-			res.status(500).json(errorResponse);
 		}
 	};
 

@@ -12,6 +12,7 @@ interface ValidationResult {
 		order: "asc" | "desc";
 		fields?: string;
 		sort?: string | object;
+		skip: number;
 		document: boolean;
 		pagination: boolean;
 		count: boolean;
@@ -55,7 +56,10 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 		logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_ORDER}: ${order}`);
 		return {
 			isValid: false,
-			errorResponse: buildErrorResponse(config.ERROR.QUERY_PARAMS.ORDER_MUST_BE_ASC_OR_DESC, 400),
+			errorResponse: buildErrorResponse(
+				config.ERROR.QUERY_PARAMS.ORDER_MUST_BE_ASC_OR_DESC,
+				400,
+			),
 		};
 	}
 
@@ -64,7 +68,10 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 		logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_POPULATE}: ${fields}`);
 		return {
 			isValid: false,
-			errorResponse: buildErrorResponse(config.ERROR.QUERY_PARAMS.POPULATE_MUST_BE_STRING, 400),
+			errorResponse: buildErrorResponse(
+				config.ERROR.QUERY_PARAMS.POPULATE_MUST_BE_STRING,
+				400,
+			),
 		};
 	}
 
@@ -76,7 +83,10 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 			logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_SORT}: ${sort}`);
 			return {
 				isValid: false,
-				errorResponse: buildErrorResponse(config.ERROR.QUERY_PARAMS.SORT_MUST_BE_STRING, 400),
+				errorResponse: buildErrorResponse(
+					config.ERROR.QUERY_PARAMS.SORT_MUST_BE_STRING,
+					400,
+				),
 			};
 		}
 	}
@@ -119,6 +129,7 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 			order: order as "asc" | "desc",
 			fields: fields as string | undefined,
 			sort: sort as string | undefined,
+			skip: (pageNum - 1) * limitNum, // Use pageNum and limitNum here
 			document: documentValue,
 			pagination: paginationValue,
 			count: countValue,
