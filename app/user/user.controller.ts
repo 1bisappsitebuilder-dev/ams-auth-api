@@ -5,6 +5,9 @@ import { config } from "../../config/constant";
 import { logActivity } from "../../utils/activityLogger";
 import { AuthRequest } from "../../middleware/verifyToken";
 import { sendPrismaErrorResponse, sendValidationError } from "../../utils/validationHelper";
+import { buildErrorResponse } from "../../helper/error-handler";
+import { getNestedFields } from "../../helper/query-builder";
+import { buildSuccessResponse } from "../../helper/success-handler";
 
 const logger = getLogger();
 const userLogger = logger.child({ module: "user" });
@@ -16,13 +19,18 @@ export const controller = (prisma: PrismaClient) => {
 
 		if (!id) {
 			userLogger.error(config.ERROR.USER.MISSING_ID);
-			res.status(400).json({ error: config.ERROR.USER.USER_ID_REQUIRED });
+			const errorResponse = buildErrorResponse(config.ERROR.USER.USER_ID_REQUIRED, 400);
+			res.status(400).json(errorResponse);
 			return;
 		}
 
 		if (fields && typeof fields !== "string") {
-			userLogger.error(`${config.ERROR.USER.INVALID_POPULATE}: ${fields}`);
-			res.status(400).json({ error: config.ERROR.USER.POPULATE_MUST_BE_STRING });
+			userLogger.error(`${config.ERROR.QUERY_PARAMS.INVALID_POPULATE}: ${fields}`);
+			const errorResponse = buildErrorResponse(
+				config.ERROR.QUERY_PARAMS.POPULATE_MUST_BE_STRING,
+				400,
+			);
+			res.status(400).json(errorResponse);
 			return;
 		}
 
@@ -32,42 +40,32 @@ export const controller = (prisma: PrismaClient) => {
 			const query: Prisma.UserFindFirstArgs = {
 				where: {
 					id,
-					deletedAt: null,
-				},
-				include: {
-					person: true,
+					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				},
 			};
 
-			if (fields) {
-				const includeFields = (fields as string).split(",").reduce(
-					(acc, field) => ({
-						...acc,
-						[field.trim()]: true,
-					}),
-					{},
-				);
-
-				query.select = {
-					...query.select,
-					...includeFields,
-					person: true,
-				};
-			}
+			query.select = getNestedFields(fields);
 
 			const user = await prisma.user.findFirst(query);
 
 			if (!user) {
 				userLogger.error(`${config.ERROR.USER.NOT_FOUND}: ${id}`);
-				res.status(404).json({ error: config.ERROR.USER.NOT_FOUND });
+				const errorResponse = buildErrorResponse(config.ERROR.USER.NOT_FOUND, 404);
+				res.status(404).json(errorResponse);
 				return;
 			}
 
 			userLogger.info(`${config.SUCCESS.USER.RETRIEVED}: ${user.id}`);
-			res.status(200).json(user);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.USER.RETRIEVED,
+				{ user },
+				200,
+			);
+			res.status(200).json(successResponse);
 		} catch (error) {
 			userLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${error}`);
-			res.status(500).json({ error: config.ERROR.USER.INTERNAL_SERVER_ERROR });
+			const errorResponse = buildErrorResponse(config.ERROR.USER.INTERNAL_SERVER_ERROR, 500);
+			res.status(500).json(errorResponse);
 		}
 	};
 
@@ -440,6 +438,6 @@ export const controller = (prisma: PrismaClient) => {
 		update,
 		remove,
 		getCurrentUser,
-		create
+		create,
 	};
 };
