@@ -282,6 +282,29 @@ export const controller = (prisma: PrismaClient) => {
 				}
 			}
 
+			// if roles are provided, assign them using UserRole
+			if (req.body.roles && Array.isArray(req.body.roles)) {
+				const roleIds: string[] = req.body.roles;
+
+				for (const roleId of roleIds) {
+					const existingRole = await prisma.userRole.findUnique({
+						where: {
+							userId_roleId: { userId: id, roleId },
+						},
+					});
+
+					if (!existingRole) {
+						await prisma.userRole.create({
+							data: {
+								userId: id,
+								roleId,
+							},
+						});
+					}
+				}
+			}
+
+			// update user basic info first
 			const updatedUser = await prisma.user.update({
 				where: { id },
 				data: {
