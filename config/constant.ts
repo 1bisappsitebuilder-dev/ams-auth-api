@@ -241,7 +241,7 @@ export const config = {
 			RETRIEVED: "Role retrieved successfully",
 			GETTING_ALL: "Getting all roles",
 			CREATED: "Role created successfully",
-			UPDATE: "Role updated successfully",
+			UPDATED: "Role updated successfully",
 			SOFT_DELETING: "Soft deleting role",
 			DELETED: "Role deleted successfully",
 		},

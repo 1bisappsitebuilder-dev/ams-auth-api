@@ -7,7 +7,7 @@ model Role {
   updatedAt   DateTime  @updatedAt
 
   // Relations
-  users           UserRole[]
+  users       UserRole[]
   permissions Permission[] // Link to Security Schemes through join table
 
   // Indexes
