@@ -2,6 +2,10 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient, Prisma } from "../../generated/prisma";
 import { getLogger } from "../../helper/logger";
 import { config } from "../../config/constant";
+import { buildErrorResponse, formatZodErrors } from "../../helper/error-handler";
+import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
+import { PersonSchema } from "../../zod/person.zod";
+import { validateQueryParams } from "../../helper/validation-helper";
 
 const logger = getLogger();
 const personLogger = logger.child({ module: "person" });
@@ -13,13 +17,18 @@ export const controller = (prisma: PrismaClient) => {
 
 		if (!id) {
 			personLogger.error(config.ERROR.PERSON.MISSING_ID);
-			res.status(400).json({ error: config.ERROR.PERSON.USER_ID_REQUIRED });
+			const errorResponse = buildErrorResponse(config.ERROR.PERSON.USER_ID_REQUIRED, 400);
+			res.status(400).json(errorResponse);
 			return;
 		}
 
 		if (fields && typeof fields !== "string") {
-			personLogger.error(`${config.ERROR.PERSON.INVALID_POPULATE}: ${fields}`);
-			res.status(400).json({ error: config.ERROR.PERSON.POPULATE_MUST_BE_STRING });
+			personLogger.error(`${config.ERROR.QUERY_PARAMS.INVALID_POPULATE}: ${fields}`);
+			const errorResponse = buildErrorResponse(
+				config.ERROR.QUERY_PARAMS.POPULATE_MUST_BE_STRING,
+				400,
+			);
+			res.status(400).json(errorResponse);
 			return;
 		}
 
@@ -52,60 +61,42 @@ export const controller = (prisma: PrismaClient) => {
 
 			if (!person) {
 				personLogger.error(`${config.ERROR.PERSON.NOT_FOUND}: ${id}`);
-				res.status(404).json({ error: config.ERROR.PERSON.NOT_FOUND });
+				const errorResponse = buildErrorResponse(config.ERROR.PERSON.NOT_FOUND, 404);
+				res.status(404).json(errorResponse);
 				return;
 			}
 
 			personLogger.info(`${config.SUCCESS.PERSON.RETRIEVED}: ${person.id}`);
-			res.status(200).json(person);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.PERSON.RETRIEVED,
+				{ person },
+				200,
+			);
+			res.status(200).json(successResponse);
 		} catch (error) {
 			personLogger.error(`${config.ERROR.PERSON.ERROR_GETTING_USER}: ${error}`);
-			res.status(500).json({ error: config.ERROR.PERSON.INTERNAL_SERVER_ERROR });
+			const errorResponse = buildErrorResponse(
+				config.ERROR.PERSON.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
 	const getAll = async (req: Request, res: Response, _next: NextFunction) => {
-		const { page = 1, limit = 10, sort, fields, query, order = "desc" } = req.query;
+		const { query } = req.query;
 
-		if (isNaN(Number(page)) || Number(page) < 1) {
-			personLogger.error(`${config.ERROR.PERSON.INVALID_PAGE}: ${page}`);
-			res.status(400).json({ error: config.ERROR.PERSON.INVALID_PAGE });
+		// Validate query parameters
+		const validationResult = validateQueryParams(req, personLogger);
+
+		if (!validationResult.isValid) {
+			res.status(400).json(validationResult.errorResponse);
 			return;
 		}
 
-		if (isNaN(Number(limit)) || Number(limit) < 1) {
-			personLogger.error(`${config.ERROR.PERSON.INVALID_LIMIT}: ${limit}`);
-			res.status(400).json({ error: config.ERROR.PERSON.INVALID_LIMIT });
-			return;
-		}
+		const { page, limit, order, fields, sort } = validationResult.validatedParams!;
 
-		if (order && !["asc", "desc"].includes(order as string)) {
-			personLogger.error(`${config.ERROR.PERSON.INVALID_ORDER}: ${order}`);
-			res.status(400).json({ error: config.ERROR.PERSON.ORDER_MUST_BE_ASC_OR_DESC });
-			return;
-		}
-
-		if (fields && typeof fields !== "string") {
-			personLogger.error(`${config.ERROR.PERSON.INVALID_POPULATE}: ${fields}`);
-			res.status(400).json({ error: config.ERROR.PERSON.POPULATE_MUST_BE_STRING });
-			return;
-		}
-
-		if (sort) {
-			if (typeof sort === "string" && sort.startsWith("{")) {
-				try {
-					JSON.parse(sort);
-				} catch (error) {
-					personLogger.error(`${config.ERROR.PERSON.INVALID_SORT}: ${sort}`);
-					res.status(400).json({
-						error: config.ERROR.PERSON.SORT_MUST_BE_STRING,
-					});
-					return;
-				}
-			}
-		}
-
-		const skip = (Number(page) - 1) * Number(limit);
+		const skip = (page - 1) * limit;
 
 		personLogger.info(
 			`${config.SUCCESS.PERSON.GETTING_ALL_USERS}, page: ${page}, limit: ${limit}, query: ${query}, order: ${order}`,
@@ -128,7 +119,7 @@ export const controller = (prisma: PrismaClient) => {
 			const findManyQuery: Prisma.PersonFindManyArgs = {
 				where: whereClause,
 				skip,
-				take: Number(limit),
+				take: limit,
 				orderBy: sort
 					? typeof sort === "string" && !sort.startsWith("{")
 						? { [sort as string]: order }
@@ -167,106 +158,203 @@ export const controller = (prisma: PrismaClient) => {
 			]);
 
 			personLogger.info(`Retrieved ${person.length} person`);
-			res.status(200).json({
-				person,
-				total,
-				page: Number(page),
-				totalPages: Math.ceil(total / Number(limit)),
-			});
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.PERSON.RETRIEVED,
+				{
+					person,
+					pagination: buildPagination(total, page, limit),
+				},
+				200,
+			);
+			res.status(200).json(successResponse);
 		} catch (error) {
 			personLogger.error(`${config.ERROR.PERSON.ERROR_GETTING_USER}: ${error}`);
-			res.status(500).json({ error: config.ERROR.PERSON.INTERNAL_SERVER_ERROR });
+			const errorResponse = buildErrorResponse(
+				config.ERROR.PERSON.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
 	const create = async (req: Request, res: Response, _next: NextFunction) => {
-		const { firstName, lastName, ...others } = req.body;
-
-		if (!firstName || !lastName) {
-			personLogger.error(config.ERROR.PERSON.INVALID_ID);
-			res.status(400).json({ error: "First name and last name are required" });
-			return;
-		}
-
 		try {
+			// Validate the request body using Zod
+			const validationResult = PersonSchema.safeParse(req.body);
+
+			if (!validationResult.success) {
+				const formattedErrors = formatZodErrors(validationResult.error.format());
+				personLogger.error(`Validation failed: ${JSON.stringify(formattedErrors)}`);
+				const errorResponse = buildErrorResponse("Validation failed", 400, formattedErrors);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			const validatedData = validationResult.data;
+
+			// Check if person already exists
 			const existingPerson = await prisma.person.findFirst({
 				where: {
-					firstName,
-					lastName,
+					firstName: validatedData.firstName,
+					lastName: validatedData.lastName,
 					deletedAt: null,
 				},
 			});
 
 			if (existingPerson) {
 				personLogger.info(`${config.SUCCESS.PERSON.RETRIEVED}: ${existingPerson.id}`);
-				res.status(200).json({
-					...existingPerson,
-					message: "Existing person found",
-				});
+				const successResponse = buildSuccessResponse(
+					"Existing person found",
+					{ person: existingPerson },
+					200,
+				);
+				res.status(200).json(successResponse);
 				return;
 			}
 
 			const newPerson = await prisma.person.create({
 				data: {
-					firstName,
-					lastName,
-					...others,
+					organizationId: validatedData.organizationId,
+					prefix: validatedData.prefix,
+					firstName: validatedData.firstName,
+					middleName: validatedData.middleName,
+					lastName: validatedData.lastName,
+					dateOfBirth: validatedData.dateOfBirth
+						? new Date(validatedData.dateOfBirth)
+						: undefined,
+					placeOfBirth: validatedData.placeOfBirth,
+					age: validatedData.age,
+					nationality: validatedData.nationality,
+					primaryLanguage: validatedData.primaryLanguage,
+					gender: validatedData.gender,
+					currency: validatedData.currency,
+					vipCode: validatedData.vipCode,
+					contactInfo: validatedData.contactInfo,
+					identification: validatedData.identification,
+					isActive: validatedData.isActive,
+					status: validatedData.status,
+					createdBy: validatedData.createdBy,
+					updatedBy: validatedData.updatedBy,
+					lastLoginAt: validatedData.lastLoginAt
+						? new Date(validatedData.lastLoginAt)
+						: undefined,
+					deletedAt: validatedData.deletedAt
+						? new Date(validatedData.deletedAt)
+						: undefined,
 				},
 			});
 
 			personLogger.info(`${config.SUCCESS.PERSON.CREATED}: ${newPerson.id}`);
-			res.status(201).json(newPerson);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.PERSON.CREATED,
+				{ person: newPerson },
+				201,
+			);
+			res.status(201).json(successResponse);
 		} catch (error) {
 			personLogger.error(`${config.ERROR.PERSON.INTERNAL_SERVER_ERROR}: ${error}`);
-			res.status(500).json({ error: config.ERROR.PERSON.INTERNAL_SERVER_ERROR });
+			const errorResponse = buildErrorResponse(
+				config.ERROR.PERSON.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
 	const update = async (req: Request, res: Response, _next: NextFunction) => {
 		const { id } = req.params;
-		const { firstName, lastName, ...others } = req.body;
-
-		if (!id) {
-			personLogger.error(config.ERROR.PERSON.MISSING_ID);
-			res.status(400).json({ error: config.ERROR.PERSON.USER_ID_REQUIRED });
-			return;
-		}
-
-		if (Object.keys(req.body).length === 0) {
-			personLogger.error(config.ERROR.PERSON.NO_UPDATE_FIELDS);
-			res.status(400).json({
-				error: config.ERROR.PERSON.AT_LEAST_ONE_FIELD_REQUIRED,
-			});
-			return;
-		}
-
-		personLogger.info(`Updating person: ${id}`);
 
 		try {
+			if (!id) {
+				personLogger.error(config.ERROR.PERSON.MISSING_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.PERSON.USER_ID_REQUIRED, 400);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			// Validate the request body using Zod
+			const validationResult = PersonSchema.partial().safeParse(req.body);
+
+			if (!validationResult.success) {
+				const formattedErrors = formatZodErrors(validationResult.error.format());
+				personLogger.error(`Validation failed: ${JSON.stringify(formattedErrors)}`);
+				const errorResponse = buildErrorResponse("Validation failed", 400, formattedErrors);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			if (Object.keys(req.body).length === 0) {
+				personLogger.error(config.ERROR.PERSON.NO_UPDATE_FIELDS);
+				const errorResponse = buildErrorResponse(
+					config.ERROR.PERSON.AT_LEAST_ONE_FIELD_REQUIRED,
+					400,
+				);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			const validatedData = validationResult.data;
+
+			personLogger.info(`Updating person: ${id}`);
+
 			const existingPerson = await prisma.person.findUnique({
 				where: { id },
 			});
 
 			if (!existingPerson) {
 				personLogger.error(`${config.ERROR.PERSON.NOT_FOUND}: ${id}`);
-				res.status(404).json({ error: config.ERROR.PERSON.NOT_FOUND });
+				const errorResponse = buildErrorResponse(config.ERROR.PERSON.NOT_FOUND, 404);
+				res.status(404).json(errorResponse);
 				return;
 			}
 
 			const updatedPerson = await prisma.person.update({
 				where: { id },
 				data: {
-					...(firstName && { firstName }),
-					...(lastName && { lastName }),
-					...others,
+					organizationId: validatedData.organizationId,
+					prefix: validatedData.prefix,
+					firstName: validatedData.firstName,
+					middleName: validatedData.middleName,
+					lastName: validatedData.lastName,
+					dateOfBirth: validatedData.dateOfBirth
+						? new Date(validatedData.dateOfBirth)
+						: undefined,
+					placeOfBirth: validatedData.placeOfBirth,
+					age: validatedData.age,
+					nationality: validatedData.nationality,
+					primaryLanguage: validatedData.primaryLanguage,
+					gender: validatedData.gender,
+					currency: validatedData.currency,
+					vipCode: validatedData.vipCode,
+					contactInfo: validatedData.contactInfo,
+					identification: validatedData.identification,
+					isActive: validatedData.isActive,
+					status: validatedData.status,
+					createdBy: validatedData.createdBy,
+					updatedBy: validatedData.updatedBy,
+					lastLoginAt: validatedData.lastLoginAt
+						? new Date(validatedData.lastLoginAt)
+						: undefined,
+					deletedAt: validatedData.deletedAt
+						? new Date(validatedData.deletedAt)
+						: undefined,
 				},
 			});
 
 			personLogger.info(`${config.SUCCESS.PERSON.UPDATE}: ${updatedPerson.id}`);
-			res.status(200).json(updatedPerson);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.PERSON.UPDATE,
+				{ person: updatedPerson },
+				200,
+			);
+			res.status(200).json(successResponse);
 		} catch (error) {
 			personLogger.error(`${config.ERROR.PERSON.ERROR_UPDATING_USER}: ${error}`);
-			res.status(500).json({ error: config.ERROR.PERSON.INTERNAL_SERVER_ERROR });
+			const errorResponse = buildErrorResponse(
+				config.ERROR.PERSON.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
@@ -275,7 +363,8 @@ export const controller = (prisma: PrismaClient) => {
 
 		if (!id) {
 			personLogger.error(config.ERROR.PERSON.MISSING_ID);
-			res.status(400).json({ error: config.ERROR.PERSON.USER_ID_REQUIRED });
+			const errorResponse = buildErrorResponse(config.ERROR.PERSON.USER_ID_REQUIRED, 400);
+			res.status(400).json(errorResponse);
 			return;
 		}
 
@@ -288,7 +377,8 @@ export const controller = (prisma: PrismaClient) => {
 
 			if (!existingUser) {
 				personLogger.error(`${config.ERROR.PERSON.NOT_FOUND}: ${id}`);
-				res.status(404).json({ error: config.ERROR.PERSON.NOT_FOUND });
+				const errorResponse = buildErrorResponse(config.ERROR.PERSON.NOT_FOUND, 404);
+				res.status(404).json(errorResponse);
 				return;
 			}
 
@@ -300,10 +390,15 @@ export const controller = (prisma: PrismaClient) => {
 			});
 
 			personLogger.info(`${config.SUCCESS.PERSON.DELETED}: ${id}`);
-			res.status(200).json({ message: config.SUCCESS.PERSON.DELETED });
+			const successResponse = buildSuccessResponse(config.SUCCESS.PERSON.DELETED, {}, 200);
+			res.status(200).json(successResponse);
 		} catch (error) {
 			personLogger.error(`${config.ERROR.PERSON.ERROR_DELETING_USER}: ${error}`);
-			res.status(500).json({ error: config.ERROR.PERSON.INTERNAL_SERVER_ERROR });
+			const errorResponse = buildErrorResponse(
+				config.ERROR.PERSON.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 

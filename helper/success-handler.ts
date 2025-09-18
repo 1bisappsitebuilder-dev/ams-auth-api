@@ -1,5 +1,3 @@
-import { Response } from "express";
-
 export interface SuccessResponse<T = unknown> {
 	status: "success";
 	message: string;
@@ -22,13 +20,14 @@ export function buildSuccessResponse<T>(
 	};
 }
 
-// Optional: Keep the original function but rename it for clarity
-// export function sendSuccessResponse<T>(
-// 	res: Response,
-// 	message: string,
-// 	data?: T,
-// 	statusCode: number = 200,
-// ): void {
-// 	const response = buildSuccessResponse(message, data, statusCode);
-// 	res.status(statusCode).json(response);
-// }
+export const buildPagination = (total: number, page: number, limit: number) => {
+	const totalPages = Math.ceil(total / limit);
+	return {
+		total,
+		page,
+		limit,
+		totalPages,
+		hasNext: page < totalPages,
+		hasPrev: page > 1,
+	};
+};
