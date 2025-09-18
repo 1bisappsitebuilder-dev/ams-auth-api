@@ -28,11 +28,21 @@ export function buildErrorResponse(
 }
 
 // Optional: Helper to convert Zod errors to ErrorDetail format
-export function formatZodErrors(zodError: any): ErrorDetail[] {
-	if (!zodError || !zodError.errors) return [];
+export interface ErrorDetail {
+	field?: string;
+	message: string;
+}
 
-	return Object.entries(zodError.errors).map(([field, error]: [string, any]) => ({
-		field: field !== "_errors" ? field : undefined,
-		message: error?._errors?.[0] || "Validation error",
-	}));
+export function formatZodErrors(zodError: any): ErrorDetail[] {
+	if (!zodError) return [];
+
+	const formattedErrors = zodError; // Expecting zodError to be the result of error.format()
+
+	return Object.entries(formattedErrors)
+		.filter(([field]) => field !== "_errors") // Exclude top-level _errors
+		.map(([field, error]: [string, any]) => ({
+			field,
+			message: error._errors?.[0] || "Validation error",
+		}))
+		.filter((error) => error.message !== "Validation error"); // Filter out generic errors
 }

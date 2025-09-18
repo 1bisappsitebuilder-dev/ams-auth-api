@@ -13,6 +13,7 @@ export const config = {
 			INVALID_POPULATE: "Invalid populate parameter",
 			INVALID_SORT: "Invalid sort parameter",
 			INVALID_QUERY: "Invalid Query",
+			MISSING_ID: "ID is required"
 		},
 		USER: {
 			NOT_FOUND: "User not found",
@@ -231,7 +232,7 @@ export const config = {
 			RETRIEVED: "Organization retrieved successfully",
 			GETTING_ALL: "Getting all organizations",
 			CREATED: "Organization created successfully",
-			UPDATE: "Organization updated successfully",
+			UPDATED: "Organization updated successfully",
 			SOFT_DELETING: "Soft deleting organization",
 			DELETED: "Organization deleted successfully",
 		},

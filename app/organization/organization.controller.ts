@@ -2,301 +2,330 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient, Prisma } from "../../generated/prisma";
 import { getLogger } from "../../helper/logger";
 import { config } from "../../config/constant";
+import { buildErrorResponse, formatZodErrors } from "../../helper/error-handler";
+import { buildFindManyQuery, getNestedFields } from "../../helper/query-builder";
+import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
+import { validateQueryParams } from "../../helper/validation-helper";
+import { OrganizationSchema } from "../../zod/organization.zod";
 
 const logger = getLogger();
-const roleLogger = logger.child({ module: "role" });
+const organizationLogger = logger.child({ module: "organization" });
 
 export const controller = (prisma: PrismaClient) => {
 	const getById = async (req: Request, res: Response, _next: NextFunction) => {
 		const { id } = req.params;
 		const { fields } = req.query;
 
-		if (!id) {
-			roleLogger.error(config.ERROR.ROLE.MISSING_ID);
-			res.status(400).json({ error: config.ERROR.ROLE.ROLE_ID_REQUIRED });
-			return;
-		}
-
-		if (fields && typeof fields !== "string") {
-			roleLogger.error(`${config.ERROR.USER.INVALID_POPULATE}: ${fields}`);
-			res.status(400).json({ error: config.ERROR.USER.POPULATE_MUST_BE_STRING });
-			return;
-		}
-
-		roleLogger.info(`${config.SUCCESS.ROLE.GETTING_BY_ID}: ${id}`);
-
 		try {
-			const query: Prisma.RoleFindFirstArgs = {
+			if (!id) {
+				organizationLogger.error(config.ERROR.ORGANIZATION.MISSING_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.MISSING_ID, 400);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			if (fields && typeof fields !== "string") {
+				organizationLogger.error(
+					`${config.ERROR.QUERY_PARAMS.INVALID_POPULATE}: ${fields}`,
+				);
+				const errorResponse = buildErrorResponse(
+					config.ERROR.QUERY_PARAMS.POPULATE_MUST_BE_STRING,
+					400,
+				);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			organizationLogger.info(`${config.SUCCESS.ORGANIZATION.GETTING_BY_ID}: ${id}`);
+
+			const query: Prisma.OrganizationFindFirstArgs = {
 				where: {
 					id,
 					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				},
 			};
 
-			if (fields) {
-				const includeFields = (fields as string).split(",").reduce(
-					(acc, field) => ({
-						...acc,
-						[field.trim()]: true,
-					}),
-					{},
-				);
+			query.select = getNestedFields(fields) || {
+				id: true,
+				name: true,
+				code: true,
+				description: true,
+				branding: true,
+				createdAt: true,
+				updatedAt: true,
+				deletedAt: true,
+				users: true,
+				apps: true,
+			};
 
-				query.select = {
-					...query.select,
-					...includeFields,
-				};
-			}
+			const organization = await prisma.organization.findFirst(query);
 
-			const role = await prisma.role.findFirst(query);
-
-			if (!role) {
-				roleLogger.error(`${config.ERROR.ROLE.NOT_FOUND}: ${id}`);
-				res.status(404).json({ error: config.ERROR.ROLE.NOT_FOUND });
+			if (!organization) {
+				organizationLogger.error(`${config.ERROR.ORGANIZATION.NOT_FOUND}: ${id}`);
+				const errorResponse = buildErrorResponse(config.ERROR.ORGANIZATION.NOT_FOUND, 404);
+				res.status(404).json(errorResponse);
 				return;
 			}
 
-			roleLogger.info(`${config.SUCCESS.ROLE.RETRIEVED}: ${role.id}`);
-			res.status(200).json(role);
+			organizationLogger.info(`${config.SUCCESS.ORGANIZATION.RETRIEVED}: ${organization.id}`);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.ORGANIZATION.RETRIEVED,
+				{ organization },
+				200,
+			);
+			res.status(200).json(successResponse);
 		} catch (error) {
-			roleLogger.error(`${config.ERROR.ROLE.ERROR_GETTING}: ${error}`);
-			res.status(500).json({ error: config.ERROR.ROLE.INTERNAL_SERVER_ERROR });
+			organizationLogger.error(`${config.ERROR.ORGANIZATION.ERROR_GETTING}: ${error}`);
+			const errorResponse = buildErrorResponse(
+				config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
 	const getAll = async (req: Request, res: Response, _next: NextFunction) => {
-		const { page = 1, limit = 10, sort, fields, query, order = "desc" } = req.query;
+		// Validate query parameters
+		const validationResult = validateQueryParams(req, organizationLogger);
 
-		if (isNaN(Number(page)) || Number(page) < 1) {
-			roleLogger.error(`${config.ERROR.ROLE.INVALID_PAGE}: ${page}`);
-			res.status(400).json({ error: config.ERROR.ROLE.INVALID_PAGE });
+		if (!validationResult.isValid) {
+			res.status(400).json(validationResult.errorResponse);
 			return;
 		}
 
-		if (isNaN(Number(limit)) || Number(limit) < 1) {
-			roleLogger.error(`${config.ERROR.ROLE.INVALID_LIMIT}: ${limit}`);
-			res.status(400).json({ error: config.ERROR.ROLE.INVALID_LIMIT });
-			return;
-		}
+		const { page, limit, order, fields, sort, skip, query, document, pagination, count } =
+			validationResult.validatedParams!;
 
-		if (order && !["asc", "desc"].includes(order as string)) {
-			roleLogger.error(`${config.ERROR.ROLE.INVALID_ORDER}: ${order}`);
-			res.status(400).json({ error: config.ERROR.ROLE.ORDER_MUST_BE_ASC_OR_DESC });
-			return;
-		}
-
-		if (fields && typeof fields !== "string") {
-			roleLogger.error(`${config.ERROR.USER.INVALID_POPULATE}: ${fields}`);
-			res.status(400).json({ error: config.ERROR.USER.POPULATE_MUST_BE_STRING });
-			return;
-		}
-
-		if (sort) {
-			if (typeof sort === "string" && sort.startsWith("{")) {
-				try {
-					JSON.parse(sort);
-				} catch (error) {
-					roleLogger.error(`${config.ERROR.ROLE.INVALID_SORT}: ${sort}`);
-					res.status(400).json({
-						error: config.ERROR.ROLE.SORT_MUST_BE_STRING,
-					});
-					return;
-				}
-			}
-		}
-
-		const skip = (Number(page) - 1) * Number(limit);
-
-		roleLogger.info(
-			`${config.SUCCESS.ROLE.GETTING_ALL}, page: ${page}, limit: ${limit}, query: ${query}, order: ${order}`,
+		organizationLogger.info(
+			`${config.SUCCESS.ORGANIZATION.GETTING_ALL}, page: ${page}, limit: ${limit}, query: ${query}, order: ${order}`,
 		);
 
 		try {
-			const whereClause: Prisma.RoleWhereInput = {
+			const whereClause: Prisma.OrganizationWhereInput = {
 				OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				...(query
 					? {
 							OR: [
 								{ name: { contains: String(query) } },
+								{ code: { contains: String(query) } },
 								{ description: { contains: String(query) } },
 							],
 						}
 					: {}),
 			};
 
-			const findManyQuery: Prisma.RoleFindManyArgs = {
-				where: whereClause,
-				skip,
-				take: Number(limit),
-				orderBy: sort
-					? typeof sort === "string" && !sort.startsWith("{")
-						? { [sort as string]: order }
-						: JSON.parse(sort as string)
-					: { id: order as Prisma.SortOrder },
-			};
+			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);
 
-			if (fields) {
-				const fieldSelections = fields.split(",").reduce(
-					(acc, field) => {
-						const parts = field.trim().split(".");
-						if (parts.length > 1) {
-							const [parent, ...children] = parts;
-							acc[parent] = acc[parent] || { select: {} };
-
-							let current = acc[parent].select;
-							for (let i = 0; i < children.length - 1; i++) {
-								current[children[i]] = current[children[i]] || { select: {} };
-								current = current[children[i]].select;
-							}
-							current[children[children.length - 1]] = true;
-						} else {
-							acc[parts[0]] = true;
-						}
-						return acc;
-					},
-					{ id: true } as Record<string, any>,
-				);
-
-				findManyQuery.select = fieldSelections;
-			}
-
-			const [roles, total] = await Promise.all([
-				prisma.role.findMany(findManyQuery),
-				prisma.role.count({ where: whereClause }),
+			const [organizations, total] = await Promise.all([
+				document ? prisma.organization.findMany(findManyQuery) : [],
+				count ? prisma.organization.count({ where: whereClause }) : 0,
 			]);
 
-			roleLogger.info(`Retrieved ${roles.length} roles`);
-			res.status(200).json({
-				roles,
-				total,
-				page: Number(page),
-				totalPages: Math.ceil(total / Number(limit)),
-			});
+			organizationLogger.info(`Retrieved ${organizations.length} organizations`);
+			const responseData = {
+				...(document && { organizations }),
+				...(count && { count: total }),
+				...(pagination && { pagination: buildPagination(total, page, limit) }),
+			};
+
+			res.status(200).json(
+				buildSuccessResponse(config.SUCCESS.ORGANIZATION.RETRIEVED, responseData, 200),
+			);
 		} catch (error) {
-			roleLogger.error(`${config.ERROR.ROLE.ERROR_GETTING}: ${error}`);
-			res.status(500).json({ error: config.ERROR.ROLE.INTERNAL_SERVER_ERROR });
+			organizationLogger.error(`${config.ERROR.ORGANIZATION.ERROR_GETTING}: ${error}`);
+			res.status(500).json(
+				buildErrorResponse(config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR, 500),
+			);
 		}
 	};
 
 	const create = async (req: Request, res: Response, _next: NextFunction) => {
-		const { name, description } = req.body;
-
-		if (!name) {
-			roleLogger.error(config.ERROR.ROLE.INVALID_INPUT);
-			res.status(400).json({ error: "Role name is required" });
-			return;
-		}
-
 		try {
-			const existingRole = await prisma.role.findFirst({
-				where: { name, deletedAt: null },
-			});
+			// Validate the request body using Zod
+			const validationResult = OrganizationSchema.safeParse(req.body);
 
-			if (existingRole) {
-				roleLogger.info(`${config.SUCCESS.ROLE.RETRIEVED}: ${existingRole.id}`);
-				res.status(200).json({
-					...existingRole,
-					message: "Existing role found",
-				});
+			if (!validationResult.success) {
+				const formattedErrors = formatZodErrors(validationResult.error.format());
+				organizationLogger.error(`Validation failed: ${JSON.stringify(formattedErrors)}`);
+				const errorResponse = buildErrorResponse("Validation failed", 400, formattedErrors);
+				res.status(400).json(errorResponse);
 				return;
 			}
 
-			const newRole = await prisma.role.create({
-				data: {
-					name,
-					description,
+			const validatedData = validationResult.data;
+
+			// Check if organization already exists
+			const existingOrganization = await prisma.organization.findFirst({
+				where: {
+					name: validatedData.name,
+					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				},
 			});
 
-			roleLogger.info(`${config.SUCCESS.ROLE.CREATED}: ${newRole.id}`);
-			res.status(201).json(newRole);
+			if (existingOrganization) {
+				organizationLogger.info(
+					`${config.SUCCESS.ORGANIZATION.RETRIEVED}: ${existingOrganization.id}`,
+				);
+				const successResponse = buildSuccessResponse(
+					"Existing organization found",
+					{ organization: existingOrganization },
+					200,
+				);
+				res.status(200).json(successResponse);
+				return;
+			}
+
+			const newOrganization = await prisma.organization.create({
+				data: {
+					...validatedData,
+				},
+			});
+
+			organizationLogger.info(
+				`${config.SUCCESS.ORGANIZATION.CREATED}: ${newOrganization.id}`,
+			);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.ORGANIZATION.CREATED,
+				{ organization: newOrganization },
+				201,
+			);
+			res.status(201).json(successResponse);
 		} catch (error) {
-			roleLogger.error(`${config.ERROR.ROLE.INTERNAL_SERVER_ERROR}: ${error}`);
-			res.status(500).json({ error: config.ERROR.ROLE.INTERNAL_SERVER_ERROR });
+			organizationLogger.error(
+				`${config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR}: ${error}`,
+			);
+			const errorResponse = buildErrorResponse(
+				config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
 	const update = async (req: Request, res: Response, _next: NextFunction) => {
 		const { id } = req.params;
-		const { name, description } = req.body;
-
-		if (!id) {
-			roleLogger.error(config.ERROR.ROLE.MISSING_ID);
-			res.status(400).json({ error: config.ERROR.ROLE.ROLE_ID_REQUIRED });
-			return;
-		}
-
-		if (Object.keys(req.body).length === 0) {
-			roleLogger.error(config.ERROR.ROLE.NO_UPDATE_FIELDS);
-			res.status(400).json({
-				error: config.ERROR.ROLE.AT_LEAST_ONE_FIELD_REQUIRED,
-			});
-			return;
-		}
-
-		roleLogger.info(`Updating role: ${id}`);
 
 		try {
-			const existingRole = await prisma.role.findUnique({
-				where: { id },
-			});
-
-			if (!existingRole) {
-				roleLogger.error(`${config.ERROR.ROLE.NOT_FOUND}: ${id}`);
-				res.status(404).json({ error: config.ERROR.ROLE.NOT_FOUND });
+			if (!id) {
+				organizationLogger.error(config.ERROR.ORGANIZATION.MISSING_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.ORGANIZATION.MISSING_ID, 400);
+				res.status(400).json(errorResponse);
 				return;
 			}
 
-			const updatedRole = await prisma.role.update({
-				where: { id },
-				data: {
-					...(name && { name }),
-					...(description && { description }),
+			// Validate the request body using Zod
+			const validationResult = OrganizationSchema.partial().safeParse(req.body);
+
+			if (!validationResult.success) {
+				const formattedErrors = formatZodErrors(validationResult.error.format());
+				organizationLogger.error(`Validation failed: ${JSON.stringify(formattedErrors)}`);
+				const errorResponse = buildErrorResponse("Validation failed", 400, formattedErrors);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			if (Object.keys(req.body).length === 0) {
+				organizationLogger.error(config.ERROR.ORGANIZATION.NO_UPDATE_FIELDS);
+				const errorResponse = buildErrorResponse(
+					config.ERROR.ORGANIZATION.AT_LEAST_ONE_FIELD_REQUIRED,
+					400,
+				);
+				res.status(400).json(errorResponse);
+				return;
+			}
+
+			const validatedData = validationResult.data;
+
+			organizationLogger.info(`Updating organization: ${id}`);
+
+			const existingOrganization = await prisma.organization.findFirst({
+				where: {
+					id,
+					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				},
 			});
 
-			roleLogger.info(`${config.SUCCESS.ROLE.UPDATE}: ${updatedRole.id}`);
-			res.status(200).json(updatedRole);
+			if (!existingOrganization) {
+				organizationLogger.error(`${config.ERROR.ORGANIZATION.NOT_FOUND}: ${id}`);
+				const errorResponse = buildErrorResponse(config.ERROR.ORGANIZATION.NOT_FOUND, 404);
+				res.status(404).json(errorResponse);
+				return;
+			}
+
+			const updatedOrganization = await prisma.organization.update({
+				where: { id },
+				data: {
+					...validatedData,
+				},
+			});
+
+			organizationLogger.info(
+				`${config.SUCCESS.ORGANIZATION.UPDATED}: ${updatedOrganization.id}`,
+			);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.ORGANIZATION.UPDATED,
+				{ organization: updatedOrganization },
+				200,
+			);
+			res.status(200).json(successResponse);
 		} catch (error) {
-			roleLogger.error(`${config.ERROR.ROLE.ERROR_UPDATING}: ${error}`);
-			res.status(500).json({ error: config.ERROR.ROLE.INTERNAL_SERVER_ERROR });
+			organizationLogger.error(`${config.ERROR.ORGANIZATION.ERROR_UPDATING}: ${error}`);
+			const errorResponse = buildErrorResponse(
+				config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
 	const remove = async (req: Request, res: Response, _next: NextFunction) => {
 		const { id } = req.params;
 
-		if (!id) {
-			roleLogger.error(config.ERROR.ROLE.MISSING_ID);
-			res.status(400).json({ error: config.ERROR.ROLE.ROLE_ID_REQUIRED });
-			return;
-		}
-
-		roleLogger.info(`${config.SUCCESS.ROLE.SOFT_DELETING}: ${id}`);
-
 		try {
-			const existingRole = await prisma.role.findUnique({
-				where: { id },
-			});
-
-			if (!existingRole) {
-				roleLogger.error(`${config.ERROR.ROLE.NOT_FOUND}: ${id}`);
-				res.status(404).json({ error: config.ERROR.ROLE.NOT_FOUND });
+			if (!id) {
+				organizationLogger.error(config.ERROR.ORGANIZATION.MISSING_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.ORGANIZATION.MISSING_ID, 400);
+				res.status(400).json(errorResponse);
 				return;
 			}
 
-			await prisma.role.update({
+			organizationLogger.info(`${config.SUCCESS.ORGANIZATION.SOFT_DELETING}: ${id}`);
+
+			const existingOrganization = await prisma.organization.findFirst({
+				where: {
+					id,
+					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+				},
+			});
+
+			if (!existingOrganization) {
+				organizationLogger.error(`${config.ERROR.ORGANIZATION.NOT_FOUND}: ${id}`);
+				const errorResponse = buildErrorResponse(config.ERROR.ORGANIZATION.NOT_FOUND, 404);
+				res.status(404).json(errorResponse);
+				return;
+			}
+
+			await prisma.organization.update({
 				where: { id },
 				data: {
 					deletedAt: new Date(),
 				},
 			});
 
-			roleLogger.info(`${config.SUCCESS.ROLE.DELETED}: ${id}`);
-			res.status(200).json({ message: config.SUCCESS.ROLE.DELETED });
+			organizationLogger.info(`${config.SUCCESS.ORGANIZATION.DELETED}: ${id}`);
+			const successResponse = buildSuccessResponse(
+				config.SUCCESS.ORGANIZATION.DELETED,
+				{},
+				200,
+			);
+			res.status(200).json(successResponse);
 		} catch (error) {
-			roleLogger.error(`${config.ERROR.ROLE.ERROR_DELETING}: ${error}`);
-			res.status(500).json({ error: config.ERROR.ROLE.INTERNAL_SERVER_ERROR });
+			organizationLogger.error(`${config.ERROR.ORGANIZATION.ERROR_DELETING}: ${error}`);
+			const errorResponse = buildErrorResponse(
+				config.ERROR.ORGANIZATION.INTERNAL_SERVER_ERROR,
+				500,
+			);
+			res.status(500).json(errorResponse);
 		}
 	};
 
