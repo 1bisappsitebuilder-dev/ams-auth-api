@@ -163,15 +163,6 @@ export const controller = (prisma: PrismaClient) => {
 			const newPerson = await prisma.person.create({
 				data: {
 					...validatedData,
-					dateOfBirth: validatedData.dateOfBirth
-						? new Date(validatedData.dateOfBirth)
-						: undefined,
-					lastLoginAt: validatedData.lastLoginAt
-						? new Date(validatedData.lastLoginAt)
-						: undefined,
-					deletedAt: validatedData.deletedAt
-						? new Date(validatedData.deletedAt)
-						: undefined,
 				},
 			});
 
@@ -246,15 +237,6 @@ export const controller = (prisma: PrismaClient) => {
 				where: { id },
 				data: {
 					...validatedData,
-					dateOfBirth: validatedData.dateOfBirth
-						? new Date(validatedData.dateOfBirth)
-						: undefined,
-					lastLoginAt: validatedData.lastLoginAt
-						? new Date(validatedData.lastLoginAt)
-						: undefined,
-					deletedAt: validatedData.deletedAt
-						? new Date(validatedData.deletedAt)
-						: undefined,
 				},
 			});
 

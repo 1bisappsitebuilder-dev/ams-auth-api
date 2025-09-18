@@ -194,12 +194,6 @@ export const controller = (prisma: PrismaClient) => {
 			const newUser = await prisma.user.create({
 				data: {
 					...validatedData,
-					lastLoginAt: validatedData.lastLoginAt
-						? new Date(validatedData.lastLoginAt)
-						: undefined,
-					deletedAt: validatedData.deletedAt
-						? new Date(validatedData.deletedAt)
-						: undefined,
 				},
 			});
 
@@ -292,12 +286,6 @@ export const controller = (prisma: PrismaClient) => {
 				where: { id },
 				data: {
 					...validatedData,
-					lastLoginAt: validatedData.lastLoginAt
-						? new Date(validatedData.lastLoginAt)
-						: undefined,
-					deletedAt: validatedData.deletedAt
-						? new Date(validatedData.deletedAt)
-						: undefined,
 				},
 			});
 
@@ -418,7 +406,7 @@ export const controller = (prisma: PrismaClient) => {
 				return;
 			}
 
-		// Exclude password from response
+			// Exclude password from response
 			const { password, ...userWithoutPassword } = user;
 
 			userLogger.info(`${config.SUCCESS.USER.RETRIEVED}: ${user.id}`);
