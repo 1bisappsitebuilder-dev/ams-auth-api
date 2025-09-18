@@ -10,6 +10,7 @@ import { buildFindManyQuery, getNestedFields } from "../../helper/query-builder"
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { validateQueryParams } from "../../helper/validation-helper";
 import { UserSchema } from "../../zod/user.zod";
+import * as argon2 from "argon2";
 
 const logger = getLogger();
 const userLogger = logger.child({ module: "user" });
@@ -190,10 +191,17 @@ export const controller = (prisma: PrismaClient) => {
 				return;
 			}
 
+			// 🔑 Hash password if provided
+			let hashedPassword: string | undefined = undefined;
+			if (validatedData.password) {
+				hashedPassword = await argon2.hash(validatedData.password);
+			}
+
 			// Create new user
 			const newUser = await prisma.user.create({
 				data: {
 					...validatedData,
+					password: hashedPassword, // store the hash, not plain text
 				},
 			});
 
