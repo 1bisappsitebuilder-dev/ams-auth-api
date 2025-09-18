@@ -418,7 +418,7 @@ export const controller = (prisma: PrismaClient) => {
 				return;
 			}
 
-			// Exclude password from response
+		// Exclude password from response
 			const { password, ...userWithoutPassword } = user;
 
 			userLogger.info(`${config.SUCCESS.USER.RETRIEVED}: ${user.id}`);

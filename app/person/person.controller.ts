@@ -145,7 +145,7 @@ export const controller = (prisma: PrismaClient) => {
 				where: {
 					firstName: validatedData.firstName,
 					lastName: validatedData.lastName,
-					deletedAt: null,
+					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				},
 			});
 
@@ -162,27 +162,10 @@ export const controller = (prisma: PrismaClient) => {
 
 			const newPerson = await prisma.person.create({
 				data: {
-					organizationId: validatedData.organizationId,
-					prefix: validatedData.prefix,
-					firstName: validatedData.firstName,
-					middleName: validatedData.middleName,
-					lastName: validatedData.lastName,
+					...validatedData,
 					dateOfBirth: validatedData.dateOfBirth
 						? new Date(validatedData.dateOfBirth)
 						: undefined,
-					placeOfBirth: validatedData.placeOfBirth,
-					age: validatedData.age,
-					nationality: validatedData.nationality,
-					primaryLanguage: validatedData.primaryLanguage,
-					gender: validatedData.gender,
-					currency: validatedData.currency,
-					vipCode: validatedData.vipCode,
-					contactInfo: validatedData.contactInfo,
-					identification: validatedData.identification,
-					isActive: validatedData.isActive,
-					status: validatedData.status,
-					createdBy: validatedData.createdBy,
-					updatedBy: validatedData.updatedBy,
 					lastLoginAt: validatedData.lastLoginAt
 						? new Date(validatedData.lastLoginAt)
 						: undefined,
@@ -245,8 +228,11 @@ export const controller = (prisma: PrismaClient) => {
 
 			personLogger.info(`Updating person: ${id}`);
 
-			const existingPerson = await prisma.person.findUnique({
-				where: { id },
+			const existingPerson = await prisma.person.findFirst({
+				where: {
+					id,
+					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+				},
 			});
 
 			if (!existingPerson) {
@@ -259,27 +245,10 @@ export const controller = (prisma: PrismaClient) => {
 			const updatedPerson = await prisma.person.update({
 				where: { id },
 				data: {
-					organizationId: validatedData.organizationId,
-					prefix: validatedData.prefix,
-					firstName: validatedData.firstName,
-					middleName: validatedData.middleName,
-					lastName: validatedData.lastName,
+					...validatedData,
 					dateOfBirth: validatedData.dateOfBirth
 						? new Date(validatedData.dateOfBirth)
 						: undefined,
-					placeOfBirth: validatedData.placeOfBirth,
-					age: validatedData.age,
-					nationality: validatedData.nationality,
-					primaryLanguage: validatedData.primaryLanguage,
-					gender: validatedData.gender,
-					currency: validatedData.currency,
-					vipCode: validatedData.vipCode,
-					contactInfo: validatedData.contactInfo,
-					identification: validatedData.identification,
-					isActive: validatedData.isActive,
-					status: validatedData.status,
-					createdBy: validatedData.createdBy,
-					updatedBy: validatedData.updatedBy,
 					lastLoginAt: validatedData.lastLoginAt
 						? new Date(validatedData.lastLoginAt)
 						: undefined,
