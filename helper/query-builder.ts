@@ -49,3 +49,17 @@ export const getNestedFields = (fields?: string) => {
 		return fieldSelections;
 	}
 };
+
+export function buildFilterConditions(filter: Record<string, any>[] | undefined): any[] {
+  if (!filter || filter.length === 0) {
+    return [];
+  }
+
+  return filter.map((filterItem) => {
+    const conditions: any = {};
+    Object.entries(filterItem).forEach(([key, value]) => {
+      conditions[key] = value; // Exact matching for all fields
+    });
+    return conditions;
+  });
+}

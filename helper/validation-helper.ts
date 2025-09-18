@@ -13,10 +13,11 @@ interface ValidationResult {
 		fields?: string;
 		sort?: string | object;
 		skip: number;
-		query: string; // Keep as string
+		query: string;
 		document: boolean;
 		pagination: boolean;
 		count: boolean;
+		filter?: Record<string, any>[]; // Add filter as an array of key-value objects
 	};
 }
 
@@ -31,6 +32,7 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 		document,
 		pagination,
 		count,
+		filter, // Add filter to destructured query params
 	} = req.query;
 
 	// Validate page
@@ -101,7 +103,7 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 			errorResponse: buildErrorResponse("Query must be a string", 400),
 		};
 	}
-	const queryValue = query !== undefined ? String(query) : ""; // Default to empty string if undefined
+	const queryValue = query !== undefined ? String(query) : "";
 
 	// Validate document
 	if (document !== undefined && (typeof document !== "string" || document !== "true")) {
@@ -133,6 +135,47 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 	}
 	const countValue = count === "true";
 
+	// Validate filter
+	let filterValue: Record<string, any>[] = [];
+	if (filter !== undefined) {
+		if (typeof filter !== "string") {
+			logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_FILTER}: ${filter}`);
+			return {
+				isValid: false,
+				errorResponse: buildErrorResponse("Filter must be a stringified JSON array", 400),
+			};
+		}
+		try {
+			const parsedFilter = JSON.parse(filter);
+			if (!Array.isArray(parsedFilter)) {
+				logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_FILTER}: Not an array`);
+				return {
+					isValid: false,
+					errorResponse: buildErrorResponse("Filter must be an array of objects", 400),
+				};
+			}
+			// Ensure each item is an object with key-value pairs
+			if (
+				!parsedFilter.every(
+					(item) => item && typeof item === "object" && !Array.isArray(item),
+				)
+			) {
+				logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_FILTER}: Items must be objects`);
+				return {
+					isValid: false,
+					errorResponse: buildErrorResponse("Filter items must be objects", 400),
+				};
+			}
+			filterValue = parsedFilter;
+		} catch (error) {
+			logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_FILTER}: ${error}`);
+			return {
+				isValid: false,
+				errorResponse: buildErrorResponse("Filter must be valid JSON", 400),
+			};
+		}
+	}
+
 	return {
 		isValid: true,
 		validatedParams: {
@@ -142,10 +185,11 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 			fields: fields as string | undefined,
 			sort: sort as string | undefined,
 			skip: (pageNum - 1) * limitNum,
-			query: queryValue, // Use validated query value
+			query: queryValue,
 			document: documentValue,
 			pagination: paginationValue,
 			count: countValue,
+			filter: filterValue, // Include parsed filter
 		},
 	};
 };

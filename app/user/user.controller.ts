@@ -6,7 +6,7 @@ import { logActivity } from "../../utils/activityLogger";
 import { AuthRequest } from "../../middleware/verifyToken";
 import { sendPrismaErrorResponse, sendValidationError } from "../../utils/validationHelper";
 import { buildErrorResponse, formatZodErrors } from "../../helper/error-handler";
-import { buildFindManyQuery, getNestedFields } from "../../helper/query-builder";
+import { buildFilterConditions, buildFindManyQuery, getNestedFields } from "../../helper/query-builder";
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { validateQueryParams } from "../../helper/validation-helper";
 import { UserSchema } from "../../zod/user.zod";
@@ -81,7 +81,7 @@ export const controller = (prisma: PrismaClient) => {
 			return;
 		}
 
-		const { page, limit, order, fields, sort, skip, query, document, pagination, count } =
+		const { page, limit, order, fields, sort, skip, query, filter, document, pagination, count } =
 			validationResult.validatedParams!;
 
 		userLogger.info(
@@ -108,6 +108,12 @@ export const controller = (prisma: PrismaClient) => {
 						}
 					: {}),
 			};
+
+			// Add filter conditions using the reusable function
+			const filterConditions = buildFilterConditions(filter);
+			if (filterConditions.length > 0) {
+				whereClause.AND = filterConditions;
+			}
 
 			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);
 			const [users, total] = await Promise.all([

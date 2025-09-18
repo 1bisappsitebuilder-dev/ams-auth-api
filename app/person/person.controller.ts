@@ -6,7 +6,11 @@ import { buildErrorResponse, formatZodErrors } from "../../helper/error-handler"
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { PersonSchema } from "../../zod/person.zod";
 import { validateQueryParams } from "../../helper/validation-helper";
-import { buildFindManyQuery, getNestedFields } from "../../helper/query-builder";
+import {
+	buildFilterConditions,
+	buildFindManyQuery,
+	getNestedFields,
+} from "../../helper/query-builder";
 
 const logger = getLogger();
 const personLogger = logger.child({ module: "person" });
@@ -79,14 +83,26 @@ export const controller = (prisma: PrismaClient) => {
 			res.status(400).json(validationResult.errorResponse);
 		}
 
-		const { page, limit, order, fields, sort, skip, query, document, pagination, count } =
-			validationResult.validatedParams!;
+		const {
+			page,
+			limit,
+			order,
+			fields,
+			sort,
+			skip,
+			query,
+			document,
+			pagination,
+			count,
+			filter, 
+		} = validationResult.validatedParams!;
 
 		personLogger.info(
-			`${config.SUCCESS.PERSON.GETTING_ALL_USERS}, page: ${page}, limit: ${limit}, query: ${query}, order: ${order}`,
+			`${config.SUCCESS.PERSON.GETTING_ALL_USERS}, page: ${page}, limit: ${limit}, query: ${query}, order: ${order}, filter: ${JSON.stringify(filter)}`,
 		);
 
 		try {
+			// Base where clause
 			const whereClause: Prisma.PersonWhereInput = {
 				OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				...(query
@@ -99,6 +115,12 @@ export const controller = (prisma: PrismaClient) => {
 						}
 					: {}),
 			};
+
+			// Add filter conditions using the reusable function
+			const filterConditions = buildFilterConditions(filter);
+			if (filterConditions.length > 0) {
+				whereClause.AND = filterConditions;
+			}
 
 			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);
 

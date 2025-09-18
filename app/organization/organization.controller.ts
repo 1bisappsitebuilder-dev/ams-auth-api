@@ -3,7 +3,11 @@ import { PrismaClient, Prisma } from "../../generated/prisma";
 import { getLogger } from "../../helper/logger";
 import { config } from "../../config/constant";
 import { buildErrorResponse, formatZodErrors } from "../../helper/error-handler";
-import { buildFindManyQuery, getNestedFields } from "../../helper/query-builder";
+import {
+	buildFilterConditions,
+	buildFindManyQuery,
+	getNestedFields,
+} from "../../helper/query-builder";
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { validateQueryParams } from "../../helper/validation-helper";
 import { OrganizationSchema } from "../../zod/organization.zod";
@@ -82,8 +86,19 @@ export const controller = (prisma: PrismaClient) => {
 			return;
 		}
 
-		const { page, limit, order, fields, sort, skip, query, document, pagination, count } =
-			validationResult.validatedParams!;
+		const {
+			page,
+			limit,
+			order,
+			fields,
+			sort,
+			skip,
+			query,
+			filter,
+			document,
+			pagination,
+			count,
+		} = validationResult.validatedParams!;
 
 		organizationLogger.info(
 			`${config.SUCCESS.ORGANIZATION.GETTING_ALL}, page: ${page}, limit: ${limit}, query: ${query}, order: ${order}`,
@@ -102,6 +117,12 @@ export const controller = (prisma: PrismaClient) => {
 						}
 					: {}),
 			};
+
+			// Add filter conditions using the reusable function
+			const filterConditions = buildFilterConditions(filter);
+			if (filterConditions.length > 0) {
+				whereClause.AND = filterConditions;
+			}
 
 			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);
 

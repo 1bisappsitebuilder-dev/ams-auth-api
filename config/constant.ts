@@ -14,6 +14,7 @@ export const config = {
 			INVALID_SORT: "Invalid sort parameter",
 			INVALID_QUERY: "Invalid Query",
 			MISSING_ID: "ID is required",
+			INVALID_FILTER: "Invalid folter format",
 		},
 		USER: {
 			NOT_FOUND: "User not found",
