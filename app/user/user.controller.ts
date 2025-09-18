@@ -6,8 +6,9 @@ import { logActivity } from "../../utils/activityLogger";
 import { AuthRequest } from "../../middleware/verifyToken";
 import { sendPrismaErrorResponse, sendValidationError } from "../../utils/validationHelper";
 import { buildErrorResponse } from "../../helper/error-handler";
-import { getNestedFields } from "../../helper/query-builder";
-import { buildSuccessResponse } from "../../helper/success-handler";
+import { buildFindManyQuery, getNestedFields } from "../../helper/query-builder";
+import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
+import { validateQueryParams } from "../../helper/validation-helper";
 
 const logger = getLogger();
 const userLogger = logger.child({ module: "user" });
@@ -70,47 +71,16 @@ export const controller = (prisma: PrismaClient) => {
 	};
 
 	const getAll = async (req: AuthRequest, res: Response, _next: NextFunction) => {
-		const { page = 1, limit = 10, sort, fields, query, order = "desc" } = req.query;
+		// Validate query parameters
+		const validationResult = validateQueryParams(req, userLogger);
 
-		if (isNaN(Number(page)) || Number(page) < 1) {
-			userLogger.error(`${config.ERROR.USER.INVALID_PAGE}: ${page}`);
-			res.status(400).json({ error: config.ERROR.USER.INVALID_PAGE });
-			return;
+		if (!validationResult.isValid) {
+			res.status(400).json(validationResult.errorResponse);
+			return; // Ensure return to prevent further execution
 		}
 
-		if (isNaN(Number(limit)) || Number(limit) < 1) {
-			userLogger.error(`${config.ERROR.USER.INVALID_LIMIT}: ${limit}`);
-			res.status(400).json({ error: config.ERROR.USER.INVALID_LIMIT });
-			return;
-		}
-
-		if (order && !["asc", "desc"].includes(order as string)) {
-			userLogger.error(`${config.ERROR.USER.INVALID_ORDER}: ${order}`);
-			res.status(400).json({ error: config.ERROR.USER.ORDER_MUST_BE_ASC_OR_DESC });
-			return;
-		}
-
-		if (fields && typeof fields !== "string") {
-			userLogger.error(`${config.ERROR.USER.INVALID_POPULATE}: ${fields}`);
-			res.status(400).json({ error: config.ERROR.USER.POPULATE_MUST_BE_STRING });
-			return;
-		}
-
-		if (sort) {
-			if (typeof sort === "string" && sort.startsWith("{")) {
-				try {
-					JSON.parse(sort);
-				} catch (error) {
-					userLogger.error(`${config.ERROR.USER.INVALID_SORT}: ${sort}`);
-					res.status(400).json({
-						error: config.ERROR.USER.SORT_MUST_BE_STRING,
-					});
-					return;
-				}
-			}
-		}
-
-		const skip = (Number(page) - 1) * Number(limit);
+		const { page, limit, order, fields, sort, skip, query, document, pagination, count } =
+			validationResult.validatedParams!;
 
 		userLogger.info(
 			`${config.SUCCESS.USER.GETTING_ALL_USERS}, page: ${page}, limit: ${limit}, query: ${query}, order: ${order}`,
@@ -118,77 +88,44 @@ export const controller = (prisma: PrismaClient) => {
 
 		try {
 			const whereClause: Prisma.UserWhereInput = {
-				deletedAt: null,
+				OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				...(query
 					? {
 							OR: [
 								{
 									person: {
 										OR: [
-											{ firstName: { contains: String(query) } },
-											{ lastName: { contains: String(query) } },
+											{ firstName: { contains: query } },
+											{ lastName: { contains: query } },
 										],
 									},
 								},
-								{ email: { contains: String(query) } },
-								{ userName: { contains: String(query) } },
+								{ email: { contains: query } },
+								{ userName: { contains: query } },
 							],
 						}
 					: {}),
 			};
 
-			const findManyQuery: Prisma.UserFindManyArgs = {
-				where: whereClause,
-				skip,
-				take: Number(limit),
-				orderBy: sort
-					? typeof sort === "string" && !sort.startsWith("{")
-						? { [sort as string]: order }
-						: JSON.parse(sort as string)
-					: { id: order as Prisma.SortOrder },
-			};
-
-			if (fields) {
-				const fieldSelections = fields.split(",").reduce(
-					(acc, field) => {
-						const parts = field.trim().split(".");
-						if (parts.length > 1) {
-							const [parent, ...children] = parts;
-							acc[parent] = acc[parent] || { select: {} };
-
-							let current = acc[parent].select;
-							for (let i = 0; i < children.length - 1; i++) {
-								current[children[i]] = current[children[i]] || { select: {} };
-								current = current[children[i]].select;
-							}
-							current[children[children.length - 1]] = true;
-						} else {
-							acc[parts[0]] = true;
-						}
-						return acc;
-					},
-					{ id: true } as Record<string, any>,
-				);
-
-				findManyQuery.select = fieldSelections;
-			}
-
+			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);
 			const [users, total] = await Promise.all([
-				prisma.user.findMany(findManyQuery),
-				prisma.user.count({ where: whereClause }),
+				document ? prisma.user.findMany(findManyQuery) : [],
+				count ? prisma.user.count({ where: whereClause }) : 0,
 			]);
 
 			userLogger.info(`Retrieved ${users.length} users`);
-			res.status(200).json({
-				users,
-				total,
-				page: Number(page),
-				totalPages: Math.ceil(total / Number(limit)),
-			});
-			``;
+			const responseData = {
+				...(document && { users }),
+				...(count && { count: total }),
+				...(pagination && { pagination: buildPagination(total, page, limit) }),
+			};
+
+			res.status(200).json(
+				buildSuccessResponse(config.SUCCESS.USER.RETRIEVED, responseData, 200),
+			);
 		} catch (error) {
 			userLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${error}`);
-			res.status(500).json({ error: config.ERROR.USER.INTERNAL_SERVER_ERROR });
+			res.status(500).json(buildErrorResponse(config.ERROR.USER.INTERNAL_SERVER_ERROR, 500));
 		}
 	};
 

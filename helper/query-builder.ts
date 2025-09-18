@@ -1,14 +1,14 @@
 import { Prisma } from "../generated/prisma";
 
-export const buildFindManyQuery = <T extends Prisma.PersonWhereInput | undefined>(
+export const buildFindManyQuery = <T extends any | undefined>(
 	whereClause: T,
 	skip: number,
 	limit: number,
 	order: "asc" | "desc",
 	sort?: string | object,
 	fields?: string,
-): Prisma.PersonFindManyArgs => {
-	const query: Prisma.PersonFindManyArgs = {
+): any => {
+	const query: any = {
 		where: whereClause,
 		skip,
 		take: limit,
