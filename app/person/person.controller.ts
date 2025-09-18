@@ -72,8 +72,6 @@ export const controller = (prisma: PrismaClient) => {
 	};
 
 	const getAll = async (req: Request, res: Response, _next: NextFunction) => {
-		const { query } = req.query;
-
 		// Validate query parameters
 		const validationResult = validateQueryParams(req, personLogger);
 
@@ -81,7 +79,7 @@ export const controller = (prisma: PrismaClient) => {
 			res.status(400).json(validationResult.errorResponse);
 		}
 
-		const { page, limit, order, fields, sort, skip, document, pagination, count } =
+		const { page, limit, order, fields, sort, skip, query, document, pagination, count } =
 			validationResult.validatedParams!;
 
 		personLogger.info(

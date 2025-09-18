@@ -13,6 +13,7 @@ interface ValidationResult {
 		fields?: string;
 		sort?: string | object;
 		skip: number;
+		query: string; // Keep as string
 		document: boolean;
 		pagination: boolean;
 		count: boolean;
@@ -26,6 +27,7 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 		order = "desc",
 		fields,
 		sort,
+		query,
 		document,
 		pagination,
 		count,
@@ -91,6 +93,16 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 		}
 	}
 
+	// Validate query
+	if (query !== undefined && typeof query !== "string") {
+		logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_QUERY}: ${query}`);
+		return {
+			isValid: false,
+			errorResponse: buildErrorResponse("Query must be a string", 400),
+		};
+	}
+	const queryValue = query !== undefined ? String(query) : ""; // Default to empty string if undefined
+
 	// Validate document
 	if (document !== undefined && (typeof document !== "string" || document !== "true")) {
 		logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_DOCUMENT}: ${document}`);
@@ -129,7 +141,8 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 			order: order as "asc" | "desc",
 			fields: fields as string | undefined,
 			sort: sort as string | undefined,
-			skip: (pageNum - 1) * limitNum, // Use pageNum and limitNum here
+			skip: (pageNum - 1) * limitNum,
+			query: queryValue, // Use validated query value
 			document: documentValue,
 			pagination: paginationValue,
 			count: countValue,

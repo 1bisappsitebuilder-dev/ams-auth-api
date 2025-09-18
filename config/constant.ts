@@ -12,6 +12,7 @@ export const config = {
 			INVALID_ORDER: "Invalid order parameter",
 			INVALID_POPULATE: "Invalid populate parameter",
 			INVALID_SORT: "Invalid sort parameter",
+			INVALID_QUERY: "Invalid Query",
 		},
 		USER: {
 			NOT_FOUND: "User not found",

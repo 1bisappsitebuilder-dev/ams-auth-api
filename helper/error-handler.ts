@@ -27,17 +27,6 @@ export function buildErrorResponse(
 	};
 }
 
-// Optional: Helper function to send error response directly
-export function sendErrorResponse(
-	res: Response,
-	message: string,
-	code: number = 500,
-	errors?: ErrorDetail[],
-): void {
-	const errorResponse = buildErrorResponse(message, code, errors);
-	res.status(code).json(errorResponse);
-}
-
 // Optional: Helper to convert Zod errors to ErrorDetail format
 export function formatZodErrors(zodError: any): ErrorDetail[] {
 	if (!zodError || !zodError.errors) return [];
