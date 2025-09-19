@@ -141,6 +141,7 @@ export const controller = (prisma: PrismaClient) => {
 				},
 				include: {
 					person: true,
+					organization: true,
 					roles: {
 						include: {
 							role: true,
@@ -191,7 +192,6 @@ export const controller = (prisma: PrismaClient) => {
 				organizationId: user.organizationId ?? undefined,
 				authType,
 			};
-			console.log(tokenPayload);
 
 			const token = jwt.sign(
 				tokenPayload,
@@ -207,18 +207,18 @@ export const controller = (prisma: PrismaClient) => {
 			});
 
 			authLogger.info(`User logged in: ${user.id}`);
+			console.log(user);
 
 			// Build success response
 			const successResponse = buildSuccessResponse(
 				"Logged in successfully",
 				{
-					user: {
-						id: user.id,
-						email: user.email,
-						userName: user.userName,
-						roles: user.roles,
-						person: user.person,
-					},
+					id: user.id,
+					email: user.email,
+					userName: user.userName,
+					roles: user.roles,
+					person: user.person,
+					organization: user.organization,
 				},
 				200,
 			);

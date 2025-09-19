@@ -146,11 +146,6 @@ export const controller = (prisma: PrismaClient) => {
 			// Validate the request body using Zod
 			const validationResult = RoleSchema.safeParse(req.body);
 			if (!validationResult.success) {
-				// Debug: Log raw Zod error
-				console.log(
-					"Raw Zod Error:",
-					JSON.stringify(validationResult.error.format(), null, 2),
-				);
 				const formattedErrors = formatZodErrors(validationResult.error.format());
 				roleLogger.error(`Validation failed: ${JSON.stringify(formattedErrors)}`);
 				const errorResponse = buildErrorResponse("Validation failed", 400, formattedErrors);

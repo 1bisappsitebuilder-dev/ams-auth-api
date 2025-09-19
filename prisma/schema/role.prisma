@@ -1,7 +1,13 @@
+enum RoleType {
+  organization
+  project
+}
+
 model Role {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   name        String    @unique
   description String?
+  type        RoleType  @default(organization)
   deletedAt   DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { StatusEnum } from "./user.zod";
 
 const ColorsSchema = z.object({
 	primary: z.string().optional(),
@@ -25,6 +26,7 @@ export const OrganizationSchema = z.object({
 	code: z.string().nonempty("Organization code is required"),
 	description: z.string().optional(),
 	branding: BrandingSchema.optional(),
+	status: StatusEnum.default("active"), // reused enum
 	createdAt: z.string().datetime().optional(),
 	updatedAt: z.string().datetime().optional(),
 	deletedAt: z.string().datetime().optional(),

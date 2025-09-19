@@ -6,7 +6,11 @@ import { logActivity } from "../../utils/activityLogger";
 import { AuthRequest } from "../../middleware/verifyToken";
 import { sendPrismaErrorResponse, sendValidationError } from "../../utils/validationHelper";
 import { buildErrorResponse, formatZodErrors } from "../../helper/error-handler";
-import { buildFilterConditions, buildFindManyQuery, getNestedFields } from "../../helper/query-builder";
+import {
+	buildFilterConditions,
+	buildFindManyQuery,
+	getNestedFields,
+} from "../../helper/query-builder";
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { validateQueryParams } from "../../helper/validation-helper";
 import { UserSchema } from "../../zod/user.zod";
@@ -81,8 +85,19 @@ export const controller = (prisma: PrismaClient) => {
 			return;
 		}
 
-		const { page, limit, order, fields, sort, skip, query, filter, document, pagination, count } =
-			validationResult.validatedParams!;
+		const {
+			page,
+			limit,
+			order,
+			fields,
+			sort,
+			skip,
+			query,
+			filter,
+			document,
+			pagination,
+			count,
+		} = validationResult.validatedParams!;
 
 		userLogger.info(
 			`${config.SUCCESS.USER.GETTING_ALL_USERS}, page: ${page}, limit: ${limit}, query: ${query}, order: ${order}`,
@@ -324,6 +339,15 @@ export const controller = (prisma: PrismaClient) => {
 				data: {
 					...validatedData,
 				},
+				include: {
+					person: true,
+					organization: true,
+					roles: {
+						include: {
+							role: true,
+						},
+					},
+				},
 			});
 
 			userLogger.info(`${config.SUCCESS.USER.UPDATE}: ${updatedUser.id}`);
@@ -432,6 +456,11 @@ export const controller = (prisma: PrismaClient) => {
 				deletedAt: true,
 				person: true,
 				organization: true,
+				roles: {
+					select: {
+						role: true,
+					},
+				},
 			};
 
 			const user = await prisma.user.findFirst(query);
@@ -449,7 +478,7 @@ export const controller = (prisma: PrismaClient) => {
 			userLogger.info(`${config.SUCCESS.USER.RETRIEVED}: ${user.id}`);
 			const successResponse = buildSuccessResponse(
 				config.SUCCESS.USER.RETRIEVED,
-				{ user: userWithoutPassword },
+				userWithoutPassword,
 				200,
 			);
 			res.status(200).json(successResponse);
