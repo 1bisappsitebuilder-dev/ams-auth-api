@@ -42,14 +42,7 @@ export const controller = (prisma: PrismaClient) => {
 				where: { id },
 			};
 
-			query.select = getNestedFields(fields) || {
-				id: true,
-				name: true,
-				description: true,
-				createdAt: true,
-				updatedAt: true,
-				permissions: true,
-			};
+			query.select = getNestedFields(fields);
 
 			const accessPolicy = await prisma.accessPolicy.findFirst(query);
 

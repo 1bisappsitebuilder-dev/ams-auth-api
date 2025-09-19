@@ -94,7 +94,7 @@ export const controller = (prisma: PrismaClient) => {
 			document,
 			pagination,
 			count,
-			filter, 
+			filter,
 		} = validationResult.validatedParams!;
 
 		personLogger.info(
@@ -221,8 +221,8 @@ export const controller = (prisma: PrismaClient) => {
 
 			if (!validationResult.success) {
 				const formattedErrors = formatZodErrors(validationResult.error.format());
-				personLogger.error(`Validation failed: ${JSON.stringify(formattedErrors)}`);
 				const errorResponse = buildErrorResponse("Validation failed", 400, formattedErrors);
+				personLogger.error(`Validation failed: ${JSON.stringify(formattedErrors)}`);
 				res.status(400).json(errorResponse);
 				return;
 			}
