@@ -444,19 +444,33 @@ export const controller = (prisma: PrismaClient) => {
 
 			query.select = getNestedFields(fields) || {
 				id: true,
-				userName: true,
 				email: true,
-				loginMethod: true,
-				avatar: true,
-				status: true,
+				userName: true,
+				password: true,
 				organizationId: true,
-				lastLoginAt: true,
-				deletedAt: true,
-				person: true,
-				organization: true,
 				roles: {
 					select: {
-						role: true,
+						role: {
+							select: {
+								name: true,
+								description: true,
+								type: true,
+							},
+						},
+					},
+				},
+				person: {
+					select: {
+						firstName: true,
+						lastName: true,
+					},
+				},
+				organization: {
+					select: {
+						name: true,
+						code: true,
+						description: true,
+						branding: true,
 					},
 				},
 			};

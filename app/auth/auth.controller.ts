@@ -140,15 +140,47 @@ export const controller = (prisma: PrismaClient) => {
 					isDeleted: false,
 					OR: [{ email: identifier }, { userName: identifier }],
 				},
-				include: {
-					person: true,
-					organization: true,
+				select: {
+					id: true,
+					email: true,
+					userName: true,
+					password: true,
+					organizationId: true,
 					roles: {
-						include: {
-							role: true,
+						select: {
+							role: {
+								select: {
+									name: true,
+									description: true,
+									type: true,
+								},
+							},
+						},
+					},
+					person: {
+						select: {
+							firstName: true,
+							lastName: true,
+						},
+					},
+					organization: {
+						select: {
+							name: true,
+							code: true,
+							description: true,
+							branding: true,
 						},
 					},
 				},
+				// include: {
+				// 	person: true,
+				// 	organization: true,
+				// 	roles: {
+				// 		include: {
+				// 			role: true,
+				// 		},
+				// 	},
+				// },
 			});
 
 			if (!user || !user.password) {
@@ -193,6 +225,7 @@ export const controller = (prisma: PrismaClient) => {
 				organizationId: user.organizationId ?? undefined,
 				authType,
 			};
+			console.log("tokenPayload", tokenPayload);
 
 			const token = jwt.sign(
 				tokenPayload,
