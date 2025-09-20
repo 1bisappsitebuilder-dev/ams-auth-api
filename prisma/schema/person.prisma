@@ -98,7 +98,7 @@ model Person {
   createdBy   String?   @db.ObjectId
   updatedBy   String?   @db.ObjectId
   lastLoginAt DateTime?
-  deletedAt   DateTime?
+  isDeleted   Boolean   @default(false)
 
   //  Relations
   users User[]

@@ -39,7 +39,7 @@ export const controller = (prisma: PrismaClient) => {
 			accessPolicyLogger.info(`${config.SUCCESS.ACCESS_POLICY.GETTING_BY_ID}: ${id}`);
 
 			const query: Prisma.AccessPolicyFindFirstArgs = {
-				where: { id },
+				where: { id, isDeleted: false },
 			};
 
 			query.select = getNestedFields(fields);
@@ -90,6 +90,7 @@ export const controller = (prisma: PrismaClient) => {
 
 		try {
 			const whereClause: Prisma.AccessPolicyWhereInput = {
+				isDeleted: false,
 				...(query
 					? {
 							OR: [
@@ -219,7 +220,7 @@ export const controller = (prisma: PrismaClient) => {
 			accessPolicyLogger.info(`Updating access policy: ${id}`);
 
 			const existingPolicy = await prisma.accessPolicy.findFirst({
-				where: { id },
+				where: { id, isDeleted: false },
 			});
 
 			if (!existingPolicy) {
@@ -267,7 +268,7 @@ export const controller = (prisma: PrismaClient) => {
 			accessPolicyLogger.info(`${config.SUCCESS.ACCESS_POLICY.DELETED}: ${id}`);
 
 			const existingPolicy = await prisma.accessPolicy.findFirst({
-				where: { id },
+				where: { id, isDeleted: false },
 			});
 
 			if (!existingPolicy) {
@@ -277,8 +278,11 @@ export const controller = (prisma: PrismaClient) => {
 				return;
 			}
 
-			await prisma.accessPolicy.delete({
+			await prisma.accessPolicy.update({
 				where: { id },
+				data: {
+					isDeleted: true,
+				},
 			});
 
 			accessPolicyLogger.info(`${config.SUCCESS.ACCESS_POLICY.DELETED}: ${id}`);

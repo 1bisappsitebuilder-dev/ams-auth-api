@@ -16,7 +16,7 @@ model User {
   status         Status    @default(active)
   loginMethod    String
   lastLoginAt    DateTime?
-  deletedAt      DateTime?
+  isDeleted      Boolean   @default(false)
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
 

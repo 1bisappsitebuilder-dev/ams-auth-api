@@ -43,7 +43,7 @@ export const controller = (prisma: PrismaClient) => {
 			const query: Prisma.RoleFindFirstArgs = {
 				where: {
 					id,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			};
 
@@ -73,7 +73,6 @@ export const controller = (prisma: PrismaClient) => {
 	};
 
 	const getAll = async (req: Request, res: Response, _next: NextFunction) => {
-		// Validate query parameters
 		const validationResult = validateQueryParams(req, roleLogger);
 
 		if (!validationResult.isValid) {
@@ -101,7 +100,7 @@ export const controller = (prisma: PrismaClient) => {
 
 		try {
 			const whereClause: Prisma.RoleWhereInput = {
-				OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+				isDeleted: false,
 				...(query
 					? {
 							OR: [
@@ -159,7 +158,7 @@ export const controller = (prisma: PrismaClient) => {
 			const existingRole = await prisma.role.findFirst({
 				where: {
 					name: validatedData.name,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			});
 
@@ -233,7 +232,7 @@ export const controller = (prisma: PrismaClient) => {
 			const existingRole = await prisma.role.findFirst({
 				where: {
 					id,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			});
 
@@ -281,7 +280,7 @@ export const controller = (prisma: PrismaClient) => {
 			const existingRole = await prisma.role.findFirst({
 				where: {
 					id,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			});
 
@@ -295,7 +294,7 @@ export const controller = (prisma: PrismaClient) => {
 			await prisma.role.update({
 				where: { id },
 				data: {
-					deletedAt: new Date(),
+					isDeleted: true,
 				},
 			});
 

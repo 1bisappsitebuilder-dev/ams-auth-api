@@ -45,7 +45,7 @@ export const controller = (prisma: PrismaClient) => {
 			const query: Prisma.OrganizationFindFirstArgs = {
 				where: {
 					id,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			};
 
@@ -106,7 +106,7 @@ export const controller = (prisma: PrismaClient) => {
 
 		try {
 			const whereClause: Prisma.OrganizationWhereInput = {
-				OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+				isDeleted: false,
 				...(query
 					? {
 							OR: [
@@ -151,7 +151,6 @@ export const controller = (prisma: PrismaClient) => {
 
 	const create = async (req: Request, res: Response, _next: NextFunction) => {
 		try {
-			// Validate the request body using Zod
 			const validationResult = OrganizationSchema.safeParse(req.body);
 
 			if (!validationResult.success) {
@@ -168,7 +167,7 @@ export const controller = (prisma: PrismaClient) => {
 			const existingOrganization = await prisma.organization.findFirst({
 				where: {
 					name: validatedData.name,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			});
 
@@ -249,7 +248,7 @@ export const controller = (prisma: PrismaClient) => {
 			const existingOrganization = await prisma.organization.findFirst({
 				where: {
 					id,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			});
 
@@ -302,7 +301,7 @@ export const controller = (prisma: PrismaClient) => {
 			const existingOrganization = await prisma.organization.findFirst({
 				where: {
 					id,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			});
 
@@ -316,7 +315,7 @@ export const controller = (prisma: PrismaClient) => {
 			await prisma.organization.update({
 				where: { id },
 				data: {
-					deletedAt: new Date(),
+					isDeleted: true,
 				},
 			});
 

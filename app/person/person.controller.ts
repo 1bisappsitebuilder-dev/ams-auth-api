@@ -43,7 +43,7 @@ export const controller = (prisma: PrismaClient) => {
 			const query: Prisma.PersonFindFirstArgs = {
 				where: {
 					id,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			};
 
@@ -104,7 +104,7 @@ export const controller = (prisma: PrismaClient) => {
 		try {
 			// Base where clause
 			const whereClause: Prisma.PersonWhereInput = {
-				OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+				isDeleted: false,
 				...(query
 					? {
 							OR: [
@@ -165,9 +165,9 @@ export const controller = (prisma: PrismaClient) => {
 			// Check if person already exists
 			const existingPerson = await prisma.person.findFirst({
 				where: {
+					isDeleted: false,
 					firstName: validatedData.firstName,
 					lastName: validatedData.lastName,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
 				},
 			});
 
@@ -244,7 +244,7 @@ export const controller = (prisma: PrismaClient) => {
 			const existingPerson = await prisma.person.findFirst({
 				where: {
 					id,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			});
 
@@ -293,7 +293,7 @@ export const controller = (prisma: PrismaClient) => {
 
 		try {
 			const existingUser = await prisma.person.findUnique({
-				where: { id },
+				where: { id, isDeleted: false },
 			});
 
 			if (!existingUser) {
@@ -306,7 +306,7 @@ export const controller = (prisma: PrismaClient) => {
 			await prisma.person.update({
 				where: { id },
 				data: {
-					deletedAt: new Date(),
+					isDeleted: true,
 				},
 			});
 

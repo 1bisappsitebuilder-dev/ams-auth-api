@@ -25,7 +25,7 @@ model Organization {
   description String?
   status      Status    @default(active)
   branding    Branding?
-  deletedAt   DateTime?
+  isDeleted   Boolean @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 

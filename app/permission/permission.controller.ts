@@ -44,7 +44,7 @@ export const controller = (prisma: PrismaClient) => {
 			permissionLogger.info(`${config.SUCCESS.PERMISSION.GETTING_BY_ID}: ${id}`);
 
 			const query: Prisma.PermissionFindFirstArgs = {
-				where: { id },
+				where: { id, isDeleted: false },
 			};
 
 			query.select = getNestedFields(fields);
@@ -104,6 +104,7 @@ export const controller = (prisma: PrismaClient) => {
 
 		try {
 			const whereClause: Prisma.PermissionWhereInput = {
+				isDeleted: false,
 				...(query
 					? {
 							OR: [
@@ -171,6 +172,7 @@ export const controller = (prisma: PrismaClient) => {
 			// Check if permission already exists
 			const existingPermission = await prisma.permission.findFirst({
 				where: {
+					isDeleted: false,
 					accessPolicyId: validatedData.accessPolicyId,
 					roleId: validatedData.roleId,
 				},
@@ -252,7 +254,7 @@ export const controller = (prisma: PrismaClient) => {
 			permissionLogger.info(`Updating permission: ${id}`);
 
 			const existingPermission = await prisma.permission.findFirst({
-				where: { id },
+				where: { id, isDeleted: false },
 			});
 
 			if (!existingPermission) {
@@ -303,7 +305,7 @@ export const controller = (prisma: PrismaClient) => {
 			permissionLogger.info(`${config.SUCCESS.PERMISSION.DELETING}: ${id}`);
 
 			const existingPermission = await prisma.permission.findFirst({
-				where: { id },
+				where: { id, isDeleted: false },
 			});
 
 			if (!existingPermission) {
@@ -313,8 +315,11 @@ export const controller = (prisma: PrismaClient) => {
 				return;
 			}
 
-			await prisma.permission.delete({
+			await prisma.permission.update({
 				where: { id },
+				data: {
+					isDeleted: true,
+				},
 			});
 
 			permissionLogger.info(`${config.SUCCESS.PERMISSION.DELETED}: ${id}`);

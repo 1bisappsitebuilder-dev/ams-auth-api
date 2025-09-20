@@ -137,6 +137,7 @@ export const controller = (prisma: PrismaClient) => {
 			// Find user by email or username
 			const user = await prisma.user.findFirst({
 				where: {
+					isDeleted: false,
 					OR: [{ email: identifier }, { userName: identifier }],
 				},
 				include: {
