@@ -14,5 +14,4 @@ export const UserSchema = z.object({
 	status: StatusEnum.default("active"), // reused enum
 	organizationId: z.string().optional(),
 	lastLoginAt: z.string().datetime().optional(),
-	deletedAt: z.string().datetime().optional(),
 });

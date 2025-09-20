@@ -47,7 +47,7 @@ export const controller = (prisma: PrismaClient) => {
 			const query: Prisma.UserFindFirstArgs = {
 				where: {
 					id,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			};
 
@@ -105,7 +105,7 @@ export const controller = (prisma: PrismaClient) => {
 
 		try {
 			const whereClause: Prisma.UserWhereInput = {
-				OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+				isDeleted: false,
 				...(query
 					? {
 							OR: [
@@ -124,7 +124,6 @@ export const controller = (prisma: PrismaClient) => {
 					: {}),
 			};
 
-			// Add filter conditions using the reusable function
 			const filterConditions = buildFilterConditions(filter);
 			if (filterConditions.length > 0) {
 				whereClause.AND = filterConditions;
@@ -154,7 +153,6 @@ export const controller = (prisma: PrismaClient) => {
 
 	const create = async (req: AuthRequest, res: Response, _next: NextFunction) => {
 		try {
-			// Validate the request body using Zod
 			const validationResult = UserSchema.safeParse(req.body);
 
 			if (!validationResult.success) {
@@ -171,7 +169,7 @@ export const controller = (prisma: PrismaClient) => {
 			const existingPerson = await prisma.person.findFirst({
 				where: {
 					id: validatedData.personId,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			});
 
@@ -195,7 +193,7 @@ export const controller = (prisma: PrismaClient) => {
 							],
 						},
 						{
-							OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+							isDeleted: false,
 						},
 					],
 				},
@@ -279,7 +277,7 @@ export const controller = (prisma: PrismaClient) => {
 			const existingUser = await prisma.user.findFirst({
 				where: {
 					id,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			});
 
@@ -294,7 +292,7 @@ export const controller = (prisma: PrismaClient) => {
 				const userWithEmail = await prisma.user.findFirst({
 					where: {
 						email: validatedData.email,
-						OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+						isDeleted: false,
 					},
 				});
 
@@ -380,7 +378,7 @@ export const controller = (prisma: PrismaClient) => {
 			const existingUser = await prisma.user.findFirst({
 				where: {
 					id,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			});
 
@@ -393,7 +391,7 @@ export const controller = (prisma: PrismaClient) => {
 
 			const updatedUser = await prisma.user.update({
 				where: { id },
-				data: { deletedAt: new Date() },
+				data: { isDeleted: true },
 			});
 
 			userLogger.info(`${config.SUCCESS.USER.DELETED}: ${id}`);
@@ -440,7 +438,7 @@ export const controller = (prisma: PrismaClient) => {
 			const query: Prisma.UserFindFirstArgs = {
 				where: {
 					id: userId,
-					OR: [{ deletedAt: null }, { deletedAt: { isSet: false } }],
+					isDeleted: false,
 				},
 			};
 

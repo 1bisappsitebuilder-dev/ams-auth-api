@@ -83,5 +83,4 @@ export const PersonSchema = z.object({
 	createdBy: z.string().optional(),
 	updatedBy: z.string().optional(),
 	lastLoginAt: z.string().datetime().optional(),
-	deletedAt: z.string().datetime().optional(),
 });

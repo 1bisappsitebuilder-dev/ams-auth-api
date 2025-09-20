@@ -61,15 +61,6 @@ type Identification {
   expiryDate     DateTime?
 }
 
-type Metadata {
-  isActive    Boolean   @default(true)
-  status      String?
-  createdBy   String?   @db.ObjectId
-  updatedBy   String?   @db.ObjectId
-  lastLoginAt DateTime?
-  deletedAt   DateTime?
-}
-
 model Person {
   id             String  @id @default(auto()) @map("_id") @db.ObjectId
   organizationId String? @db.ObjectId

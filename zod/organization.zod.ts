@@ -29,5 +29,4 @@ export const OrganizationSchema = z.object({
 	status: StatusEnum.default("active"), // reused enum
 	createdAt: z.string().datetime().optional(),
 	updatedAt: z.string().datetime().optional(),
-	deletedAt: z.string().datetime().optional(),
 });

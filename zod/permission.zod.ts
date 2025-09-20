@@ -14,5 +14,4 @@ export const PermissionSchema = z.object({
 		)
 		.nonempty("At least one role permission is required"),
 	createdAt: z.string().datetime().optional(),
-	updatedAt: z.string().datetime().optional(),
 });
