@@ -16,12 +16,11 @@ export const config = {
 			MISSING_ID: "ID is required",
 			INVALID_FILTER: "Invalid folter format",
 			INVALID_COMBINATION: "Invalid Combination",
+			INVALID_ID: "Invalid ID"
 		},
 		USER: {
 			NOT_FOUND: "User not found",
 			INVALID_ID: "Invalid user ID",
-			MISSING_ID: "Missing user ID",
-			USER_ID_REQUIRED: "User ID is required",
 			INVALID_POPULATE: "Invalid populate parameter",
 			POPULATE_MUST_BE_STRING: "Populate parameter must be a comma-separated string",
 			INTERNAL_SERVER_ERROR: "Internal server error",

@@ -18,6 +18,7 @@ import {
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { validateQueryParams } from "../../helper/validation-helper";
 import { UserSchema } from "../../zod/user.zod";
+import { ObjectIdSchema } from "../../zod/object-id.zod";
 import * as argon2 from "argon2";
 
 const logger = getLogger();
@@ -28,9 +29,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 		const { fields } = req.query;
 
-		if (!id) {
-			userLogger.error(config.ERROR.USER.MISSING_ID);
-			const errorResponse = buildErrorResponse(config.ERROR.USER.USER_ID_REQUIRED, 400);
+		const idValidation = ObjectIdSchema.safeParse(req.params.id);
+
+		if (!idValidation.success) {
+			userLogger.error(config.ERROR.USER.INVALID_ID);
+			const errorResponse = buildErrorResponse(config.ERROR.USER.INVALID_ID, 400);
 			res.status(400).json(errorResponse);
 			return;
 		}
@@ -261,9 +264,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			if (!id) {
-				userLogger.error(config.ERROR.USER.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.USER.USER_ID_REQUIRED, 400);
+			const idValidation = ObjectIdSchema.safeParse(req.params.id);
+
+			if (!idValidation.success) {
+				userLogger.error(config.ERROR.USER.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.USER.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
@@ -385,13 +390,14 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			if (!id) {
-				userLogger.error(config.ERROR.USER.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.USER.USER_ID_REQUIRED, 400);
+			const idValidation = ObjectIdSchema.safeParse(req.params.id);
+
+			if (!idValidation.success) {
+				userLogger.error(config.ERROR.USER.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.USER.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
-
 			userLogger.info(`${config.SUCCESS.USER.SOFT_DELETING}: ${id}`);
 
 			const existingUser = await prisma.user.findFirst({
@@ -432,13 +438,12 @@ export const controller = (prisma: PrismaClient) => {
 		const { fields } = req.query;
 
 		try {
-			if (!userId) {
-				userLogger.error(config.ERROR.USER.UNAUTHORIZED_USER_ID_NOT_FOUND);
-				const errorResponse = buildErrorResponse(
-					config.ERROR.USER.UNAUTHORIZED_USER_ID_NOT_FOUND,
-					401,
-				);
-				res.status(401).json(errorResponse);
+			const idValidation = ObjectIdSchema.safeParse(userId);
+
+			if (!idValidation.success) {
+				userLogger.error(config.ERROR.USER.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.USER.INVALID_ID, 400);
+				res.status(400).json(errorResponse);
 				return;
 			}
 
