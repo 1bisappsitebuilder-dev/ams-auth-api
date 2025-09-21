@@ -29,7 +29,7 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 		const { fields } = req.query;
 
-		const idValidation = ObjectIdSchema.safeParse(req.params.id);
+		const idValidation = ObjectIdSchema.safeParse(id);
 
 		if (!idValidation.success) {
 			userLogger.error(config.ERROR.USER.INVALID_ID);
@@ -264,7 +264,7 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			const idValidation = ObjectIdSchema.safeParse(req.params.id);
+			const idValidation = ObjectIdSchema.safeParse(id);
 
 			if (!idValidation.success) {
 				userLogger.error(config.ERROR.USER.INVALID_ID);
@@ -390,7 +390,7 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			const idValidation = ObjectIdSchema.safeParse(req.params.id);
+			const idValidation = ObjectIdSchema.safeParse(id);
 
 			if (!idValidation.success) {
 				userLogger.error(config.ERROR.USER.INVALID_ID);

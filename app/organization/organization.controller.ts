@@ -11,6 +11,7 @@ import {
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { validateQueryParams } from "../../helper/validation-helper";
 import { OrganizationSchema } from "../../zod/organization.zod";
+import { ObjectIdSchema } from "../../zod/object-id.zod";
 
 const logger = getLogger();
 const organizationLogger = logger.child({ module: "organization" });
@@ -21,9 +22,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { fields } = req.query;
 
 		try {
-			if (!id) {
-				organizationLogger.error(config.ERROR.ORGANIZATION.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.MISSING_ID, 400);
+			const idValidation = ObjectIdSchema.safeParse(id);
+
+			if (!idValidation.success) {
+				organizationLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
@@ -213,9 +216,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			if (!id) {
-				organizationLogger.error(config.ERROR.ORGANIZATION.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.ORGANIZATION.MISSING_ID, 400);
+			const idValidation = ObjectIdSchema.safeParse(id);
+
+			if (!idValidation.success) {
+				organizationLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
@@ -289,9 +294,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			if (!id) {
-				organizationLogger.error(config.ERROR.ORGANIZATION.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.ORGANIZATION.MISSING_ID, 400);
+			const idValidation = ObjectIdSchema.safeParse(id);
+
+			if (!idValidation.success) {
+				organizationLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
