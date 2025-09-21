@@ -11,6 +11,7 @@ import {
 	buildFindManyQuery,
 	getNestedFields,
 } from "../../helper/query-builder";
+import { ObjectIdSchema } from "../../zod/object-id.zod";
 
 const logger = getLogger();
 const personLogger = logger.child({ module: "person" });
@@ -20,9 +21,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 		const { fields } = req.query;
 
-		if (!id) {
-			personLogger.error(config.ERROR.PERSON.MISSING_ID);
-			const errorResponse = buildErrorResponse(config.ERROR.PERSON.USER_ID_REQUIRED, 400);
+		const idValidation = ObjectIdSchema.safeParse(id);
+
+		if (!idValidation.success) {
+			personLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+			const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 			res.status(400).json(errorResponse);
 			return;
 		}
@@ -209,9 +212,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			if (!id) {
-				personLogger.error(config.ERROR.PERSON.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.PERSON.USER_ID_REQUIRED, 400);
+			const idValidation = ObjectIdSchema.safeParse(id);
+
+			if (!idValidation.success) {
+				personLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
@@ -282,9 +287,11 @@ export const controller = (prisma: PrismaClient) => {
 	const remove = async (req: Request, res: Response, _next: NextFunction) => {
 		const { id } = req.params;
 
-		if (!id) {
-			personLogger.error(config.ERROR.PERSON.MISSING_ID);
-			const errorResponse = buildErrorResponse(config.ERROR.PERSON.USER_ID_REQUIRED, 400);
+		const idValidation = ObjectIdSchema.safeParse(id);
+
+		if (!idValidation.success) {
+			personLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+			const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 			res.status(400).json(errorResponse);
 			return;
 		}
