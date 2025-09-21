@@ -48,6 +48,9 @@ export const RegisterSchema = z.object({
 	status: z.nativeEnum(Status).default(Status.active),
 	loginMethod: z.string().default("email"),
 
+	//connect user to existing roles
+	roleIds: z.array(z.string()).optional(),
+
 	// Person fields
 	firstName: z.string().min(1, "First name is required"),
 	lastName: z.string().min(1, "Last name is required"),

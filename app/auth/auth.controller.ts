@@ -91,9 +91,17 @@ export const controller = (prisma: PrismaClient) => {
 					},
 					include: {
 						person: true,
-						roles: true,
 					},
 				});
+
+				if (validatedData.roleIds && validatedData.roleIds.length > 0) {
+					await tx.userRole.createMany({
+						data: validatedData.roleIds.map((roleId) => ({
+							userId: user.id,
+							roleId,
+						})),
+					});
+				}
 
 				return { user };
 			});
