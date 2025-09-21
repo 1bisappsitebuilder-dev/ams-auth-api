@@ -11,6 +11,7 @@ import {
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { validateQueryParams } from "../../helper/validation-helper";
 import { PermissionSchema } from "../../zod/permission.zod";
+import { ObjectIdSchema } from "../../zod/object-id.zod";
 
 const logger = getLogger();
 const permissionLogger = logger.child({ module: "permission" });
@@ -21,12 +22,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { fields } = req.query;
 
 		try {
-			if (!id) {
-				permissionLogger.error(config.ERROR.PERMISSION.MISSING_ID);
-				const errorResponse = buildErrorResponse(
-					config.ERROR.PERMISSION.PERMISSION_ID_REQUIRED,
-					400,
-				);
+			const idValidation = ObjectIdSchema.safeParse(id);
+
+			if (!idValidation.success) {
+				permissionLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
@@ -218,12 +218,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			if (!id) {
-				permissionLogger.error(config.ERROR.PERMISSION.MISSING_ID);
-				const errorResponse = buildErrorResponse(
-					config.ERROR.PERMISSION.PERMISSION_ID_REQUIRED,
-					400,
-				);
+			const idValidation = ObjectIdSchema.safeParse(id);
+
+			if (!idValidation.success) {
+				permissionLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
@@ -292,12 +291,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			if (!id) {
-				permissionLogger.error(config.ERROR.PERMISSION.MISSING_ID);
-				const errorResponse = buildErrorResponse(
-					config.ERROR.PERMISSION.PERMISSION_ID_REQUIRED,
-					400,
-				);
+			const idValidation = ObjectIdSchema.safeParse(id);
+
+			if (!idValidation.success) {
+				permissionLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
