@@ -7,6 +7,7 @@ import { buildPagination, buildSuccessResponse } from "../../helper/success-hand
 import { validateQueryParams } from "../../helper/validation-helper";
 import { buildFindManyQuery, getNestedFields } from "../../helper/query-builder";
 import { AccessPolicySchema } from "../../zod/access-policy.zod";
+import { ObjectIdSchema } from "../../zod/object-id.zod";
 
 const logger = getLogger();
 const accessPolicyLogger = logger.child({ module: "person" });
@@ -16,26 +17,25 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 		const { fields } = req.query;
 
+		const idValidation = ObjectIdSchema.safeParse(req.params.id);
+
+		if (!idValidation.success) {
+			accessPolicyLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+			const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
+			res.status(400).json(errorResponse);
+			return;
+		}
+
+		if (fields && typeof fields !== "string") {
+			accessPolicyLogger.error(`${config.ERROR.QUERY_PARAMS.INVALID_POPULATE}: ${fields}`);
+			const errorResponse = buildErrorResponse(
+				config.ERROR.QUERY_PARAMS.POPULATE_MUST_BE_STRING,
+				400,
+			);
+			res.status(400).json(errorResponse);
+			return;
+		}
 		try {
-			if (!id) {
-				accessPolicyLogger.error(config.ERROR.QUERY_PARAMS.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.MISSING_ID, 400);
-				res.status(400).json(errorResponse);
-				return;
-			}
-
-			if (fields && typeof fields !== "string") {
-				accessPolicyLogger.error(
-					`${config.ERROR.QUERY_PARAMS.INVALID_POPULATE}: ${fields}`,
-				);
-				const errorResponse = buildErrorResponse(
-					config.ERROR.QUERY_PARAMS.POPULATE_MUST_BE_STRING,
-					400,
-				);
-				res.status(400).json(errorResponse);
-				return;
-			}
-
 			accessPolicyLogger.info(`${config.SUCCESS.ACCESS_POLICY.GETTING_BY_ID}: ${id}`);
 
 			const query: Prisma.AccessPolicyFindFirstArgs = {
@@ -190,9 +190,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			if (!id) {
-				accessPolicyLogger.error(config.ERROR.QUERY_PARAMS.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.MISSING_ID, 400);
+			const idValidation = ObjectIdSchema.safeParse(req.params.id);
+
+			if (!idValidation.success) {
+				accessPolicyLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
@@ -258,13 +260,14 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			if (!id) {
-				accessPolicyLogger.error(config.ERROR.QUERY_PARAMS.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.MISSING_ID, 400);
+			const idValidation = ObjectIdSchema.safeParse(req.params.id);
+
+			if (!idValidation.success) {
+				accessPolicyLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
-
 			accessPolicyLogger.info(`${config.SUCCESS.ACCESS_POLICY.DELETED}: ${id}`);
 
 			const existingPolicy = await prisma.accessPolicy.findFirst({
