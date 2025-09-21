@@ -184,7 +184,7 @@ export const controller = (prisma: PrismaClient) => {
 				);
 				const successResponse = buildSuccessResponse(
 					"Existing permission found",
-					{ permission: existingPermission },
+					existingPermission,
 					200,
 				);
 				res.status(200).json(successResponse);
@@ -200,7 +200,7 @@ export const controller = (prisma: PrismaClient) => {
 			permissionLogger.info(`${config.SUCCESS.PERMISSION.CREATED}: ${newPermission.id}`);
 			const successResponse = buildSuccessResponse(
 				config.SUCCESS.PERMISSION.CREATED,
-				{ permission: newPermission },
+				newPermission,
 				201,
 			);
 			res.status(201).json(successResponse);

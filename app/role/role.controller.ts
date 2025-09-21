@@ -169,7 +169,7 @@ export const controller = (prisma: PrismaClient) => {
 				roleLogger.info(`${config.SUCCESS.ROLE.RETRIEVED}: ${existingRole.id}`);
 				const successResponse = buildSuccessResponse(
 					"Existing role found",
-					{ role: existingRole },
+					existingRole,
 					200,
 				);
 				res.status(200).json(successResponse);

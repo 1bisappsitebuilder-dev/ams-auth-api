@@ -194,7 +194,7 @@ export const controller = (prisma: PrismaClient) => {
 			personLogger.info(`${config.SUCCESS.PERSON.CREATED}: ${newPerson.id}`);
 			const successResponse = buildSuccessResponse(
 				config.SUCCESS.PERSON.CREATED,
-				{ person: newPerson },
+				newPerson,
 				201,
 			);
 			res.status(201).json(successResponse);

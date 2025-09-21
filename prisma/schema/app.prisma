@@ -3,8 +3,11 @@ model App {
   name        String
   description String
   icon        String?
+  thumbnail   String?
+  status      Status   @default(active)
+  version     String?
   code        String   @unique
-  withModule  Boolean  @default(true)
+  withModule  Boolean  @default(false)
   isDeleted   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
