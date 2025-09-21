@@ -224,14 +224,14 @@ export const controller = (prisma: PrismaClient) => {
 				return;
 			}
 
-			if (Object.keys(req.body).length === 0) {
+			if (!validationResult.data || Object.keys(validationResult.data).length === 0) {
 				accessPolicyLogger.error(config.ERROR.COMMON.NO_UPDATE_FIELDS);
 				const errorResponse = buildErrorResponse(config.ERROR.COMMON.NO_UPDATE_FIELDS, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
 
-			const validatedData = validationResult.data;
+			const { rolePermissions, ...otherData } = validationResult.data;
 
 			accessPolicyLogger.info(`Updating access policy: ${id}`);
 
@@ -246,11 +246,52 @@ export const controller = (prisma: PrismaClient) => {
 				return;
 			}
 
-			const updatedPolicy = await prisma.accessPolicy.update({
-				where: { id },
-				data: {
-					...validatedData,
-				},
+			// Perform the update in a transaction to ensure atomicity
+			const updatedPolicy = await prisma.$transaction(async (tx) => {
+				// Update access policy fields
+				const policyUpdate = await tx.accessPolicy.update({
+					where: { id },
+					data: {
+						...otherData,
+						updatedAt: new Date(), // Ensure updatedAt is set
+					},
+					include: {
+						permissions: {
+							include: {
+								role: true,
+							},
+						},
+					},
+				});
+
+				// Update permissions if rolePermissions is provided
+				if (rolePermissions) {
+					// Delete existing Permission records for the access policy
+					const deleted = await tx.permission.deleteMany({
+						where: { accessPolicyId: id },
+					});
+					accessPolicyLogger.info(
+						`Deleted ${deleted.count} Permission records for access policy ${id}`,
+					);
+
+					// Create new Permission records
+					if (rolePermissions.length > 0) {
+						const created = await tx.permission.createMany({
+							data: rolePermissions.map((rp) => ({
+								accessPolicyId: id,
+								roleId: rp.roleId,
+								rolePermissions: rp.rolePermissions || [], // Default to empty array if not provided
+								createdAt: new Date(),
+								updatedAt: new Date(),
+							})),
+						});
+						accessPolicyLogger.info(
+							`Created ${created.count} Permission records for access policy ${id}`,
+						);
+					}
+				}
+
+				return policyUpdate;
 			});
 
 			accessPolicyLogger.info(`${config.SUCCESS.ACCESS_POLICY.UPDATED}: ${updatedPolicy.id}`);
@@ -261,7 +302,11 @@ export const controller = (prisma: PrismaClient) => {
 			);
 			res.status(200).json(successResponse);
 		} catch (error) {
-			accessPolicyLogger.error(`${config.ERROR.ACCESS_POLICY.ERROR_UPDATING}: ${error}`);
+			accessPolicyLogger.error(
+				`${config.ERROR.ACCESS_POLICY.ERROR_UPDATING}: ${
+					error instanceof Error ? error.message : JSON.stringify(error)
+				}`,
+			);
 			const errorResponse = buildErrorResponse(
 				config.ERROR.COMMON.INTERNAL_SERVER_ERROR,
 				500,

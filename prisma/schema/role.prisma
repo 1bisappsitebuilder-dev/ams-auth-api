@@ -8,6 +8,7 @@ model Role {
   name        String   @unique
   description String?
   type        RoleType @default(organization)
+  status      Status   @default(active)
   isDeleted   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
