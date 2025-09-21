@@ -35,6 +35,7 @@ const images = require("./app/images")(prisma);
 const role = require("./app/role")(prisma);
 const accessPolicy = require("./app/access-policy")(prisma);
 const permission = require("./app/permission")(prisma);
+const apps = require("./app/app")(prisma);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -69,6 +70,7 @@ app.use(`${config.baseApiPath}/images`, images);
 app.use(config.baseApiPath, role);
 app.use(config.baseApiPath, accessPolicy);
 app.use(config.baseApiPath, permission);
+app.use(config.baseApiPath, apps);
 
 server.listen(config.port, async () => {
 	await connectDb();
