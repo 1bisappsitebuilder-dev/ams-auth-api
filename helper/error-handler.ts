@@ -1,5 +1,3 @@
-import { Response } from "express";
-
 export interface ErrorDetail {
 	field?: string;
 	message: string;
@@ -28,10 +26,6 @@ export function buildErrorResponse(
 }
 
 // Optional: Helper to convert Zod errors to ErrorDetail format
-export interface ErrorDetail {
-	field?: string;
-	message: string;
-}
 
 export function formatZodErrors(zodError: any): ErrorDetail[] {
 	if (!zodError) return [];
@@ -45,4 +39,11 @@ export function formatZodErrors(zodError: any): ErrorDetail[] {
 			message: error._errors?.[0] || "Validation error",
 		}))
 		.filter((error) => error.message !== "Validation error"); // Filter out generic errors
+}
+
+export function handlePrismaClientValidationError(errorMessage: string) {
+	return (
+		errorMessage.split("\n").find((line: string) => line.includes("Unknown field")) ||
+		"Invalid field in query. Please check the fields parameter."
+	);
 }

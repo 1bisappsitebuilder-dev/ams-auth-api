@@ -5,7 +5,11 @@ import { config } from "../../config/constant";
 import { logActivity } from "../../utils/activityLogger";
 import { AuthRequest } from "../../middleware/verifyToken";
 import { sendPrismaErrorResponse, sendValidationError } from "../../utils/validationHelper";
-import { buildErrorResponse, formatZodErrors } from "../../helper/error-handler";
+import {
+	buildErrorResponse,
+	formatZodErrors,
+	handlePrismaClientValidationError,
+} from "../../helper/error-handler";
 import {
 	buildFilterConditions,
 	buildFindManyQuery,
@@ -69,10 +73,17 @@ export const controller = (prisma: PrismaClient) => {
 				200,
 			);
 			res.status(200).json(successResponse);
-		} catch (error) {
-			userLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${error}`);
-			const errorResponse = buildErrorResponse(config.ERROR.USER.INTERNAL_SERVER_ERROR, 500);
-			res.status(500).json(errorResponse);
+		} catch (error: any) {
+			if (error.name === "PrismaClientValidationError") {
+				const errorMsg = handlePrismaClientValidationError(error.message);
+				userLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${errorMsg}`);
+				res.status(400).json(buildErrorResponse(errorMsg, 400));
+			} else {
+				userLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${error}`);
+				res.status(500).json(
+					buildErrorResponse(config.ERROR.USER.INTERNAL_SERVER_ERROR, 500),
+				);
+			}
 		}
 	};
 
@@ -145,9 +156,17 @@ export const controller = (prisma: PrismaClient) => {
 			res.status(200).json(
 				buildSuccessResponse(config.SUCCESS.USER.RETRIEVED, responseData, 200),
 			);
-		} catch (error) {
-			userLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${error}`);
-			res.status(500).json(buildErrorResponse(config.ERROR.USER.INTERNAL_SERVER_ERROR, 500));
+		} catch (error: any) {
+			if (error.name === "PrismaClientValidationError") {
+				const errorMsg = handlePrismaClientValidationError(error.message);
+				userLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${errorMsg}`);
+				res.status(400).json(buildErrorResponse(errorMsg, 400));
+			} else {
+				userLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${error}`);
+				res.status(500).json(
+					buildErrorResponse(config.ERROR.USER.INTERNAL_SERVER_ERROR, 500),
+				);
+			}
 		}
 	};
 

@@ -225,7 +225,6 @@ export const controller = (prisma: PrismaClient) => {
 				organizationId: user.organizationId ?? undefined,
 				authType,
 			};
-			console.log("tokenPayload", tokenPayload);
 
 			const token = jwt.sign(
 				tokenPayload,
@@ -241,7 +240,6 @@ export const controller = (prisma: PrismaClient) => {
 			});
 
 			authLogger.info(`User logged in: ${user.id}`);
-			console.log(user);
 
 			// Build success response
 			const successResponse = buildSuccessResponse(
@@ -320,7 +318,6 @@ export const controller = (prisma: PrismaClient) => {
 
 			// Get user info from request (set by auth middleware)
 			const userId = req.userId;
-			console.log(req.userId);
 			if (!userId) {
 				authLogger.error("No user found in request");
 				const errorResponse = buildErrorResponse("Unauthorized", 401, [

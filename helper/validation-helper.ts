@@ -29,11 +29,73 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 		fields,
 		sort,
 		query,
-		document,
-		pagination,
-		count,
-		filter, // Add filter to destructured query params
+		document = "false",
+		pagination = "false",
+		count = "false",
+		filter,
 	} = req.query;
+
+	// Validate document
+	if (
+		document !== undefined &&
+		(typeof document !== "string" || !["true", "false"].includes(document))
+	) {
+		logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_DOCUMENT}: ${document}`);
+		return {
+			isValid: false,
+			errorResponse: buildErrorResponse("Document must be 'true' or 'false'", 400),
+		};
+	}
+	const documentValue = document === "true";
+
+	// Validate pagination
+	if (
+		pagination !== undefined &&
+		(typeof pagination !== "string" || !["true", "false"].includes(pagination))
+	) {
+		logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_PAGINATION}: ${pagination}`);
+		return {
+			isValid: false,
+			errorResponse: buildErrorResponse("Pagination must be 'true' or 'false'", 400),
+		};
+	}
+	const paginationValue = pagination === "true";
+
+	// Validate count
+	if (count !== undefined && (typeof count !== "string" || !["true", "false"].includes(count))) {
+		logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_COUNT}: ${count}`);
+		return {
+			isValid: false,
+			errorResponse: buildErrorResponse("Count must be 'true' or 'false'", 400),
+		};
+	}
+	const countValue = count === "true";
+
+	// Rule 1: All three cannot be false
+	if (!documentValue && !paginationValue && !countValue) {
+		logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_COMBINATION}: All flags cannot be false`);
+		return {
+			isValid: false,
+			errorResponse: buildErrorResponse(
+				"At least one of document, pagination, or count must be true",
+				400,
+			),
+		};
+	}
+
+	// Rule 2: Pagination cannot be true if document is false
+	if (paginationValue && !documentValue) {
+		logger.error(
+			`${config.ERROR.QUERY_PARAMS.INVALID_COMBINATION}: Pagination requires document to be true`,
+		);
+		return {
+			isValid: false,
+			errorResponse: buildErrorResponse(
+				"Pagination can only be true when document is also true",
+				400,
+			),
+		};
+	}
 
 	// Validate page
 	const pageNum = Number(page);
@@ -104,36 +166,6 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 		};
 	}
 	const queryValue = query !== undefined ? String(query) : "";
-
-	// Validate document
-	if (document !== undefined && (typeof document !== "string" || document !== "true")) {
-		logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_DOCUMENT}: ${document}`);
-		return {
-			isValid: false,
-			errorResponse: buildErrorResponse("Document must be 'true'", 400),
-		};
-	}
-	const documentValue = document === "true";
-
-	// Validate pagination
-	if (pagination !== undefined && (typeof pagination !== "string" || pagination !== "true")) {
-		logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_PAGINATION}: ${pagination}`);
-		return {
-			isValid: false,
-			errorResponse: buildErrorResponse("Pagination must be 'true'", 400),
-		};
-	}
-	const paginationValue = pagination === "true";
-
-	// Validate count
-	if (count !== undefined && (typeof count !== "string" || count !== "true")) {
-		logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_COUNT}: ${count}`);
-		return {
-			isValid: false,
-			errorResponse: buildErrorResponse("Count must be 'true'", 400),
-		};
-	}
-	const countValue = count === "true";
 
 	// Validate filter
 	let filterValue: Record<string, any>[] = [];
