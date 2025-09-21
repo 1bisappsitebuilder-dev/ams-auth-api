@@ -11,6 +11,7 @@ import {
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { validateQueryParams } from "../../helper/validation-helper";
 import { RoleSchema } from "../../zod/role.zod";
+import { ObjectIdSchema } from "../../zod/object-id.zod";
 
 const logger = getLogger();
 const roleLogger = logger.child({ module: "role" });
@@ -21,9 +22,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { fields } = req.query;
 
 		try {
-			if (!id) {
-				roleLogger.error(config.ERROR.ROLE.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.ROLE.ROLE_ID_REQUIRED, 400);
+			const idValidation = ObjectIdSchema.safeParse(id);
+
+			if (!idValidation.success) {
+				roleLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
@@ -197,9 +200,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			if (!id) {
-				roleLogger.error(config.ERROR.ROLE.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.ROLE.ROLE_ID_REQUIRED, 400);
+			const idValidation = ObjectIdSchema.safeParse(id);
+
+			if (!idValidation.success) {
+				roleLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
@@ -268,9 +273,11 @@ export const controller = (prisma: PrismaClient) => {
 		const { id } = req.params;
 
 		try {
-			if (!id) {
-				roleLogger.error(config.ERROR.ROLE.MISSING_ID);
-				const errorResponse = buildErrorResponse(config.ERROR.ROLE.ROLE_ID_REQUIRED, 400);
+			const idValidation = ObjectIdSchema.safeParse(id);
+
+			if (!idValidation.success) {
+				roleLogger.error(config.ERROR.QUERY_PARAMS.INVALID_ID);
+				const errorResponse = buildErrorResponse(config.ERROR.QUERY_PARAMS.INVALID_ID, 400);
 				res.status(400).json(errorResponse);
 				return;
 			}
