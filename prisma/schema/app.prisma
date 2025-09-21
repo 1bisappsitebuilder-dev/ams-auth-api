@@ -4,12 +4,12 @@ model App {
   description String
   icon        String?
   code        String   @unique
-  withModule Boolean
+  withModule  Boolean  @default(true)
   isDeleted   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   //relations
-  modules     Module[]
+  modules       Module[]
   organizations OrganizationApp[]
 }
