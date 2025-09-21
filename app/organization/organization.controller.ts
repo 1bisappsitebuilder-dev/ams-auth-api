@@ -270,11 +270,6 @@ export const controller = (prisma: PrismaClient) => {
 						...otherData,
 						updatedAt: new Date(), // Ensure updatedAt is set
 					},
-					include: {
-						apps: {
-							include: { app: true },
-						},
-					},
 				});
 
 				// Update apps if appIds is provided
@@ -290,8 +285,6 @@ export const controller = (prisma: PrismaClient) => {
 							data: appIds.map((appId) => ({
 								organizationId: id,
 								appId,
-								createdAt: new Date(),
-								updatedAt: new Date(),
 							})),
 						});
 					}

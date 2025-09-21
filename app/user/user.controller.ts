@@ -338,15 +338,6 @@ export const controller = (prisma: PrismaClient) => {
 						...validatedData,
 						updatedAt: new Date(), // Ensure updatedAt is set
 					},
-					include: {
-						person: true,
-						organization: true,
-						roles: {
-							include: {
-								role: true,
-							},
-						},
-					},
 				});
 
 				// Update roles if roleIds is provided
