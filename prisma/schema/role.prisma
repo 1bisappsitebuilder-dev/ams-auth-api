@@ -1,6 +1,6 @@
 enum RoleType {
   organization
-  project
+  system
 }
 
 model Role {

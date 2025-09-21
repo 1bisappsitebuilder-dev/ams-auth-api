@@ -2,7 +2,11 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient, Prisma } from "../../generated/prisma";
 import { getLogger } from "../../helper/logger";
 import { config } from "../../config/constant";
-import { buildErrorResponse, formatZodErrors } from "../../helper/error-handler";
+import {
+	buildErrorResponse,
+	formatZodErrors,
+	handlePrismaClientValidationError,
+} from "../../helper/error-handler";
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { PersonSchema } from "../../zod/person.zod";
 import { validateQueryParams } from "../../helper/validation-helper";
@@ -68,13 +72,17 @@ export const controller = (prisma: PrismaClient) => {
 				200,
 			);
 			res.status(200).json(successResponse);
-		} catch (error) {
-			personLogger.error(`${config.ERROR.PERSON.ERROR_GETTING_USER}: ${error}`);
-			const errorResponse = buildErrorResponse(
-				config.ERROR.PERSON.INTERNAL_SERVER_ERROR,
-				500,
-			);
-			res.status(500).json(errorResponse);
+		} catch (error: any) {
+			if (error.name === "PrismaClientValidationError") {
+				const errorMsg = handlePrismaClientValidationError(error.message);
+				personLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${errorMsg}`);
+				res.status(400).json(buildErrorResponse(errorMsg, 400));
+			} else {
+				personLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${error}`);
+				res.status(500).json(
+					buildErrorResponse(config.ERROR.USER.INTERNAL_SERVER_ERROR, 500),
+				);
+			}
 		}
 	};
 
@@ -142,11 +150,17 @@ export const controller = (prisma: PrismaClient) => {
 			res.status(200).json(
 				buildSuccessResponse(config.SUCCESS.PERSON.RETRIEVED, responseData, 200),
 			);
-		} catch (error) {
-			personLogger.error(`${config.ERROR.PERSON.ERROR_GETTING_USER}: ${error}`);
-			res.status(500).json(
-				buildErrorResponse(config.ERROR.PERSON.INTERNAL_SERVER_ERROR, 500),
-			);
+		} catch (error: any) {
+			if (error.name === "PrismaClientValidationError") {
+				const errorMsg = handlePrismaClientValidationError(error.message);
+				personLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${errorMsg}`);
+				res.status(400).json(buildErrorResponse(errorMsg, 400));
+			} else {
+				personLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${error}`);
+				res.status(500).json(
+					buildErrorResponse(config.ERROR.USER.INTERNAL_SERVER_ERROR, 500),
+				);
+			}
 		}
 	};
 
