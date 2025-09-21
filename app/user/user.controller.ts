@@ -247,11 +247,7 @@ export const controller = (prisma: PrismaClient) => {
 			});
 
 			userLogger.info(`${config.SUCCESS.USER.CREATED}: ${newUser.id}`);
-			const successResponse = buildSuccessResponse(
-				config.SUCCESS.USER.CREATED,
-				{ user: newUser },
-				201,
-			);
+			const successResponse = buildSuccessResponse(config.SUCCESS.USER.CREATED, newUser, 201);
 			res.status(201).json(successResponse);
 		} catch (error) {
 			userLogger.error(`${config.ERROR.USER.INTERNAL_SERVER_ERROR}: ${error}`);
@@ -294,7 +290,7 @@ export const controller = (prisma: PrismaClient) => {
 				return;
 			}
 
-			const validatedData = validationResult.data;
+			const { password, roleIds, ...validatedData } = validationResult.data;
 
 			userLogger.info(`Updating user: ${id}`);
 
@@ -333,43 +329,45 @@ export const controller = (prisma: PrismaClient) => {
 				}
 			}
 
-			// if roles are provided, assign them using UserRole
-			if (req.body.roles && Array.isArray(req.body.roles)) {
-				const roleIds: string[] = req.body.roles;
-
-				for (const roleId of roleIds) {
-					const existingRole = await prisma.userRole.findUnique({
-						where: {
-							userId_roleId: { userId: id, roleId },
+			// Perform the update in a transaction to ensure atomicity
+			const updatedUser = await prisma.$transaction(async (tx) => {
+				// Update user fields
+				const userUpdate = await tx.user.update({
+					where: { id },
+					data: {
+						...validatedData,
+						updatedAt: new Date(), // Ensure updatedAt is set
+					},
+					include: {
+						person: true,
+						organization: true,
+						roles: {
+							include: {
+								role: true,
+							},
 						},
+					},
+				});
+
+				// Update roles if roleIds is provided
+				if (roleIds) {
+					// Delete existing UserRole records for the user
+					await tx.userRole.deleteMany({
+						where: { userId: id },
 					});
 
-					if (!existingRole) {
-						await prisma.userRole.create({
-							data: {
+					// Create new UserRole records
+					if (roleIds.length > 0) {
+						await tx.userRole.createMany({
+							data: roleIds.map((roleId) => ({
 								userId: id,
 								roleId,
-							},
+							})),
 						});
 					}
 				}
-			}
 
-			// update user basic info first
-			const updatedUser = await prisma.user.update({
-				where: { id },
-				data: {
-					...validatedData,
-				},
-				include: {
-					person: true,
-					organization: true,
-					roles: {
-						include: {
-							role: true,
-						},
-					},
-				},
+				return userUpdate;
 			});
 
 			userLogger.info(`${config.SUCCESS.USER.UPDATE}: ${updatedUser.id}`);

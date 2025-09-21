@@ -26,7 +26,10 @@ export const OrganizationSchema = z.object({
 	code: z.string().nonempty("Organization code is required"),
 	description: z.string().optional(),
 	branding: BrandingSchema.optional(),
-	status: StatusEnum.default("active"), // reused enum
+	status: StatusEnum.default("active"),
 	createdAt: z.string().datetime().optional(),
 	updatedAt: z.string().datetime().optional(),
+
+	// new field
+	appIds: z.array(z.string()).optional(),
 });

@@ -186,7 +186,7 @@ export const controller = (prisma: PrismaClient) => {
 			appLogger.info(`${config.SUCCESS.APP.CREATED}: ${newApp.id}`);
 			const successResponse = buildSuccessResponse(
 				config.SUCCESS.APP.CREATED,
-				{ app: newApp },
+				newApp,
 				201,
 			);
 			res.status(201).json(successResponse);

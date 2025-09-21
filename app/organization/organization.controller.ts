@@ -180,7 +180,7 @@ export const controller = (prisma: PrismaClient) => {
 				);
 				const successResponse = buildSuccessResponse(
 					"Existing organization found",
-					{ organization: existingOrganization },
+					existingOrganization,
 					200,
 				);
 				res.status(200).json(successResponse);
@@ -198,7 +198,7 @@ export const controller = (prisma: PrismaClient) => {
 			);
 			const successResponse = buildSuccessResponse(
 				config.SUCCESS.ORGANIZATION.CREATED,
-				{ organization: newOrganization },
+				newOrganization,
 				201,
 			);
 			res.status(201).json(successResponse);
@@ -236,7 +236,7 @@ export const controller = (prisma: PrismaClient) => {
 				return;
 			}
 
-			if (Object.keys(req.body).length === 0) {
+			if (!validationResult.data || Object.keys(validationResult.data).length === 0) {
 				organizationLogger.error(config.ERROR.ORGANIZATION.NO_UPDATE_FIELDS);
 				const errorResponse = buildErrorResponse(
 					config.ERROR.ORGANIZATION.AT_LEAST_ONE_FIELD_REQUIRED,
@@ -246,15 +246,12 @@ export const controller = (prisma: PrismaClient) => {
 				return;
 			}
 
-			const validatedData = validationResult.data;
+			const { appIds, ...otherData } = validationResult.data;
 
 			organizationLogger.info(`Updating organization: ${id}`);
 
 			const existingOrganization = await prisma.organization.findFirst({
-				where: {
-					id,
-					isDeleted: false,
-				},
+				where: { id, isDeleted: false },
 			});
 
 			if (!existingOrganization) {
@@ -264,11 +261,43 @@ export const controller = (prisma: PrismaClient) => {
 				return;
 			}
 
-			const updatedOrganization = await prisma.organization.update({
-				where: { id },
-				data: {
-					...validatedData,
-				},
+			// Perform the update in a transaction to ensure atomicity
+			const updatedOrganization = await prisma.$transaction(async (tx) => {
+				// Update organization fields
+				const organizationUpdate = await tx.organization.update({
+					where: { id },
+					data: {
+						...otherData,
+						updatedAt: new Date(), // Ensure updatedAt is set
+					},
+					include: {
+						apps: {
+							include: { app: true },
+						},
+					},
+				});
+
+				// Update apps if appIds is provided
+				if (appIds) {
+					// Delete existing OrganizationApp records for the organization
+					await tx.organizationApp.deleteMany({
+						where: { organizationId: id },
+					});
+
+					// Create new OrganizationApp records
+					if (appIds.length > 0) {
+						await tx.organizationApp.createMany({
+							data: appIds.map((appId) => ({
+								organizationId: id,
+								appId,
+								createdAt: new Date(),
+								updatedAt: new Date(),
+							})),
+						});
+					}
+				}
+
+				return organizationUpdate;
 			});
 
 			organizationLogger.info(
@@ -281,7 +310,11 @@ export const controller = (prisma: PrismaClient) => {
 			);
 			res.status(200).json(successResponse);
 		} catch (error) {
-			organizationLogger.error(`${config.ERROR.ORGANIZATION.ERROR_UPDATING}: ${error}`);
+			organizationLogger.error(
+				`${config.ERROR.ORGANIZATION.ERROR_UPDATING}: ${
+					error instanceof Error ? error.message : JSON.stringify(error)
+				}`,
+			);
 			const errorResponse = buildErrorResponse(
 				config.ERROR.COMMON.INTERNAL_SERVER_ERROR,
 				500,
