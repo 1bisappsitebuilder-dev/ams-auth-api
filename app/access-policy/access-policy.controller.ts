@@ -62,7 +62,7 @@ export const controller = (prisma: PrismaClient) => {
 			);
 			const successResponse = buildSuccessResponse(
 				config.SUCCESS.ACCESS_POLICY.RETRIEVED,
-				{ accessPolicy },
+				accessPolicy,
 				200,
 			);
 			res.status(200).json(successResponse);

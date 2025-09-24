@@ -1,6 +1,7 @@
 enum RoleType {
-  organization
   system
+  organization
+  app
 }
 
 model Role {
