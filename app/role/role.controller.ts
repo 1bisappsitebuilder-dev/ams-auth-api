@@ -143,7 +143,8 @@ export const controller = (prisma: PrismaClient) => {
 			]);
 
 			roleLogger.info(`Retrieved ${roles.length} roles`);
-			// groupBy usage sample (?groupBy=firstName or ?groupBy=contacInfo.email )
+			
+			// groupBy usage sample (?groupBy=firstName or ?groupBy=contactInfo.email )
 			const processedData = groupBy && document ? groupDataByField(roles, groupBy) : roles;
 
 			const responseData: Record<string, any> = {
