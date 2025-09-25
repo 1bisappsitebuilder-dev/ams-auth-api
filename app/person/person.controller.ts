@@ -147,11 +147,11 @@ export const controller = (prisma: PrismaClient) => {
 			personLogger.info(`Retrieved ${persons.length} persons`);
 
 			// groupBy usage sample (?groupBy=firstName or ?groupBy=contacInfo.email )
-			const processedPersons =
+			const processedData =
 				groupBy && document ? groupDataByField(persons, groupBy) : persons;
 
 			const responseData: Record<string, any> = {
-				...(document && { person: processedPersons }),
+				...(document && { person: processedData }),
 				...(count && { count: total }),
 				...(pagination && { pagination: buildPagination(total, page, limit) }),
 				...(groupBy && { groupedBy: groupBy }),

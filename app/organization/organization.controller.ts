@@ -11,6 +11,7 @@ import {
 	buildFilterConditions,
 	buildFindManyQuery,
 	getNestedFields,
+	groupDataByField,
 } from "../../helper/query-builder";
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { validateQueryParams } from "../../helper/validation-helper";
@@ -109,6 +110,7 @@ export const controller = (prisma: PrismaClient) => {
 			document,
 			pagination,
 			count,
+			groupBy
 		} = validationResult.validatedParams!;
 
 		organizationLogger.info(
@@ -143,10 +145,15 @@ export const controller = (prisma: PrismaClient) => {
 			]);
 
 			organizationLogger.info(`Retrieved ${organizations.length} organizations`);
-			const responseData = {
-				...(document && { organizations }),
+			// groupBy usage sample (?groupBy=firstName or ?groupBy=contacInfo.email )
+			const processedData =
+				groupBy && document ? groupDataByField(organizations, groupBy) : organizations;
+
+			const responseData: Record<string, any> = {
+				...(document && { organizations: processedData }),
 				...(count && { count: total }),
 				...(pagination && { pagination: buildPagination(total, page, limit) }),
+				...(groupBy && { groupedBy: groupBy }),
 			};
 
 			res.status(200).json(

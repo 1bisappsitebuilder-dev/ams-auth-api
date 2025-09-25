@@ -15,6 +15,7 @@ import {
 	buildFindManyQuery,
 	buildSearchCondition,
 	getNestedFields,
+	groupDataByField,
 } from "../../helper/query-builder";
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { validateQueryParams } from "../../helper/validation-helper";
@@ -112,6 +113,7 @@ export const controller = (prisma: PrismaClient) => {
 			document,
 			pagination,
 			count,
+			groupBy,
 		} = validationResult.validatedParams!;
 
 		userLogger.info(
@@ -143,11 +145,15 @@ export const controller = (prisma: PrismaClient) => {
 				count ? prisma.user.count({ where: whereClause }) : 0,
 			]);
 
-			userLogger.info(`Retrieved ${users.length} users`);
-			const responseData = {
-				...(document && { users }),
+			// groupBy usage sample (?groupBy=firstName or ?groupBy=contacInfo.email )
+			const processedData =
+				groupBy && document ? groupDataByField(users, groupBy) : users;
+
+			const responseData: Record<string, any> = {
+				...(document && { users: processedData }),
 				...(count && { count: total }),
 				...(pagination && { pagination: buildPagination(total, page, limit) }),
+				...(groupBy && { groupedBy: groupBy }),
 			};
 
 			res.status(200).json(

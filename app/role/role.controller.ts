@@ -10,7 +10,9 @@ import {
 import {
 	buildFilterConditions,
 	buildFindManyQuery,
+	buildSearchCondition,
 	getNestedFields,
+	groupDataByField,
 } from "../../helper/query-builder";
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
 import { validateQueryParams } from "../../helper/validation-helper";
@@ -106,6 +108,7 @@ export const controller = (prisma: PrismaClient) => {
 			document,
 			pagination,
 			count,
+			groupBy,
 		} = validationResult.validatedParams!;
 
 		roleLogger.info(
@@ -115,15 +118,16 @@ export const controller = (prisma: PrismaClient) => {
 		try {
 			const whereClause: Prisma.RoleWhereInput = {
 				isDeleted: false,
-				...(query
-					? {
-							OR: [
-								{ name: { contains: String(query) } },
-								{ description: { contains: String(query) } },
-							],
-						}
-					: {}),
 			};
+
+			// search fields sample ("firstName", "lastName", "middleName", "contactInfo.email")
+			const searchFields = [""];
+			if (query) {
+				const searchConditions = buildSearchCondition("Person", query, searchFields);
+				if (searchConditions.length > 0) {
+					whereClause.OR = searchConditions;
+				}
+			}
 
 			// Add filter conditions using the reusable function
 			const filterConditions = buildFilterConditions("Role", filter);
@@ -139,10 +143,14 @@ export const controller = (prisma: PrismaClient) => {
 			]);
 
 			roleLogger.info(`Retrieved ${roles.length} roles`);
-			const responseData = {
-				...(document && { roles }),
+			// groupBy usage sample (?groupBy=firstName or ?groupBy=contacInfo.email )
+			const processedData = groupBy && document ? groupDataByField(roles, groupBy) : roles;
+
+			const responseData: Record<string, any> = {
+				...(document && { roles: processedData }),
 				...(count && { count: total }),
 				...(pagination && { pagination: buildPagination(total, page, limit) }),
+				...(groupBy && { groupedBy: groupBy }),
 			};
 
 			res.status(200).json(
