@@ -132,9 +132,11 @@ export const controller = (prisma: PrismaClient) => {
 			}
 
 			// filter usage sample (?filter=key:vale or key.key:value)
-			const filterConditions = buildFilterConditions("Person", filter);
-			if (filterConditions.length > 0) {
-				whereClause.AND = filterConditions;
+			if (filter) {
+				const filterConditions = buildFilterConditions("Person", filter);
+				if (filterConditions.length > 0) {
+					whereClause.AND = filterConditions;
+				}
 			}
 
 			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);
