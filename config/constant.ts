@@ -17,6 +17,7 @@ export const config = {
 			INVALID_FILTER: "Invalid folter format",
 			INVALID_COMBINATION: "Invalid Combination",
 			INVALID_ID: "Invalid ID",
+			INVALID_GROUPBY: "Invalid group by format"
 		},
 		USER: {
 			NOT_FOUND: "User not found",

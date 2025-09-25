@@ -17,7 +17,8 @@ interface ValidationResult {
 		document: boolean;
 		pagination: boolean;
 		count: boolean;
-		filter?: string; // <-- now a raw filter string (key:value,key:value)
+		filter?: string; // <-- raw filter string (key:value,key:value)
+		groupBy?: string; // <-- Always an array of strings
 	};
 }
 
@@ -33,6 +34,7 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 		pagination = "false",
 		count = "false",
 		filter,
+		groupBy,
 	} = req.query;
 
 	// Validate document
@@ -183,6 +185,44 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 		filterValue = filter;
 	}
 
+	// Validate groupBy: return as a single string (not array)
+	let groupByValue: string | undefined;
+	if (groupBy !== undefined) {
+		if (!documentValue) {
+			logger.error(
+				`${config.ERROR.QUERY_PARAMS.INVALID_COMBINATION}: groupBy requires document=true`,
+			);
+			return {
+				isValid: false,
+				errorResponse: buildErrorResponse(
+					"groupBy can only be used when document is true",
+					400,
+				),
+			};
+		}
+
+		if (typeof groupBy !== "string") {
+			logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_GROUPBY}: ${groupBy}`);
+			return {
+				isValid: false,
+				errorResponse: buildErrorResponse(
+					"groupBy must be a string (e.g., category or category.name)",
+					400,
+				),
+			};
+		}
+
+		const trimmed = groupBy.trim();
+		if (!trimmed) {
+			logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_GROUPBY}: Empty groupBy value`);
+			return {
+				isValid: false,
+				errorResponse: buildErrorResponse("groupBy must not be empty", 400),
+			};
+		}
+		groupByValue = trimmed;
+	}
+
 	return {
 		isValid: true,
 		validatedParams: {
@@ -196,7 +236,8 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 			document: documentValue,
 			pagination: paginationValue,
 			count: countValue,
-			filter: filterValue, // 👈 pass raw string through
+			filter: filterValue,
+			groupBy: groupByValue, // <-- now just a string or undefined
 		},
 	};
 };

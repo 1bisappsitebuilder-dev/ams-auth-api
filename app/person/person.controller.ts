@@ -15,6 +15,7 @@ import {
 	buildFindManyQuery,
 	buildSearchCondition,
 	getNestedFields,
+	groupDataByField,
 } from "../../helper/query-builder";
 import { ObjectIdSchema } from "../../zod/object-id.zod";
 
@@ -93,6 +94,7 @@ export const controller = (prisma: PrismaClient) => {
 
 		if (!validationResult.isValid) {
 			res.status(400).json(validationResult.errorResponse);
+			return;
 		}
 
 		const {
@@ -107,6 +109,7 @@ export const controller = (prisma: PrismaClient) => {
 			pagination,
 			count,
 			filter,
+			groupBy,
 		} = validationResult.validatedParams!;
 
 		personLogger.info(
@@ -119,8 +122,8 @@ export const controller = (prisma: PrismaClient) => {
 				isDeleted: false,
 			};
 
-			// Add model fields e.g. "firstName", "lastName", "middleName", "contactInfo.email"
-			const searchFields = [""];
+			// search fields sample ("firstName", "lastName", "middleName", "contactInfo.email")
+			const searchFields = ["firstName", "lastName", "middleName", "contactInfo.email"];
 			if (query) {
 				const searchConditions = buildSearchCondition("Person", query, searchFields);
 				if (searchConditions.length > 0) {
@@ -128,7 +131,7 @@ export const controller = (prisma: PrismaClient) => {
 				}
 			}
 
-			// Add filter conditions using the reusable function
+			// filter usage sample (?filter=key:vale or key.key:value)
 			const filterConditions = buildFilterConditions("Person", filter);
 			if (filterConditions.length > 0) {
 				whereClause.AND = filterConditions;
@@ -136,16 +139,22 @@ export const controller = (prisma: PrismaClient) => {
 
 			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);
 
-			const [person, total] = await Promise.all([
+			const [persons, total] = await Promise.all([
 				document ? prisma.person.findMany(findManyQuery) : [],
 				count ? prisma.person.count({ where: whereClause }) : 0,
 			]);
 
-			personLogger.info(`Retrieved ${person.length} person`);
-			const responseData = {
-				...(document && { person }),
+			personLogger.info(`Retrieved ${persons.length} persons`);
+
+			// groupBy usage sample (?groupBy=firstName or ?groupBy=contacInfo.email )
+			const processedPersons =
+				groupBy && document ? groupDataByField(persons, groupBy) : persons;
+
+			const responseData: Record<string, any> = {
+				...(document && { person: processedPersons }),
 				...(count && { count: total }),
 				...(pagination && { pagination: buildPagination(total, page, limit) }),
+				...(groupBy && { groupedBy: groupBy }),
 			};
 
 			res.status(200).json(
