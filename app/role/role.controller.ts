@@ -10,7 +10,7 @@ import {
 import {
 	buildFilterConditions,
 	buildFindManyQuery,
-	buildSearchCondition,
+	buildSearchConditions,
 	getNestedFields,
 	groupDataByField,
 } from "../../helper/query-builder";
@@ -123,16 +123,18 @@ export const controller = (prisma: PrismaClient) => {
 			// search fields sample ("firstName", "lastName", "middleName", "contactInfo.email")
 			const searchFields = [""];
 			if (query) {
-				const searchConditions = buildSearchCondition("Person", query, searchFields);
+				const searchConditions = buildSearchConditions("Person", query, searchFields);
 				if (searchConditions.length > 0) {
 					whereClause.OR = searchConditions;
 				}
 			}
 
 			// Add filter conditions using the reusable function
-			const filterConditions = buildFilterConditions("Role", filter);
-			if (filterConditions.length > 0) {
-				whereClause.AND = filterConditions;
+			if (filter) {
+				const filterConditions = buildFilterConditions("Role", filter);
+				if (filterConditions.length > 0) {
+					whereClause.AND = filterConditions;
+				}
 			}
 
 			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);
@@ -143,7 +145,7 @@ export const controller = (prisma: PrismaClient) => {
 			]);
 
 			roleLogger.info(`Retrieved ${roles.length} roles`);
-			
+
 			// groupBy usage sample (?groupBy=firstName or ?groupBy=contactInfo.email )
 			const processedData = groupBy && document ? groupDataByField(roles, groupBy) : roles;
 
