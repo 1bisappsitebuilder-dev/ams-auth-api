@@ -13,7 +13,7 @@ import { validateQueryParams } from "../../helper/validation-helper";
 import {
 	buildFilterConditions,
 	buildFindManyQuery,
-	buildSearchCondition,
+	buildSearchConditions,
 	getNestedFields,
 	groupDataByField,
 } from "../../helper/query-builder";
@@ -125,7 +125,7 @@ export const controller = (prisma: PrismaClient) => {
 			// search fields sample ("firstName", "lastName", "middleName", "contactInfo.email")
 			const searchFields = ["firstName", "lastName", "middleName", "contactInfo.email"];
 			if (query) {
-				const searchConditions = buildSearchCondition("Person", query, searchFields);
+				const searchConditions = buildSearchConditions("Person", query, searchFields);
 				if (searchConditions.length > 0) {
 					whereClause.OR = searchConditions;
 				}

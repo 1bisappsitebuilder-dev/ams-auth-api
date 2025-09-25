@@ -10,6 +10,7 @@ import {
 import {
 	buildFilterConditions,
 	buildFindManyQuery,
+	buildSearchConditions,
 	getNestedFields,
 	groupDataByField,
 } from "../../helper/query-builder";
@@ -110,7 +111,7 @@ export const controller = (prisma: PrismaClient) => {
 			document,
 			pagination,
 			count,
-			groupBy
+			groupBy,
 		} = validationResult.validatedParams!;
 
 		organizationLogger.info(
@@ -120,21 +121,23 @@ export const controller = (prisma: PrismaClient) => {
 		try {
 			const whereClause: Prisma.OrganizationWhereInput = {
 				isDeleted: false,
-				...(query
-					? {
-							OR: [
-								{ name: { contains: String(query) } },
-								{ code: { contains: String(query) } },
-								{ description: { contains: String(query) } },
-							],
-						}
-					: {}),
 			};
 
-			// Add filter conditions using the reusable function
-			const filterConditions = buildFilterConditions("Organization", filter);
-			if (filterConditions.length > 0) {
-				whereClause.AND = filterConditions;
+			// search fields sample ("firstName", "lastName", "middleName", "contactInfo.email")
+			const searchFields = [""];
+			if (query) {
+				const searchConditions = buildSearchConditions("Person", query, searchFields);
+				if (searchConditions.length > 0) {
+					whereClause.OR = searchConditions;
+				}
+			}
+
+			if (filter) {
+				// Add filter conditions using the reusable function
+				const filterConditions = buildFilterConditions("Organization", filter);
+				if (filterConditions.length > 0) {
+					whereClause.AND = filterConditions;
+				}
 			}
 
 			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);

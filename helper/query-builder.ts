@@ -186,7 +186,7 @@ export function buildFilterConditions(modelName: string, filterParam?: string): 
  * Build Prisma search conditions for specified String scalar or enum fields (including nested) in a model
  * @throws Error if any provided field is invalid
  */
-export function buildSearchCondition(
+export function buildSearchConditions(
 	modelName: string,
 	searchTerm?: string,
 	searchFields?: string[],

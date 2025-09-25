@@ -2,9 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { PrismaClient, Prisma } from "../../generated/prisma";
 import { getLogger } from "../../helper/logger";
 import { config } from "../../config/constant";
-import { logActivity } from "../../utils/activityLogger";
 import { AuthRequest } from "../../middleware/verifyToken";
-import { sendPrismaErrorResponse, sendValidationError } from "../../utils/validationHelper";
 import {
 	buildErrorResponse,
 	formatZodErrors,
@@ -13,7 +11,7 @@ import {
 import {
 	buildFilterConditions,
 	buildFindManyQuery,
-	buildSearchCondition,
+	buildSearchConditions,
 	getNestedFields,
 	groupDataByField,
 } from "../../helper/query-builder";
@@ -128,15 +126,17 @@ export const controller = (prisma: PrismaClient) => {
 			// Add model fields e.g. "firstName", "lastName", "middleName", "contactInfo.email"
 			const searchFields = [""];
 			if (query) {
-				const searchConditions = buildSearchCondition("User", query, searchFields);
+				const searchConditions = buildSearchConditions("User", query, searchFields);
 				if (searchConditions.length > 0) {
 					whereClause.OR = searchConditions;
 				}
 			}
 
-			const filterConditions = buildFilterConditions("User", filter);
-			if (filterConditions.length > 0) {
-				whereClause.AND = filterConditions;
+			if (filter) {
+				const filterConditions = buildFilterConditions("User", filter);
+				if (filterConditions.length > 0) {
+					whereClause.AND = filterConditions;
+				}
 			}
 
 			const findManyQuery = buildFindManyQuery(whereClause, skip, limit, order, sort, fields);
@@ -146,8 +146,7 @@ export const controller = (prisma: PrismaClient) => {
 			]);
 
 			// groupBy usage sample (?groupBy=firstName or ?groupBy=contacInfo.email )
-			const processedData =
-				groupBy && document ? groupDataByField(users, groupBy) : users;
+			const processedData = groupBy && document ? groupDataByField(users, groupBy) : users;
 
 			const responseData: Record<string, any> = {
 				...(document && { users: processedData }),
