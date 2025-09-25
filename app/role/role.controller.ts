@@ -126,7 +126,7 @@ export const controller = (prisma: PrismaClient) => {
 			};
 
 			// Add filter conditions using the reusable function
-			const filterConditions = buildFilterConditions(filter);
+			const filterConditions = buildFilterConditions("Role", filter);
 			if (filterConditions.length > 0) {
 				whereClause.AND = filterConditions;
 			}

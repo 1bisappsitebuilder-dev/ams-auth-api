@@ -6,19 +6,16 @@ async function main() {
 	// Prisma Queries
 	console.log("------------------------------------------\n\n\n\n\n");
 
-	const user = await prisma.user.update({
+	const persons = await prisma.person.findMany({
 		where: {
-			id: "68cbaf1ba866e31b2d055be2"
-		},
-		data: {
-			organization: {
-				connect: {
-					id: "68cb84108243224dd8d8b0c8"
+			contactInfo: {
+				is: {
+					email: "john.doe@example.com"
 				}
 			}
 		}
 	});
-	console.log(user);
+	console.log(JSON.stringify(persons, null, 2));
 
 	console.log("\n\n\n\n\n------------------------------------------");
 }

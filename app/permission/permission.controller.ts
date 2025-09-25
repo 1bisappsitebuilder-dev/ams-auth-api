@@ -132,7 +132,7 @@ export const controller = (prisma: PrismaClient) => {
 			};
 
 			// Add filter conditions using the reusable function
-			const filterConditions = buildFilterConditions(filter);
+			const filterConditions = buildFilterConditions("Permission", filter);
 			if (filterConditions.length > 0) {
 				whereClause.AND = filterConditions;
 			}

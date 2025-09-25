@@ -17,7 +17,7 @@ interface ValidationResult {
 		document: boolean;
 		pagination: boolean;
 		count: boolean;
-		filter?: Record<string, any>[]; // Add filter as an array of key-value objects
+		filter?: string; // <-- now a raw filter string (key:value,key:value)
 	};
 }
 
@@ -168,44 +168,19 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 	const queryValue = query !== undefined ? String(query) : "";
 
 	// Validate filter
-	let filterValue: Record<string, any>[] = [];
+	let filterValue: string | undefined;
 	if (filter !== undefined) {
 		if (typeof filter !== "string") {
 			logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_FILTER}: ${filter}`);
 			return {
 				isValid: false,
-				errorResponse: buildErrorResponse("Filter must be a stringified JSON array", 400),
+				errorResponse: buildErrorResponse(
+					"Filter must be a comma-separated string (key:value,key:value)",
+					400,
+				),
 			};
 		}
-		try {
-			const parsedFilter = JSON.parse(filter);
-			if (!Array.isArray(parsedFilter)) {
-				logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_FILTER}: Not an array`);
-				return {
-					isValid: false,
-					errorResponse: buildErrorResponse("Filter must be an array of objects", 400),
-				};
-			}
-			// Ensure each item is an object with key-value pairs
-			if (
-				!parsedFilter.every(
-					(item) => item && typeof item === "object" && !Array.isArray(item),
-				)
-			) {
-				logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_FILTER}: Items must be objects`);
-				return {
-					isValid: false,
-					errorResponse: buildErrorResponse("Filter items must be objects", 400),
-				};
-			}
-			filterValue = parsedFilter;
-		} catch (error) {
-			logger.error(`${config.ERROR.QUERY_PARAMS.INVALID_FILTER}: ${error}`);
-			return {
-				isValid: false,
-				errorResponse: buildErrorResponse("Filter must be valid JSON", 400),
-			};
-		}
+		filterValue = filter;
 	}
 
 	return {
@@ -221,7 +196,7 @@ export const validateQueryParams = (req: Request, logger: Logger): ValidationRes
 			document: documentValue,
 			pagination: paginationValue,
 			count: countValue,
-			filter: filterValue, // Include parsed filter
+			filter: filterValue, // 👈 pass raw string through
 		},
 	};
 };

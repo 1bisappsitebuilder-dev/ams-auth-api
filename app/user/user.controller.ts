@@ -138,7 +138,7 @@ export const controller = (prisma: PrismaClient) => {
 					: {}),
 			};
 
-			const filterConditions = buildFilterConditions(filter);
+			const filterConditions = buildFilterConditions("User", filter);
 			if (filterConditions.length > 0) {
 				whereClause.AND = filterConditions;
 			}

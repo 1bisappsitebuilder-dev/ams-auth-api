@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ResourceEnum = z.enum(["organization", "user", "role", "app", "module"]);
+export const ResourceEnum = z.enum(["organization", "user", "role", "app", "module", "project", "item"]);
 export const ActionEnum = z.enum(["create", "read", "update", "delete"]);
 
 export const RolePermissionSchema = z.object({

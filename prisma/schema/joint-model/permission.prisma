@@ -4,6 +4,8 @@ enum Resource {
     role
     app
     module
+    project
+    item
 }
 
 enum Action {

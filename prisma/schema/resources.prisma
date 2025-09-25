@@ -1,0 +1,5 @@
+model Resources {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  type      RoleType    @default(organization)    
+}

@@ -91,6 +91,7 @@ export const controller = (prisma: PrismaClient) => {
 		const validationResult = validateQueryParams(req, personLogger);
 
 		if (!validationResult.isValid) {
+			console.log("ERROR HERE!!!!!")
 			res.status(400).json(validationResult.errorResponse);
 		}
 
@@ -128,7 +129,7 @@ export const controller = (prisma: PrismaClient) => {
 			};
 
 			// Add filter conditions using the reusable function
-			const filterConditions = buildFilterConditions(filter);
+			const filterConditions = buildFilterConditions("Person", filter);
 			if (filterConditions.length > 0) {
 				whereClause.AND = filterConditions;
 			}
