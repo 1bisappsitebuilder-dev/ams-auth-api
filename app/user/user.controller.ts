@@ -13,6 +13,7 @@ import {
 import {
 	buildFilterConditions,
 	buildFindManyQuery,
+	buildSearchCondition,
 	getNestedFields,
 } from "../../helper/query-builder";
 import { buildPagination, buildSuccessResponse } from "../../helper/success-handler";
@@ -120,23 +121,16 @@ export const controller = (prisma: PrismaClient) => {
 		try {
 			const whereClause: Prisma.UserWhereInput = {
 				isDeleted: false,
-				...(query
-					? {
-							OR: [
-								{
-									person: {
-										OR: [
-											{ firstName: { contains: query } },
-											{ lastName: { contains: query } },
-										],
-									},
-								},
-								{ email: { contains: query } },
-								{ userName: { contains: query } },
-							],
-						}
-					: {}),
 			};
+
+			// Add model fields e.g. "firstName", "lastName", "middleName", "contactInfo.email"
+			const searchFields = [""];
+			if (query) {
+				const searchConditions = buildSearchCondition("User", query, searchFields);
+				if (searchConditions.length > 0) {
+					whereClause.OR = searchConditions;
+				}
+			}
 
 			const filterConditions = buildFilterConditions("User", filter);
 			if (filterConditions.length > 0) {

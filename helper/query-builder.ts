@@ -181,3 +181,117 @@ export function buildFilterConditions(modelName: string, filterParam?: string): 
 
 	return conditions;
 }
+
+/**
+ * Build Prisma search conditions for specified String scalar or enum fields (including nested) in a model
+ * @throws Error if any provided field is invalid
+ */
+export function buildSearchCondition(
+	modelName: string,
+	searchTerm?: string,
+	searchFields?: string[],
+): any[] {
+	if (!searchTerm || !searchFields || searchFields.length === 0) return [];
+
+	const model = dmmf.datamodel.models.find((m) => m.name === modelName);
+	if (!model) {
+		throw new Error(`Model "${modelName}" not found in Prisma schema`);
+	}
+
+	const conditions: any[] = [];
+	const invalidFields: string[] = [];
+
+	for (const field of searchFields) {
+		const path = field.split(".");
+		const isValid = validateFieldPath(modelName, path);
+		if (!isValid) {
+			invalidFields.push(field);
+		} else {
+			const condition = buildConditionForSearch(modelName, path, searchTerm);
+			if (Object.keys(condition).length > 0) {
+				conditions.push(condition);
+			}
+		}
+	}
+
+	if (invalidFields.length > 0) {
+		throw new Error(
+			`Invalid fields found for model "${modelName}": ${invalidFields.join(", ")}. Fields must be scalar String or enum types.`,
+		);
+	}
+
+	if (conditions.length === 0) {
+		throw new Error(
+			`No valid scalar String or enum fields found for model "${modelName}" among provided fields: ${searchFields.join(", ")}`,
+		);
+	}
+
+	return conditions;
+}
+
+/**
+ * Helper to validate a field path
+ */
+function validateFieldPath(modelName: string, path: string[]): boolean {
+	if (path.length === 0) return false;
+
+	const fieldMeta = getFieldMeta(modelName, path[0]);
+	if (!fieldMeta) return false;
+
+	if (path.length === 1) {
+		return (
+			(fieldMeta.kind === "scalar" && fieldMeta.type === "String" && !fieldMeta.isList) ||
+			fieldMeta.kind === "enum"
+		);
+	}
+
+	if (fieldMeta.kind === "object") {
+		const nextModelName = fieldMeta.type;
+		return validateFieldPath(nextModelName, path.slice(1));
+	}
+
+	return false;
+}
+
+/**
+ * Helper to build search condition for a single field path
+ */
+function buildConditionForSearch(modelName: string, path: string[], searchTerm: string): any {
+	if (path.length === 0) return {};
+
+	// Get metadata for the current (first) field
+	const fieldMeta = getFieldMeta(modelName, path[0]);
+	if (!fieldMeta) return {};
+
+	// Terminal field (scalar String or enum)
+	if (path.length === 1) {
+		if (
+			(fieldMeta.kind === "scalar" && fieldMeta.type === "String" && !fieldMeta.isList) ||
+			fieldMeta.kind === "enum"
+		) {
+			return { [path[0]]: { contains: searchTerm, mode: "insensitive" } };
+		}
+		return {}; // Non-scalar String or non-enum fields are not supported
+	}
+
+	// Non-terminal field: recurse
+	const nextModelName = fieldMeta.kind === "object" ? fieldMeta.type : modelName;
+	const nestedCondition = buildConditionForSearch(nextModelName, path.slice(1), searchTerm);
+
+	if (Object.keys(nestedCondition).length === 0) return {};
+
+	if (fieldMeta.kind === "object") {
+		if (fieldMeta.isList) {
+			// For to-many relations or list composites (e.g., contactInfo.phones)
+			return {
+				[path[0]]: {
+					some: fieldMeta.relationName ? nestedCondition : { is: nestedCondition },
+				},
+			};
+		}
+		// For to-one relations or composites (e.g., contactInfo, contactInfo.address)
+		return { [path[0]]: fieldMeta.relationName ? nestedCondition : { is: nestedCondition } };
+	}
+
+	return {};
+}

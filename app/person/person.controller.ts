@@ -13,6 +13,7 @@ import { validateQueryParams } from "../../helper/validation-helper";
 import {
 	buildFilterConditions,
 	buildFindManyQuery,
+	buildSearchCondition,
 	getNestedFields,
 } from "../../helper/query-builder";
 import { ObjectIdSchema } from "../../zod/object-id.zod";
@@ -91,7 +92,6 @@ export const controller = (prisma: PrismaClient) => {
 		const validationResult = validateQueryParams(req, personLogger);
 
 		if (!validationResult.isValid) {
-			console.log("ERROR HERE!!!!!")
 			res.status(400).json(validationResult.errorResponse);
 		}
 
@@ -117,16 +117,16 @@ export const controller = (prisma: PrismaClient) => {
 			// Base where clause
 			const whereClause: Prisma.PersonWhereInput = {
 				isDeleted: false,
-				...(query
-					? {
-							OR: [
-								{ firstName: { contains: String(query) } },
-								{ lastName: { contains: String(query) } },
-								{ middleName: { contains: String(query) } },
-							],
-						}
-					: {}),
 			};
+
+			// Add model fields e.g. "firstName", "lastName", "middleName", "contactInfo.email"
+			const searchFields = [""];
+			if (query) {
+				const searchConditions = buildSearchCondition("Person", query, searchFields);
+				if (searchConditions.length > 0) {
+					whereClause.OR = searchConditions;
+				}
+			}
 
 			// Add filter conditions using the reusable function
 			const filterConditions = buildFilterConditions("Person", filter);
@@ -157,10 +157,9 @@ export const controller = (prisma: PrismaClient) => {
 				personLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${errorMsg}`);
 				res.status(400).json(buildErrorResponse(errorMsg, 400));
 			} else {
+				console.log(JSON.stringify(error, null, 2));
 				personLogger.error(`${config.ERROR.USER.ERROR_GETTING_USER}: ${error}`);
-				res.status(500).json(
-					buildErrorResponse(config.ERROR.USER.INTERNAL_SERVER_ERROR, 500),
-				);
+				res.status(500).json(buildErrorResponse(error.message, 500));
 			}
 		}
 	};
